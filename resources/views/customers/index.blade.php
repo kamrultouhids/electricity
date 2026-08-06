@@ -3,7 +3,10 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0">Customers</h4>
+        <h4 class="mb-0">
+            Customers
+            <span class="badge bg-primary px-2 py-1 small">{{ $customers->total() }}</span>
+        </h4>
         <a href="{{ route('customers.create') }}" class="btn btn-primary text-white">+ Add Customer</a>
     </div>
 
