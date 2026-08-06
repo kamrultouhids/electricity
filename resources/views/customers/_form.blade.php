@@ -127,7 +127,7 @@
     </div>
 </div>
 
-<div class="mt-4">
+<div class="mt-4 text-end">
     <button type="submit" class="btn btn-primary text-white">{{ $customer ? 'Update' : 'Save' }}</button>
     <a href="{{ route('customers.index') }}" class="btn btn-outline-secondary">Cancel</a>
 </div>

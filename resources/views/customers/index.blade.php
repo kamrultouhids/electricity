@@ -90,8 +90,8 @@
                                 <div class="btn-group btn-group-sm">
                                     <a href="{{ route('customers.show', $customer) }}" class="btn btn-outline-info">View</a>
                                     <a href="{{ route('customers.edit', $customer) }}" class="btn btn-outline-primary">Edit</a>
-                                    <a href="{{ route('customers.delete', $customer) }}" class="btn btn-outline-danger"
-                                       onclick="return confirm('Delete this customer?');">Delete</a>
+                                    <!-- <a href="{{ route('customers.delete', $customer) }}" class="btn btn-outline-danger"
+                                       onclick="return confirm('Delete this customer?');">Delete</a> -->
                                 </div>
                             </td>
                         </tr>
@@ -105,7 +105,7 @@
         </div>
     </div>
 
-    <div class="mt-3">
+    <div class="mt-3 d-flex justify-content-center">
         {{ $customers->links() }}
     </div>
 </div>

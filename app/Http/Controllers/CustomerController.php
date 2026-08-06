@@ -154,7 +154,7 @@ class CustomerController extends Controller
             'guardian_name'             => 'nullable|string',
             'guardian_relationship'     => 'nullable|string',
             'guardian_address'          => 'nullable|string',
-            'meter_number'              => 'required|string|max:255|unique:customers,meter_number,' . $customerId,
+            'meter_number'              => 'required|string',
             'connection_type'           => 'nullable|in:' . implode(',', Customer::CONNECTION_TYPES),
             'status'                    => 'required|in:0,1',
         ]);
