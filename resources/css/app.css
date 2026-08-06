@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100;300;400;500;700;900&display=swap');
+
+@import "tailwindcss";
+
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+  --font-roboto: "Roboto", sans-serif;
+  --font-roboto-slab: "Roboto Slab", serif;
+
+
+  @keyframes bounce {
+    0%,
+    100% {
+      transform: translateY(-25%);
+      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+      transform: none;
+      animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+  }
+
+  @keyframes bounceTwo {
+    0%,
+    100% {
+      transform: translateX(-10%);
+      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+      transform: none;
+      animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+  }
+}
+
+:root {
+  --bounce-duration: 3s;
+  --bounceTwo-duration: 3s;
+}
+
+.animate-bounce {
+  animation: bounce var(--bounce-duration) cubic-bezier(0.8, 0, 1, 1) infinite;
+}
+
+.animate-bounceTwo {
+  animation: bounceTwo var(--bounceTwo-duration) cubic-bezier(0.8, 0, 1, 1)
+    infinite;
+}
+
+body {
+  @apply font-roboto antialiased;
+}
+
+button {
+  @apply cursor-pointer;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-roboto-slab);
+}
