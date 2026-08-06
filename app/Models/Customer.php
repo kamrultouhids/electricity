@@ -48,7 +48,7 @@ class Customer extends Model
     /**
      * Connection type options.
      */
-    public const CONNECTION_TYPES = ['residential', 'commercial', 'irrigation', 'others'];
+    public const CONNECTION_TYPES = ['residential', 'commercial', 'religious', 'others'];
 
     /**
      * Status constants.

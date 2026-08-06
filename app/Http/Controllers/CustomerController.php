@@ -170,7 +170,7 @@ class CustomerController extends Controller
             'guardian_relationship'     => 'nullable|string',
             'guardian_address'          => 'nullable|string',
             'meter_number'              => 'required|string',
-            'connection_type'           => 'nullable|in:' . implode(',', Customer::CONNECTION_TYPES),
+            'connection_type'           => 'required|in:' . implode(',', Customer::CONNECTION_TYPES),
             'status'                    => 'required|in:0,1',
         ]);
     }

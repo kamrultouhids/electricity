@@ -120,8 +120,8 @@
                value="{{ old('meter_number', $customer->meter_number ?? '') }}">
     </div>
     <div class="col-md-4">
-        <label class="form-label">Connection Type</label>
-        <select name="connection_type" class="form-select">
+        <label class="form-label">Connection Type <span class="text-danger">*</span></label>
+        <select name="connection_type" class="form-select" required>
             <option value="">Select</option>
             @foreach ($connectionTypes as $type)
                 <option value="{{ $type }}" @selected(old('connection_type', $customer->connection_type ?? '') === $type)>

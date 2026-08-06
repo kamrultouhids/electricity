@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\TariffController;
 use App\Http\Controllers\UserController;
 
 Route::get('/register', function () {
@@ -30,6 +31,10 @@ Route::middleware(['auth'])->group(function () {
     // User Management
     Route::get('/users/{user}/delete', [UserController::class, 'destroy'])->name('users.delete');
     Route::resource('users', UserController::class);
+
+    // Tariff / Per Unit Rate Settings
+    Route::get('/tariffs', [TariffController::class, 'index'])->name('tariffs.index');
+    Route::put('/tariffs', [TariffController::class, 'update'])->name('tariffs.update');
 });
 
 Route::get('/phpinfo', function () {
