@@ -1,112 +1,43 @@
 @extends('layouts.app')
 
+@php
+    $customer = $bill->customer;
+    $billMonth = $bill->billing_month;
+    $prepDate = $bill->created_at;
+    $lastDate = $bill->created_at->copy()->day(20);
+    $mr = $bill->meterReading;
+@endphp
+
 @section('content')
 <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-3 no-print">
         <h4 class="mb-0">Bill Details</h4>
-        <a href="{{ route('bills.index') }}" class="btn btn-outline-secondary">Back to Bills</a>
-    </div>
-
-    <div class="row g-3">
-        {{-- Customer / meta --}}
-        <div class="col-md-5">
-            <div class="card h-100">
-                <div class="card-header bg-white"><h6 class="mb-0">Customer</h6></div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <div class="text-muted small">Name</div>
-                            <div>{{ $bill->customer->name ?? '—' }}</div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-muted small">Sheet</div>
-                            <div>{{ $bill->customer->sheet->name ?? '—' }}</div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-muted small">Serial No</div>
-                            <div>{{ $bill->customer->serial_no ?? '—' }}</div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-muted small">Meter No</div>
-                            <div>{{ $bill->customer->meter_number ?? '—' }}</div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-muted small">Mobile</div>
-                            <div>{{ $bill->customer->mobile_number ?? '—' }}</div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-muted small">Billing Month</div>
-                            <div>{{ $bill->billing_month->format('M Y') }}</div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-muted small">Status</div>
-                            <div>
-                                @if ($bill->isPaid())
-                                    <span class="badge bg-success">Paid</span>
-                                @elseif ($bill->isPartial())
-                                    <span class="badge bg-info text-dark">Partial</span>
-                                @else
-                                    <span class="badge bg-warning text-dark">Unpaid</span>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- Charge breakdown --}}
-        <div class="col-md-7">
-            <div class="card h-100">
-                <div class="card-header bg-white"><h6 class="mb-0">Charge Breakdown</h6></div>
-                <div class="card-body">
-                    <table class="table table-sm mb-0">
-                        <tbody>
-                            <tr>
-                                <td>Units Consumed</td>
-                                <td class="text-end">{{ number_format($bill->units, 2) }}</td>
-                            </tr>
-                            <tr>
-                                <td>Per Unit Rate</td>
-                                <td class="text-end">{{ number_format($bill->per_unit_rate, 2) }}</td>
-                            </tr>
-                            <tr>
-                                <td>Energy Charge</td>
-                                <td class="text-end">{{ number_format($bill->energy_charge, 2) }}</td>
-                            </tr>
-                            <tr>
-                                <td>Fixed Charge</td>
-                                <td class="text-end">{{ number_format($bill->fixed_charge, 2) }}</td>
-                            </tr>
-                            <tr>
-                                <td>Meter Rent</td>
-                                <td class="text-end">{{ number_format($bill->meter_rent, 2) }}</td>
-                            </tr>
-                            <tr>
-                                <td>Previous Outstanding</td>
-                                <td class="text-end">{{ number_format($bill->previous_outstanding, 2) }}</td>
-                            </tr>
-                            <tr>
-                                <td>Late Fee</td>
-                                <td class="text-end">{{ number_format($bill->late_fee, 2) }}</td>
-                            </tr>
-                            <tr class="table-light fw-bold">
-                                <td>Total Amount</td>
-                                <td class="text-end">{{ number_format($bill->total_amount, 2) }}</td>
-                            </tr>
-                            <tr>
-                                <td>Paid Amount</td>
-                                <td class="text-end">{{ number_format($bill->paid_amount, 2) }}</td>
-                            </tr>
-                            <tr class="fw-bold">
-                                <td>Due Amount</td>
-                                <td class="text-end">{{ number_format($bill->due_amount, 2) }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="d-flex gap-2">
+            <button type="button" onclick="window.print()" class="btn btn-outline-secondary">Print</button>
+            <a href="{{ route('bills.index') }}" class="btn btn-outline-secondary">Back to Bills</a>
         </div>
     </div>
+
+    @include('bills._document', [
+        'customer'            => $customer,
+        'billMonth'          => $billMonth,
+        'prepDate'           => $prepDate,
+        'lastDate'           => $lastDate,
+        'serialNo'           => $mr->id ?? $bill->id,
+        'accountNo'          => $customer->id,
+        'preparerName'       => $bill->createdBy->name ?? '',
+        'currentReading'     => $mr->current_reading ?? 0,
+        'previousReading'    => $mr->previous_reading ?? 0,
+        'currentReadingDate' => $mr->reading_date ?? $billMonth,
+        'previousReadingDate' => $previousReading?->reading_date,
+        'units'              => $bill->units,
+        'energyCharge'       => $bill->energy_charge,
+        'meterRent'          => $bill->meter_rent,
+        'previousOutstanding' => $bill->previous_outstanding,
+        'lateFee'            => $bill->late_fee,
+        'fixedCharge'        => $bill->fixed_charge,
+        'totalAmount'        => $bill->total_amount,
+        'previousBills'      => $previousBills,
+    ])
 </div>
 @endsection

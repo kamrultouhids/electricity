@@ -118,7 +118,7 @@ class BillController extends Controller
         $previousBills = Bill::query()
             ->where('customer_id', $customer->id)
             ->orderByDesc('billing_month')
-            ->limit(6)
+            ->limit(3)
             ->get();
 
         $previousReading = MeterReading::query()
@@ -158,6 +158,21 @@ class BillController extends Controller
     {
         $bill->load(['customer.sheet', 'meterReading', 'createdBy', 'updatedBy']);
 
-        return view('bills.show', compact('bill'));
+        $previousBills = Bill::query()
+            ->where('customer_id', $bill->customer_id)
+            ->whereDate('billing_month', '<', $bill->billing_month)
+            ->orderByDesc('billing_month')
+            ->limit(3)
+            ->get();
+
+        $previousReading = $bill->meterReading
+            ? MeterReading::query()
+                ->where('customer_id', $bill->customer_id)
+                ->whereDate('reading_date', '<', $bill->meterReading->reading_date)
+                ->latest('reading_date')
+                ->first()
+            : null;
+
+        return view('bills.show', compact('bill', 'previousBills', 'previousReading'));
     }
 }
