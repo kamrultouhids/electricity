@@ -34,6 +34,11 @@ class MeterReadingController extends Controller
             });
         }
 
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', (int) $request->input('status'));
+        }
+
         // Filter by month (YYYY-MM)
         if ($request->filled('month')) {
             [$year, $month] = array_pad(explode('-', $request->input('month')), 2, null);
@@ -47,8 +52,9 @@ class MeterReadingController extends Controller
             ->paginate(15)->withQueryString();
 
         return view('meter_readings.index', [
-            'readings' => $readings,
-            'sheets'   => Sheet::orderBy('name')->get(),
+            'readings'      => $readings,
+            'sheets'        => Sheet::orderBy('name')->get(),
+            'statusOptions' => MeterReading::STATUS_LABELS,
         ]);
     }
 
@@ -82,7 +88,7 @@ class MeterReadingController extends Controller
         }
 
         $data['consumed_units'] = (float) $data['current_reading'] - $previous;
-        $data['status'] = MeterReading::STATUS_ACTIVE;
+        $data['status'] = MeterReading::STATUS_PENDING;
 
         if ($request->hasFile('photo')) {
             $data['photo'] = $request->file('photo')->store('meter_readings', 'public');

@@ -60,10 +60,10 @@
                 <div class="col-md-4">
                     <div class="text-muted small">Status</div>
                     <div>
-                        @if ($meterReading->isActive())
-                            <span class="badge bg-success">Active</span>
+                        @if ($meterReading->isCompleted())
+                            <span class="badge bg-success">Completed</span>
                         @else
-                            <span class="badge bg-secondary">Inactive</span>
+                            <span class="badge bg-warning text-dark">Pending</span>
                         @endif
                     </div>
                 </div>

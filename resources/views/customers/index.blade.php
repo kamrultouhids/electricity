@@ -18,7 +18,7 @@
     <div class="card mb-3">
         <div class="card-body">
             <form method="GET" action="{{ route('customers.index') }}" class="row g-2 align-items-end">
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <label class="form-label mb-1">Search</label>
                     <input type="text" name="search" value="{{ request('search') }}" class="form-control"
                            placeholder="Serial No, Name, Mobile or Meter Number">
@@ -34,7 +34,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label mb-1">Connection Type</label>
                     <select name="connection_type" class="form-select">
                         <option value="">All</option>

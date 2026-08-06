@@ -33,12 +33,27 @@ class MeterReading extends Model
     /**
      * Status constants.
      */
-    public const STATUS_ACTIVE = 1;
-    public const STATUS_INACTIVE = 0;
+    public const STATUS_PENDING = 1;
+    public const STATUS_COMPLETED = 2;
 
-    public function isActive(): bool
+    public const STATUS_LABELS = [
+        self::STATUS_PENDING => 'Pending',
+        self::STATUS_COMPLETED => 'Completed',
+    ];
+
+    public function isPending(): bool
     {
-        return $this->status === self::STATUS_ACTIVE;
+        return $this->status === self::STATUS_PENDING;
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this->status === self::STATUS_COMPLETED;
+    }
+
+    public function statusLabel(): string
+    {
+        return self::STATUS_LABELS[$this->status] ?? 'Unknown';
     }
 
     public function customer(): BelongsTo

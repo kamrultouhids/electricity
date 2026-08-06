@@ -18,12 +18,12 @@
     <div class="card mb-3">
         <div class="card-body">
             <form method="GET" action="{{ route('meter-readings.index') }}" class="row g-2 align-items-end">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label mb-1">Search</label>
                     <input type="text" name="search" value="{{ request('search') }}" class="form-control"
                            placeholder="Serial No, Name, Mobile or Meter No">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label mb-1">Sheet</label>
                     <select name="sheet_id" class="form-select">
                         <option value="">All</option>
@@ -34,11 +34,22 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
+                    <label class="form-label mb-1">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">All</option>
+                        @foreach ($statusOptions as $value => $label)
+                            <option value="{{ $value }}" @selected(request('status') !== null && request('status') !== '' && (int) request('status') === $value)>
+                                {{ $label }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
                     <label class="form-label mb-1">Month</label>
                     <input type="month" name="month" value="{{ request('month') }}" class="form-control">
                 </div>
-                <div class="col-md-2 d-flex gap-2">
+                <div class="col-md-3 d-flex gap-2">
                     <button type="submit" class="btn btn-primary text-white w-100">Filter</button>
                     <a href="{{ route('meter-readings.index') }}" class="btn btn-outline-secondary">Reset</a>
                 </div>
@@ -56,9 +67,9 @@
                         <th>Meter Photo</th>
                         <th>Customer</th>
                         <th>Sheet</th>
-                        <th>Previous</th>
-                        <th>Current</th>
-                        <th>Consumed</th>
+                        <th>Previous Unit</th>
+                        <th>Current Unit</th>
+                        <th>Consumed Unit</th>
                         <th>Reading Date</th>
                         <th>Reader Name</th>
                         <th>Status</th>
@@ -90,10 +101,10 @@
                             <td>{{ $reading->reading_date->format('d M Y') }}</td>
                             <td>{{ $reading->createdBy->name ?? '—' }}</td>
                             <td>
-                                @if ($reading->isActive())
-                                    <span class="badge bg-success">Active</span>
+                                @if ($reading->isCompleted())
+                                    <span class="badge bg-success">Completed</span>
                                 @else
-                                    <span class="badge bg-secondary">Inactive</span>
+                                    <span class="badge bg-warning text-dark">Pending</span>
                                 @endif
                             </td>
                             <td class="text-end">
