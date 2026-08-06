@@ -10,7 +10,7 @@ This is a Laravel-based web application built with modern tools and best practic
 - **PHP Version:** 8.2  
 - **Database:** MySQL 9  
 - **Frontend Build Tool:** Node.js 22  
-- **CSS Framework:** Tailwind CSS  
+- **CSS Framework:** bootstrap 5  
 
 ---
 

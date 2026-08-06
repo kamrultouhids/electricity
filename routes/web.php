@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\CustomerController;
 
 Route::get('/register', function () {
    abort(404);
@@ -20,6 +21,10 @@ Route::middleware(['auth'])->group(function () {
     // Change Password
     Route::get('/change-password', [App\Http\Controllers\ProfileController::class, 'changePassword'])->name('password.change');
     Route::post('/change-password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('update.password');
+
+    // Customer Management
+    Route::get('/customers/{customer}/delete', [CustomerController::class, 'destroy'])->name('customers.delete');
+    Route::resource('customers', CustomerController::class);
 });
 
 Route::get('/phpinfo', function () {
