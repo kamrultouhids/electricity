@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\BillController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\MeterReadingController;
 use App\Http\Controllers\TariffController;
@@ -43,6 +44,13 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('meter-readings', MeterReadingController::class)->parameters([
         'meter-readings' => 'meterReading',
     ]);
+
+    // Billing
+    Route::get('/bills/pending', [BillController::class, 'pending'])->name('bills.pending');
+    Route::get('/bills/generate/{meterReading}', [BillController::class, 'preview'])->name('bills.preview');
+    Route::post('/bills/generate/{meterReading}', [BillController::class, 'store'])->name('bills.store');
+    Route::get('/bills', [BillController::class, 'index'])->name('bills.index');
+    Route::get('/bills/{bill}', [BillController::class, 'show'])->name('bills.show');
 });
 
 Route::get('/phpinfo', function () {

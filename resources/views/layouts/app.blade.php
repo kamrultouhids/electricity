@@ -57,6 +57,9 @@
                                 <a class="nav-link  {{ Route::is('meter-readings.index') ? 'active' : '' }}" href="{{ route('meter-readings.index') }}">Meter Readings</a>
                             </li>
                              <li class="nav-item">
+                                <a class="nav-link  {{ Route::is('bills.*') ? 'active' : '' }}" href="{{ route('bills.index') }}">Bills</a>
+                            </li>
+                             <li class="nav-item">
                                 <a class="nav-link  {{ Route::is('users.index') ? 'active' : '' }}" href="{{ route('users.index') }}">User List</a>
                             </li>
                              <li class="nav-item">
