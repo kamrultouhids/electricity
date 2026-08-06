@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Customer extends Model
@@ -10,6 +11,7 @@ class Customer extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'sheet_id',
         'serial_no',
         'photo',
         'name',
@@ -28,12 +30,20 @@ class Customer extends Model
         'meter_number',
         'connection_type',
         'status',
+        'created_by',
+        'updated_by',
     ];
 
     protected $casts = [
+        'sheet_id' => 'integer',
         'age' => 'integer',
         'status' => 'integer',
     ];
+
+    public function sheet(): BelongsTo
+    {
+        return $this->belongsTo(Sheet::class);
+    }
 
     /**
      * Connection type options.

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Sheet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -13,7 +14,7 @@ class CustomerController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Customer::query();
+        $query = Customer::query()->with('sheet');
 
         // Search by serial_no, name, or meter_number
         if ($search = $request->input('search')) {
@@ -34,11 +35,17 @@ class CustomerController extends Controller
             $query->where('status', (int) $request->input('status'));
         }
 
+        // Filter by sheet
+        if ($request->filled('sheet_id')) {
+            $query->where('sheet_id', (int) $request->input('sheet_id'));
+        }
+
         $customers = $query->latest()->paginate(15)->withQueryString();
 
         return view('customers.index', [
             'customers'      => $customers,
             'connectionTypes' => Customer::CONNECTION_TYPES,
+            'sheets'         => Sheet::orderBy('name')->get(),
         ]);
     }
 
@@ -49,6 +56,7 @@ class CustomerController extends Controller
     {
         return view('customers.create', [
             'connectionTypes' => Customer::CONNECTION_TYPES,
+            'sheets'          => Sheet::orderBy('name')->get(),
         ]);
     }
 
@@ -62,6 +70,9 @@ class CustomerController extends Controller
         if ($request->hasFile('photo')) {
             $data['photo'] = $request->file('photo')->store('customers', 'public');
         }
+
+        $data['created_by'] = auth()->id();
+        $data['updated_by'] = auth()->id();
 
         Customer::create($data);
 
@@ -85,6 +96,7 @@ class CustomerController extends Controller
         return view('customers.edit', [
             'customer'        => $customer,
             'connectionTypes' => Customer::CONNECTION_TYPES,
+            'sheets'          => Sheet::orderBy('name')->get(),
         ]);
     }
 
@@ -101,6 +113,8 @@ class CustomerController extends Controller
             }
             $data['photo'] = $request->file('photo')->store('customers', 'public');
         }
+
+        $data['updated_by'] = auth()->id();
 
         $customer->update($data);
 
@@ -139,6 +153,7 @@ class CustomerController extends Controller
     protected function validateCustomer(Request $request, ?int $customerId = null): array
     {
         return $request->validate([
+            'sheet_id'                  => 'required|exists:sheets,id',
             'serial_no'                 => 'required|string',
             'photo'                     => 'nullable|image',
             'name'                      => 'required|string',

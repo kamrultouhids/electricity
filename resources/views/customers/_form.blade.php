@@ -26,6 +26,18 @@
     </div>
 
     <div class="col-md-4">
+        <label class="form-label">Sheet <span class="text-danger">*</span></label>
+        <select name="sheet_id" class="form-select" required>
+            <option value="">Select Sheet</option>
+            @foreach ($sheets as $sheet)
+                <option value="{{ $sheet->id }}" @selected(old('sheet_id', $customer->sheet_id ?? '') == $sheet->id)>
+                    {{ $sheet->name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+
+    <div class="col-md-4">
         <label class="form-label">Serial No <span class="text-danger">*</span></label>
         <input type="text" name="serial_no" class="form-control" required placeholder="Enter Serial No"
                value="{{ old('serial_no', $customer->serial_no ?? '') }}">

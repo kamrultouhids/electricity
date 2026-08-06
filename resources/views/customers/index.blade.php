@@ -3,10 +3,10 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0">
-            Customers
-            <span class="badge bg-primary px-2 py-1 small">{{ $customers->total() }}</span>
-        </h4>
+        <h5 class="mb-0">
+            Customer Management
+            <span class="badge bg-primary px-1 py-0 small">{{ $customers->total() }}</span>
+        </h5>
         <a href="{{ route('customers.create') }}" class="btn btn-primary text-white">+ Add Customer</a>
     </div>
 
@@ -18,10 +18,21 @@
     <div class="card mb-3">
         <div class="card-body">
             <form method="GET" action="{{ route('customers.index') }}" class="row g-2 align-items-end">
-                <div class="col-md-5">
+                <div class="col-md-3">
                     <label class="form-label mb-1">Search</label>
                     <input type="text" name="search" value="{{ request('search') }}" class="form-control"
                            placeholder="Serial No, Name or Meter Number">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label mb-1">Sheet</label>
+                    <select name="sheet_id" class="form-select">
+                        <option value="">All</option>
+                        @foreach ($sheets as $sheet)
+                            <option value="{{ $sheet->id }}" @selected(request('sheet_id') == $sheet->id)>
+                                {{ $sheet->name }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label mb-1">Connection Type</label>
@@ -56,7 +67,9 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
+                        <th>#</th>
                         <th>Photo</th>
+                        <th>Sheet</th>
                         <th>Serial No</th>
                         <th>Name</th>
                         <th>Mobile</th>
@@ -69,6 +82,7 @@
                 <tbody>
                     @forelse ($customers as $customer)
                         <tr>
+                             <td>{{ $loop->iteration }}</td>
                             <td>
                                 @if ($customer->photo)
                                     <img src="{{ asset('storage/' . $customer->photo) }}" alt="photo"
@@ -77,6 +91,7 @@
                                     <span class="text-muted">—</span>
                                 @endif
                             </td>
+                            <td>{{ $customer->sheet->name ?? '—' }}</td>
                             <td>{{ $customer->serial_no ?? '—' }}</td>
                             <td>{{ $customer->name }}</td>
                             <td>{{ $customer->mobile_number }}</td>
@@ -100,7 +115,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center text-muted py-4">No customers found.</td>
+                            <td colspan="9" class="text-center text-muted py-4">No customers found.</td>
                         </tr>
                     @endforelse
                 </tbody>

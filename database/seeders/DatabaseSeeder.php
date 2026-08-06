@@ -19,14 +19,18 @@ class DatabaseSeeder extends Seeder
     {
         User::insert([
             [
-                'name' => 'Admin',
+                'name' => 'Super Admin',
                 'user_type' => UserTypeEnum::Admin->value,
-                'email' => 'admin@gmail.com',
-                'password' => Hash::make('12345678'),
+                'email' => 'superadmin@gmail.com',
+                'password' => Hash::make('Secret@123'),
                 'created_at' => now(),
                 'updated_at' => now(),
                 'email_verified_at' => now()
             ]
+        ]);
+
+        $this->call([
+            SheetSeeder::class,
         ]);
     }
 }

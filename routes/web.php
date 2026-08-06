@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\UserController;
 
 Route::get('/register', function () {
    abort(404);
@@ -25,6 +26,10 @@ Route::middleware(['auth'])->group(function () {
     // Customer Management
     Route::get('/customers/{customer}/delete', [CustomerController::class, 'destroy'])->name('customers.delete');
     Route::resource('customers', CustomerController::class);
+
+    // User Management
+    Route::get('/users/{user}/delete', [UserController::class, 'destroy'])->name('users.delete');
+    Route::resource('users', UserController::class);
 });
 
 Route::get('/phpinfo', function () {
