@@ -21,6 +21,7 @@
             background-color:  #3585BC !important;
         }
     </style>
+    @stack('styles')
 </head>
 <body>
     <div id="app">
@@ -51,6 +52,9 @@
                         @else
                             <li class="nav-item">
                                 <a class="nav-link  {{ Route::is('customers.index') ? 'active' : '' }}" href="{{ route('customers.index') }}">Customer List</a>
+                            </li>
+                             <li class="nav-item">
+                                <a class="nav-link  {{ Route::is('meter-readings.index') ? 'active' : '' }}" href="{{ route('meter-readings.index') }}">Meter Readings</a>
                             </li>
                              <li class="nav-item">
                                 <a class="nav-link  {{ Route::is('users.index') ? 'active' : '' }}" href="{{ route('users.index') }}">User List</a>
@@ -88,5 +92,6 @@
         </main>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    @stack('scripts')
 </body>
 </html>

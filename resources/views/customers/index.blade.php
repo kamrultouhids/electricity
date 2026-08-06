@@ -21,7 +21,7 @@
                 <div class="col-md-3">
                     <label class="form-label mb-1">Search</label>
                     <input type="text" name="search" value="{{ request('search') }}" class="form-control"
-                           placeholder="Serial No, Name or Meter Number">
+                           placeholder="Serial No, Name, Mobile or Meter Number">
                 </div>
                 <div class="col-md-2">
                     <label class="form-label mb-1">Sheet</label>

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\MeterReadingController;
 use App\Http\Controllers\TariffController;
 use App\Http\Controllers\UserController;
 
@@ -25,6 +26,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/change-password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('update.password');
 
     // Customer Management
+    Route::get('/customers-search', [CustomerController::class, 'search'])->name('customers.search');
     Route::get('/customers/{customer}/delete', [CustomerController::class, 'destroy'])->name('customers.delete');
     Route::resource('customers', CustomerController::class);
 
@@ -35,6 +37,12 @@ Route::middleware(['auth'])->group(function () {
     // Tariff / Per Unit Rate Settings
     Route::get('/tariffs', [TariffController::class, 'index'])->name('tariffs.index');
     Route::put('/tariffs', [TariffController::class, 'update'])->name('tariffs.update');
+
+    // Meter Reading
+    Route::get('/meter-readings/{meterReading}/delete', [MeterReadingController::class, 'destroy'])->name('meter-readings.delete');
+    Route::resource('meter-readings', MeterReadingController::class)->parameters([
+        'meter-readings' => 'meterReading',
+    ]);
 });
 
 Route::get('/phpinfo', function () {

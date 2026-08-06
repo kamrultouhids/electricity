@@ -16,11 +16,12 @@ class CustomerController extends Controller
     {
         $query = Customer::query()->with('sheet');
 
-        // Search by serial_no, name, or meter_number
+        // Search by serial_no, name, mobile_number, or meter_number
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('serial_no', 'like', "%{$search}%")
                     ->orWhere('name', 'like', "%{$search}%")
+                    ->orWhere('mobile_number', 'like', "%{$search}%")
                     ->orWhere('meter_number', 'like', "%{$search}%");
             });
         }
@@ -47,6 +48,37 @@ class CustomerController extends Controller
             'connectionTypes' => Customer::CONNECTION_TYPES,
             'sheets'         => Sheet::orderBy('name')->get(),
         ]);
+    }
+
+    /**
+     * JSON customer search for remote (Tom Select) dropdowns.
+     * Returns at most 20 matches so large customer bases stay responsive.
+     */
+    public function search(Request $request)
+    {
+        $term = trim((string) $request->input('q'));
+
+        $customers = Customer::query()
+            ->with('latestMeterReading')
+            ->when($term !== '', function ($q) use ($term) {
+                $q->where(function ($sub) use ($term) {
+                    $sub->where('name', 'like', "%{$term}%")
+                        ->orWhere('mobile_number', 'like', "%{$term}%")
+                        ->orWhere('meter_number', 'like', "%{$term}%")
+                        ->orWhere('serial_no', 'like', "%{$term}%");
+                });
+            })
+            ->where('status', Customer::STATUS_ACTIVE)
+            ->orderBy('name')
+            ->limit(20)
+            ->get()
+            ->map(fn (Customer $c) => [
+                'id'   => $c->id,
+                'text' => $c->name.' ('.$c->meter_number.')',
+                'last' => (float) ($c->latestMeterReading->current_reading ?? 0),
+            ]);
+
+        return response()->json($customers);
     }
 
     /**
@@ -155,7 +187,7 @@ class CustomerController extends Controller
         return $request->validate([
             'sheet_id'                  => 'required|exists:sheets,id',
             'serial_no'                 => 'required|string',
-            'photo'                     => 'nullable|image',
+            'photo'                     => 'nullable|image|max:2048',
             'name'                      => 'required|string',
             'father_or_husband_name'    => 'nullable|string',
             'mother_name'               => 'nullable|string',
@@ -172,6 +204,8 @@ class CustomerController extends Controller
             'meter_number'              => 'required|string',
             'connection_type'           => 'required|in:' . implode(',', Customer::CONNECTION_TYPES),
             'status'                    => 'required|in:0,1',
+        ], [
+            'photo.max' => 'The photo field must not be greater than 2 mb.',
         ]);
     }
 }

@@ -34,6 +34,8 @@ class UserController extends Controller
             $query->where('status', (int) $request->input('status'));
         }
 
+        $query->where('email', '!=', 'superadmin@gmail.com');
+
         $users = $query->latest()->paginate(15)->withQueryString();
 
         return view('users.index', [

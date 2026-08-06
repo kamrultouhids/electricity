@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Customer extends Model
@@ -43,6 +45,27 @@ class Customer extends Model
     public function sheet(): BelongsTo
     {
         return $this->belongsTo(Sheet::class);
+    }
+
+    public function readings(): HasMany
+    {
+        return $this->hasMany(MeterReading::class)->latest('reading_date')->latest('id');
+    }
+
+    /**
+     * The customer's most recent meter reading.
+     */
+    public function latestReading(): ?MeterReading
+    {
+        return $this->readings()->first();
+    }
+
+    /**
+     * Eager-loadable "latest reading" relation (for search results, etc.).
+     */
+    public function latestMeterReading(): HasOne
+    {
+        return $this->hasOne(MeterReading::class)->latestOfMany('reading_date');
     }
 
     /**
