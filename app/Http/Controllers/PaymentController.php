@@ -7,28 +7,33 @@ use App\Models\Customer;
 use App\Models\Payment;
 use App\Models\PaymentAllocation;
 use App\Models\Sheet;
-use App\Services\BillCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
     /**
-     * List customers who have outstanding (unpaid/partial) bills, so a
-     * collector can pay against them.
+     * Customers with outstanding due (based on their latest bill, which already
+     * carries forward all previous months' due).
      */
     public function dueList(Request $request)
     {
-        $dueScope = fn ($q) => $q->where('status', '!=', Bill::STATUS_PAID)->where('due_amount', '>', 0);
+        // Latest billing month per customer.
+        $latestPerCustomer = Bill::query()
+            ->selectRaw('customer_id, MAX(billing_month) as max_month')
+            ->groupBy('customer_id');
 
-        $query = Customer::query()
-            ->with('sheet')
-            ->whereHas('bills', $dueScope)
-            ->withCount(['bills as due_bills_count' => $dueScope])
-            ->withSum(['bills as total_due' => $dueScope], 'due_amount');
+        $query = Bill::query()
+            ->select('bills.*')
+            ->joinSub($latestPerCustomer, 'lb', function ($join) {
+                $join->on('bills.customer_id', '=', 'lb.customer_id')
+                    ->on('bills.billing_month', '=', 'lb.max_month');
+            })
+            ->where('bills.due_amount', '>', 0)
+            ->with('customer.sheet');
 
         if ($search = $request->input('search')) {
-            $query->where(function ($q) use ($search) {
+            $query->whereHas('customer', function ($q) use ($search) {
                 $q->where('serial_no', 'like', "%{$search}%")
                     ->orWhere('name', 'like', "%{$search}%")
                     ->orWhere('mobile_number', 'like', "%{$search}%")
@@ -37,20 +42,20 @@ class PaymentController extends Controller
         }
 
         if ($request->filled('sheet_id')) {
-            $query->where('sheet_id', (int) $request->input('sheet_id'));
+            $query->whereHas('customer', fn ($q) => $q->where('sheet_id', (int) $request->input('sheet_id')));
         }
 
-        $customers = $query->orderByDesc('total_due')
+        $bills = $query->orderByDesc('bills.due_amount')
             ->paginate(15)->withQueryString();
 
         return view('payments.due', [
-            'customers' => $customers,
-            'sheets'    => Sheet::orderBy('name')->get(),
+            'bills'  => $bills,
+            'sheets' => Sheet::orderBy('name')->get(),
         ]);
     }
 
     /**
-     * List payments with filters (search, method, date range).
+     * List recorded payments with filters (search, method, date range).
      */
     public function index(Request $request)
     {
@@ -87,51 +92,67 @@ class PaymentController extends Controller
     }
 
     /**
-     * Show the collect-payment form for a customer (all their unpaid bills).
+     * Show the collect-payment form (against the customer's latest due bill).
      */
     public function create(Customer $customer)
     {
-        $unpaidBills = $this->unpaidBills($customer);
+        $bill = $this->latestDueBill($customer);
 
-        if ($unpaidBills->isEmpty()) {
+        if (! $bill) {
             return redirect()->route('customers.show', $customer)
-                ->with('error', 'This customer has no unpaid bills.');
+                ->with('error', 'This customer has no due.');
         }
 
+        $bill->load('customer.sheet');
+
         return view('payments.create', [
-            'customer'    => $customer,
-            'unpaidBills' => $unpaidBills,
-            'totalDue'    => round((float) $unpaidBills->sum('due_amount'), 2),
-            'methods'     => Payment::METHODS,
+            'customer' => $customer,
+            'bill'     => $bill,
+            'methods'  => Payment::METHODS,
         ]);
     }
 
     /**
-     * Record a payment and allocate it across unpaid bills, oldest first.
+     * Record a payment (amount + optional discount) against the latest due bill.
      */
-    public function store(Request $request, Customer $customer, BillCalculator $calculator)
+    public function store(Request $request, Customer $customer)
     {
-        $unpaidBills = $this->unpaidBills($customer);
-        $totalDue = round((float) $unpaidBills->sum('due_amount'), 2);
+        $bill = $this->latestDueBill($customer);
 
-        if ($totalDue <= 0) {
+        if (! $bill) {
             return redirect()->route('customers.show', $customer)
-                ->with('error', 'This customer has no unpaid bills.');
+                ->with('error', 'This customer has no due.');
         }
 
+        $due = (float) $bill->due_amount;
+
         $data = $request->validate([
-            'amount'       => ['required', 'numeric', 'min:0.01', "max:{$totalDue}"],
+            'amount'       => 'required|numeric|min:0',
+            'discount'     => 'nullable|numeric|min:0',
             'payment_date' => 'required|date',
             'method'       => 'required|in:' . implode(',', array_keys(Payment::METHODS)),
             'note'         => 'nullable|string|max:255',
-        ], [
-            'amount.max' => "Amount cannot exceed the total due ({$totalDue}).",
         ]);
 
-        $payment = DB::transaction(function () use ($data, $customer, $unpaidBills, $calculator) {
+        $amount = round((float) $data['amount'], 2);
+        $discount = round((float) ($data['discount'] ?? 0), 2);
+        $settle = round($amount + $discount, 2);
+
+        if ($settle < 0.01) {
+            return back()->withInput()->withErrors(['amount' => 'Amount and discount cannot both be zero.']);
+        }
+
+        if ($settle > $due) {
+            return back()->withInput()->withErrors([
+                'amount' => "Amount + discount ({$settle}) cannot exceed the due amount ({$due}).",
+            ]);
+        }
+
+        $payment = DB::transaction(function () use ($data, $customer, $bill, $amount, $discount) {
             $payment = Payment::create([
                 'customer_id'  => $customer->id,
-                'amount'       => $data['amount'],
+                'amount'       => $amount,
+                'discount'     => $discount,
                 'payment_date' => $data['payment_date'],
                 'collector_id' => auth()->id(),
                 'method'       => $data['method'],
@@ -141,45 +162,34 @@ class PaymentController extends Controller
                 'updated_by'   => auth()->id(),
             ]);
 
-            $remaining = round((float) $data['amount'], 2);
+            PaymentAllocation::create([
+                'payment_id' => $payment->id,
+                'bill_id'    => $bill->id,
+                'amount'     => $amount,
+            ]);
 
-            // Apply oldest first until the payment is exhausted.
-            foreach ($unpaidBills as $bill) {
-                if ($remaining <= 0) {
-                    break;
-                }
+            $total = (float) $bill->total_amount;
+            $newPaid = round((float) $bill->paid_amount + $amount, 2);
+            $newDiscount = round((float) $bill->discount + $discount, 2);
+            $newDue = round($total - $newPaid - $newDiscount, 2);
 
-                $applied = min($remaining, (float) $bill->due_amount);
-                $applied = round($applied, 2);
-
-                PaymentAllocation::create([
-                    'payment_id' => $payment->id,
-                    'bill_id'    => $bill->id,
-                    'amount'     => $applied,
-                ]);
-
-                $newPaid = round((float) $bill->paid_amount + $applied, 2);
-                $total = (float) $bill->total_amount;
-
-                $bill->update([
-                    'paid_amount' => $newPaid,
-                    'due_amount'  => round($total - $newPaid, 2),
-                    'status'      => $calculator->status($total, $newPaid),
-                    'updated_by'  => auth()->id(),
-                ]);
-
-                $remaining = round($remaining - $applied, 2);
-            }
+            $bill->update([
+                'paid_amount' => $newPaid,
+                'discount'    => $newDiscount,
+                'due_amount'  => $newDue,
+                'status'      => $newDue <= 0 ? Bill::STATUS_PAID : Bill::STATUS_PARTIAL,
+                'updated_by'  => auth()->id(),
+            ]);
 
             return $payment;
         });
 
         return redirect()->route('payments.receipt', $payment)
-            ->with('success', 'Payment recorded and allocated successfully!');
+            ->with('success', 'Payment recorded successfully!');
     }
 
     /**
-     * Printable payment receipt (with per-bill allocation breakdown).
+     * Printable payment receipt.
      */
     public function receipt(Payment $payment)
     {
@@ -189,16 +199,15 @@ class PaymentController extends Controller
     }
 
     /**
-     * Unpaid / partial bills for a customer, oldest month first.
+     * The customer's latest bill that still has a due (the true outstanding).
      */
-    protected function unpaidBills(Customer $customer)
+    protected function latestDueBill(Customer $customer): ?Bill
     {
         return Bill::query()
             ->where('customer_id', $customer->id)
-            ->where('status', '!=', Bill::STATUS_PAID)
             ->where('due_amount', '>', 0)
-            ->orderBy('billing_month')
-            ->orderBy('id')
-            ->get();
+            ->orderByDesc('billing_month')
+            ->orderByDesc('id')
+            ->first();
     }
 }

@@ -47,6 +47,7 @@
         'lateFee'            => $bill->late_fee,
         'fixedCharge'        => $bill->fixed_charge,
         'totalAmount'        => $bill->total_amount,
+        'discount'           => $bill->discount,
         'previousBills'      => $previousBills,
     ])
 </div>

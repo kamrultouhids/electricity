@@ -100,9 +100,10 @@
                     <tr><td>বকেয়া বিলের জরিমানা</td><td class="text-end">{{ number_format($lateFee, 2) }}</td></tr>
                     <tr><td>অতিরিক্ত চার্জ</td><td class="text-end">{{ number_format($fixedCharge, 2) }}</td></tr>
                     <tr><td>বিদ্যুৎ শুল্ক(%)</td><td class="text-end">0</td></tr>
+                    @php $discount = $discount ?? 0; @endphp
                     <tr class="fw-bold"><td>মোট বিল</td><td class="text-end">{{ number_format($totalAmount, 2) }}</td></tr>
-                    <tr><td>ছাড়(-)</td><td class="text-end">0</td></tr>
-                    <tr class="fw-bold table-light"><td>বিল</td><td class="text-end">৳ {{ number_format($totalAmount, 2) }}</td></tr>
+                    <tr><td>ছাড়(-)</td><td class="text-end">{{ number_format($discount, 2) }}</td></tr>
+                    <tr class="fw-bold table-light"><td>বিল</td><td class="text-end">৳ {{ number_format($totalAmount - $discount, 2) }}</td></tr>
                 </tbody>
             </table>
         </div>

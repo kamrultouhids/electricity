@@ -14,6 +14,7 @@ class Payment extends Model
     protected $fillable = [
         'customer_id',
         'amount',
+        'discount',
         'payment_date',
         'collector_id',
         'method',
@@ -25,6 +26,7 @@ class Payment extends Model
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'discount' => 'decimal:2',
         'payment_date' => 'date',
         'status' => 'integer',
     ];

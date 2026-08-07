@@ -51,6 +51,13 @@
                         <td class="text-end">{{ $alloc->bill ? number_format($alloc->bill->due_amount, 2) : '—' }}</td>
                     </tr>
                 @endforeach
+                @if ($payment->discount > 0)
+                    <tr>
+                        <td class="text-end">Discount</td>
+                        <td class="text-end">{{ number_format($payment->discount, 2) }}</td>
+                        <td></td>
+                    </tr>
+                @endif
                 <tr class="fw-bold table-light">
                     <td class="text-end">Total Paid</td>
                     <td class="text-end">৳ {{ number_format($payment->amount, 2) }}</td>

@@ -5,7 +5,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="mb-0">
             Customers with Due
-            <span class="badge bg-primary px-1 py-0 small">{{ $customers->total() }}</span>
+            <span class="badge bg-primary px-1 py-0 small">{{ $bills->total() }}</span>
         </h5>
         <a href="{{ route('payments.index') }}" class="btn btn-outline-secondary">Payment History</a>
     </div>
@@ -54,25 +54,25 @@
                         <th>#</th>
                         <th>Customer</th>
                         <th>Sheet</th>
-                        <th class="text-end">Due Months</th>
+                        <th>Latest Bill</th>
                         <th class="text-end">Total Due</th>
                         <th class="text-end" width="120">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($customers as $customer)
+                    @forelse ($bills as $bill)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>
-                                <div>{{ $customer->name }}</div>
-                                <small class="text-muted d-block">Meter No: {{ $customer->meter_number ?? '—' }}</small>
-                                <small class="text-muted d-block">Mobile: {{ $customer->mobile_number ?? '—' }}</small>
+                                <div>{{ $bill->customer->name ?? '—' }}</div>
+                                <small class="text-muted d-block">Meter No: {{ $bill->customer->meter_number ?? '—' }}</small>
+                                <small class="text-muted d-block">Mobile: {{ $bill->customer->mobile_number ?? '—' }}</small>
                             </td>
-                            <td>{{ $customer->sheet->name ?? '—' }}</td>
-                            <td class="text-end">{{ $customer->due_bills_count }}</td>
-                            <td class="text-end fw-bold">{{ number_format($customer->total_due, 2) }}</td>
+                            <td>{{ $bill->customer->sheet->name ?? '—' }}</td>
+                            <td>{{ $bill->billing_month->format('M Y') }}</td>
+                            <td class="text-end fw-bold">{{ number_format($bill->due_amount, 2) }}</td>
                             <td class="text-end">
-                                <a href="{{ route('payments.create', $customer) }}" class="btn btn-sm btn-success text-white">
+                                <a href="{{ route('payments.create', $bill->customer) }}" class="btn btn-sm btn-success text-white">
                                     Pay
                                 </a>
                             </td>
@@ -88,7 +88,7 @@
     </div>
 
     <div class="mt-3 d-flex justify-content-center">
-        {{ $customers->links() }}
+        {{ $bills->links() }}
     </div>
 </div>
 @endsection

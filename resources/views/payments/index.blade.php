@@ -59,6 +59,7 @@
                         <th>#</th>
                         <th>Customer</th>
                         <th class="text-end">Amount</th>
+                        <th class="text-end">Discount</th>
                         <th>Method</th>
                         <th>Collector</th>
                         <th>Date</th>
@@ -71,9 +72,12 @@
                             <td>{{ $loop->iteration }}</td>
                             <td>
                                 <div>{{ $payment->customer->name ?? '—' }}</div>
+                                <small class="text-muted d-block">Serial No: {{ $payment->customer->serial_no ?? '—' }}</small>
                                 <small class="text-muted d-block">Meter No: {{ $payment->customer->meter_number ?? '—' }}</small>
+                                <small class="text-muted d-block">Mobile: {{ $payment->customer->mobile_number ?? '—' }}</small>
                             </td>
                             <td class="text-end">{{ number_format($payment->amount, 2) }}</td>
+                            <td class="text-end">{{ number_format($payment->discount, 2) }}</td>
                             <td>{{ $payment->methodLabel() }}</td>
                             <td>{{ $payment->collector->name ?? '—' }}</td>
                             <td>{{ $payment->payment_date->format('d M Y') }}</td>
@@ -83,7 +87,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-4">No payments found.</td>
+                            <td colspan="8" class="text-center text-muted py-4">No payments found.</td>
                         </tr>
                     @endforelse
                 </tbody>
