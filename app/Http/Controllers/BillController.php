@@ -113,6 +113,11 @@ class BillController extends Controller
                 ->with('error', 'This customer already has a bill for that month.');
         }
 
+        if ($older = $this->olderPendingReading($meterReading)) {
+            return redirect()->route('bills.pending')
+                ->with('error', "Generate the oldest pending reading first — {$older->reading_date->format('M Y')}.");
+        }
+
         $customer = $meterReading->customer;
 
         $previousBills = Bill::query()
@@ -140,6 +145,11 @@ class BillController extends Controller
      */
     public function store(MeterReading $meterReading, BillGenerator $generator)
     {
+        if ($older = $this->olderPendingReading($meterReading)) {
+            return redirect()->route('bills.pending')
+                ->with('error', "Generate the oldest pending reading first — {$older->reading_date->format('M Y')}.");
+        }
+
         $bill = $generator->generateForReading($meterReading, auth()->id());
 
         if (! $bill) {
@@ -174,5 +184,21 @@ class BillController extends Controller
             : null;
 
         return view('bills.show', compact('bill', 'previousBills', 'previousReading'));
+    }
+
+    /**
+     * The customer's oldest pending reading, if it isn't the one being billed.
+     * Enforces "bill the oldest month first".
+     */
+    protected function olderPendingReading(MeterReading $reading): ?MeterReading
+    {
+        $oldest = MeterReading::query()
+            ->where('customer_id', $reading->customer_id)
+            ->where('status', MeterReading::STATUS_PENDING)
+            ->orderBy('reading_date')
+            ->orderBy('id')
+            ->first();
+
+        return ($oldest && $oldest->id !== $reading->id) ? $oldest : null;
     }
 }
