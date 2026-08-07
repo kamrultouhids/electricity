@@ -60,6 +60,9 @@
                             @endif
                         @else
                              <li class="nav-item">
+                                <a class="nav-link {{ Route::is('home') ? 'active' : '' }}" href="{{ route('home') }}"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
+                            </li>
+                             <li class="nav-item">
                                 <a class="nav-link  {{ Route::is('users.index') ? 'active' : '' }}" href="{{ route('users.index') }}"><i class="bi bi-people me-1"></i>User List</a>
                             </li>
                             <li class="nav-item dropdown">
