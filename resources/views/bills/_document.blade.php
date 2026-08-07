@@ -11,6 +11,15 @@
     $bn = fn ($v) => strtr((string) $v, ['0' => '০', '1' => '১', '2' => '২', '3' => '৩', '4' => '৪', '5' => '৫', '6' => '৬', '7' => '৭', '8' => '৮', '9' => '৯']);
 @endphp
 <div class="bill-copy">
+    {{-- Organisation masthead --}}
+    <div class="bill-org text-center px-2 pt-2">
+        <div class="org-bismillah">বিসমিল্লাহির রাহমানির রাহিম</div>
+        <div class="org-slogan">&ldquo;বিদ্যুৎ জাতীয় সম্পদ অপচয় রোধে এগিয়ে আসুন, অবৈধ সংযোগ থেকে বিরত থাকুন&rdquo;</div>
+        <div class="org-name">চট্টগ্রাম মহানগর ছিন্নমূল বস্তিবাসি সমন্বয় সংগ্রাম পরিষদ</div>
+        <div class="org-addr">জঙ্গল ছলিমপুর ছিন্নমূল পুনর্বাসন প্রকল্প, ডাকঘরঃ জাফরাবাদ, থানাঃ সিতাকুণ্ড, চট্টগ্রাম।</div>
+        <div class="org-dept">বিদ্যুৎ বিতরন বিভাগ</div>
+    </div>
+
     {{-- Header --}}
     <div class="text-center position-relative">
         <div class="bill-title">বিদ্যুৎ বিল</div>
@@ -138,6 +147,9 @@
         </div>
     </div>
 
+    {{-- Cut separator between customer copy and office copy --}}
+    <div class="bill-cut"><span>&#9986;</span></div>
+
     {{-- Office copy --}}
     <div class="p-2 text-center fw-bold bill-block">অফিস কপি</div>
     <div class="row g-0 bill-block">
@@ -164,7 +176,28 @@
         border: 1px solid #000;
         background: #fff;
     }
+    .bill-org { line-height: 1.35; }
+    .bill-org .org-bismillah { font-size: 12px; }
+    .bill-org .org-slogan { font-size: 13px; font-weight: 700; }
+    .bill-org .org-name { font-size: 17px; font-weight: 700; }
+    .bill-org .org-addr { font-size: 12px; }
+    .bill-org .org-dept { font-size: 13px; }
     .bill-title { font-size: 20px; font-weight: 700; padding: 8px 0 0; }
+    .bill-cut {
+        position: relative;
+        height: 24px;
+        margin: 10px 0;
+        border-top: 2px dashed #000;
+    }
+    .bill-cut span {
+        position: absolute;
+        top: -12px;
+        left: 12px;
+        background: #fff;
+        padding: 0 6px;
+        font-size: 16px;
+        line-height: 24px;
+    }
     .bill-copy-tag { position: absolute; right: 8px; top: 10px; font-size: 12px; }
     .bill-block { border-top: 1px solid #000; }
     .bill-copy .kv { display: flex; font-size: 13px; padding: 1px 0; }
@@ -174,9 +207,28 @@
     .bill-table { border-color: #000 !important; }
     .bill-table th, .bill-table td { border-color: #000 !important; }
     @media print {
+        @page { size: A4 portrait; margin: 8mm; }
+        html, body { height: auto; }
         .no-print { display: none !important; }
         .navbar, nav { display: none !important; }
-        .bill-copy { border: 1px solid #000; }
+        /* Strip app chrome/spacing so only the bill prints */
+        #app > main.py-4, main.py-4 { padding: 0 !important; }
+        .container, .container-fluid { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+        /* Fit the whole bill (both copies) on a single A4 page */
+        .bill-copy {
+            border: 1px solid #000;
+            max-width: 100%;
+            width: 100%;
+            margin: 0 auto;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .bill-copy tr, .bill-copy .bill-block, .bill-copy table { page-break-inside: avoid; break-inside: avoid; }
+        /* Slightly tighter type/padding so it never spills to a 2nd page */
+        .bill-org .org-name { font-size: 15px; }
+        .bill-title { font-size: 18px; padding-top: 4px; }
+        .bill-copy .kv { font-size: 12px; }
+        .bill-table th, .bill-table td { padding: 2px 5px; font-size: 12px; }
     }
 </style>
 @endpush
