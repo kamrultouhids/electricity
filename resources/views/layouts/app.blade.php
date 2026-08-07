@@ -16,9 +16,14 @@
 
     <!-- Scripts -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
         .btn-primary {
             background-color:  #3585BC !important;
+        }
+        .navbar-nav .nav-link.active {
+            color: #3585BC !important;
+            font-weight: 600;
         }
     </style>
     @stack('styles')
@@ -51,11 +56,11 @@
                             @endif
                         @else
                              <li class="nav-item">
-                                <a class="nav-link  {{ Route::is('users.index') ? 'active' : '' }}" href="{{ route('users.index') }}">User List</a>
+                                <a class="nav-link  {{ Route::is('users.index') ? 'active' : '' }}" href="{{ route('users.index') }}"><i class="bi bi-people me-1"></i>User List</a>
                             </li>
                             <li class="nav-item dropdown">
                                 <a id="electricityDropdown" class="nav-link dropdown-toggle {{ Route::is('customers.*') || Route::is('meter-readings.*') || Route::is('bills.*') || Route::is('payments.*') || Route::is('tariffs.*') ? 'active' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                   Electricity management
+                                   <i class="bi bi-lightning-charge me-1"></i>Electricity management
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="electricityDropdown">
                                     <a class="dropdown-item {{ Route::is('tariffs.index') ? 'active' : '' }}" href="{{ route('tariffs.index') }}">Rate Settings</a>
@@ -68,12 +73,12 @@
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }}
+                                <a id="navbarDropdown" class="nav-link dropdown-toggle {{ Route::is('password.change') ? 'active' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    <i class="bi bi-person-circle me-1"></i>{{ Auth::user()->name }}
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a href="{{ route('password.change') }}" class="dropdown-item">Change Password</a>
+                                    <a href="{{ route('password.change') }}" class="dropdown-item {{ Route::is('password.change') ? 'active' : '' }}">Change Password</a>
 
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
