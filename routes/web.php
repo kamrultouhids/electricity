@@ -68,6 +68,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('expense-categories', ExpenseCategoryController::class)->except(['show'])->parameters([
         'expense-categories' => 'expenseCategory',
     ]);
+    Route::get('/expenses/{expense}/delete', [ExpenseController::class, 'destroy'])->name('expenses.delete');
     Route::resource('expenses', ExpenseController::class)->except(['show']);
 
     // Report Management

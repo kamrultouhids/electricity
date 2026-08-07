@@ -64,7 +64,7 @@
                         <th>Note</th>
                         <th>Added By</th>
                         <th class="text-end">Amount</th>
-                        <th class="text-end" width="120">Actions</th>
+                        <th class="text-end" width="200">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -76,16 +76,10 @@
                             <td>{{ $expense->note ?? '—' }}</td>
                             <td>{{ $expense->createdBy->name ?? '—' }}</td>
                             <td class="text-end">{{ number_format($expense->amount, 2) }}</td>
-                            <td class="text-end">
-                                <div class="btn-group btn-group-sm">
-                                    <a href="{{ route('expenses.edit', $expense) }}" class="btn btn-outline-primary"><i class="bi bi-pencil-square me-1"></i>Edit</a>
-                                    <form method="POST" action="{{ route('expenses.destroy', $expense) }}"
-                                          onsubmit="return confirm('Delete this expense?');" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                    </form>
-                                </div>
+                            <td class="text-end" width="200">
+                               <a href="{{ route('expenses.edit', $expense) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil-square me-1"></i>Edit</a>
+                                    <a href="{{ route('expenses.delete', $expense) }}" class="btn btn-sm btn-outline-danger"
+                                       onclick="return confirm('Delete this expense?');"><i class="bi bi-trash me-1"></i>Delete</a>
                             </td>
                         </tr>
                     @empty

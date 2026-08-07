@@ -45,12 +45,15 @@ class PaymentController extends Controller
             $query->whereHas('customer', fn ($q) => $q->where('sheet_id', (int) $request->input('sheet_id')));
         }
 
+        $totalDue = (float) (clone $query)->sum('bills.due_amount');
+
         $bills = $query->orderByDesc('bills.due_amount')
             ->paginate(15)->withQueryString();
 
         return view('payments.due', [
-            'bills'  => $bills,
-            'sheets' => Sheet::orderBy('name')->get(),
+            'bills'    => $bills,
+            'sheets'   => Sheet::orderBy('name')->get(),
+            'totalDue' => $totalDue,
         ]);
     }
 
