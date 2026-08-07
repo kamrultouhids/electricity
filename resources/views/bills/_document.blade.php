@@ -9,6 +9,12 @@
 @php
     // Convert western digits to Bengali numerals for bill figures.
     $bn = fn ($v) => strtr((string) $v, ['0' => '০', '1' => '১', '2' => '২', '3' => '৩', '4' => '৪', '5' => '৫', '6' => '৬', '7' => '৭', '8' => '৮', '9' => '৯']);
+
+    // Bengali Gregorian month names, keyed by month number (1-12).
+    $bnMonths = [1 => 'জানুয়ারি', 2 => 'ফেব্রুয়ারি', 3 => 'মার্চ', 4 => 'এপ্রিল', 5 => 'মে', 6 => 'জুন', 7 => 'জুলাই', 8 => 'আগস্ট', 9 => 'সেপ্টেম্বর', 10 => 'অক্টোবর', 11 => 'নভেম্বর', 12 => 'ডিসেম্বর'];
+
+    // Render a Carbon date as "মাস - বছর" in Bengali.
+    $bnMonthYear = fn ($d) => $d ? $bnMonths[$d->month] . ' - ' . $bn($d->format('Y')) : '—';
 @endphp
 <div class="bill-copy">
     {{-- Organisation masthead --}}
@@ -38,7 +44,7 @@
             <div class="kv boxed"><span>মিটার নং</span><b>{{ $customer->meter_number ?? '—' }}</b></div>
         </div>
         <div class="col-5 p-2">
-            <div class="kv"><span>বিলের মাস</span><b>{{ $billMonth->format('F - Y') }}</b></div>
+            <div class="kv"><span>বিলের মাস</span><b>{{ $bnMonthYear($billMonth) }}</b></div>
             <div class="kv"><span>বিল প্রস্তুতের তারিখ</span><b>{{ $prepDate->format('d-M-Y') }}</b></div>
             <div class="kv"><span>পরিশোধের শেষ তারিখ</span><b>{{ $lastDate->format('d-M-Y') }}</b></div>
         </div>
@@ -59,7 +65,7 @@
         <tbody>
             @forelse ($previousBills as $pb)
                 <tr class="text-end">
-                    <td class="text-center">{{ $pb->billing_month->format('F-Y') }}</td>
+                    <td class="text-center">{{ $bnMonthYear($pb->billing_month) }}</td>
                     <td>{{ $bn(number_format($pb->units, 1)) }}</td>
                     <td>{{ $bn(number_format($pb->total_amount, 1)) }}</td>
                     <td>{{ $bn(number_format($pb->paid_amount, 1)) }}</td>
@@ -83,11 +89,11 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>বর্তমান<br><small>{{ $currentReadingDate ? $currentReadingDate->format('F - Y') : '—' }}</small></td>
+                        <td>বর্তমান<br><small>{{ $bnMonthYear($currentReadingDate) }}</small></td>
                         <td class="text-end align-middle">{{ $bn(number_format($currentReading, 0)) }}</td>
                     </tr>
                     <tr>
-                        <td>পূর্ববতী<br><small>{{ $previousReadingDate ? $previousReadingDate->format('F - Y') : '—' }}</small></td>
+                        <td>পূর্ববতী<br><small>{{ $bnMonthYear($previousReadingDate) }}</small></td>
                         <td class="text-end align-middle">{{ $bn(number_format($previousReading, 0)) }}</td>
                     </tr>
                     <tr>
@@ -157,12 +163,12 @@
             <div class="kv"><span>ক্রমিক নং</span><b>{{ $serialNo ?? '—' }}</b></div>
             <div class="kv"><span>গ্রাহকের নাম</span><b>{{ $customer->name }}</b></div>
             <div class="kv"><span>পিতা/স্বামীর নাম</span><b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
-            <div class="kv"><span>ঠিকানা</span><b>{{ $customer->sheet->name ?? '—' }}</b></div>
+            <div class="kv"><span>ঠিকানা</span><b>{{ $customer->address ?? '—' }}</b></div>
         </div>
         <div class="col-6 p-2">
             <div class="kv"><span>মিটার নং</span><b>{{ $customer->meter_number ?? '—' }}</b></div>
             <div class="kv"><span>হিসাব নং/গ্রাহক নং</span><b>{{ $accountNo }}</b></div>
-            <div class="kv"><span>বিলের মাস</span><b>{{ $billMonth->format('F - Y') }}</b></div>
+            <div class="kv"><span>বিলের মাস</span><b>{{ $bnMonthYear($billMonth) }}</b></div>
             <div class="kv"><span>মোট বিল</span><b>৳ {{ $bn(number_format($totalAmount, 2)) }}</b></div>
         </div>
     </div>
