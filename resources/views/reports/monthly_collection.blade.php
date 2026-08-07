@@ -13,11 +13,8 @@
             <form method="GET" action="{{ route('reports.monthly-collection') }}" class="row g-2 align-items-end">
                 <div class="col-md-3">
                     <label class="form-label mb-1">Year</label>
-                    <select name="year" class="form-select">
-                        @foreach ($years as $y)
-                            <option value="{{ $y }}" @selected($year == $y)>{{ $y }}</option>
-                        @endforeach
-                    </select>
+                    <input type="number" name="year" class="form-control" value="{{ $year }}"
+                           min="2000" max="{{ now()->year + 1 }}" step="1" placeholder="YYYY">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label mb-1">Method</label>
@@ -25,6 +22,15 @@
                         <option value="">All</option>
                         @foreach ($methods as $key => $label)
                             <option value="{{ $key }}" @selected(request('method') === $key)>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label mb-1">Collector</label>
+                    <select name="collector_id" class="form-select">
+                        <option value="">All</option>
+                        @foreach ($collectors as $collector)
+                            <option value="{{ $collector->id }}" @selected(request('collector_id') == $collector->id)>{{ $collector->name }}</option>
                         @endforeach
                     </select>
                 </div>

@@ -87,6 +87,10 @@ class ReportController extends Controller
             $query->where('method', $request->input('method'));
         }
 
+        if ($request->filled('collector_id')) {
+            $query->where('collector_id', (int) $request->input('collector_id'));
+        }
+
         $rows = $query->get();
 
         if ($request->input('export') === 'csv') {
@@ -103,10 +107,10 @@ class ReportController extends Controller
         }
 
         return view('reports.monthly_collection', [
-            'rows'    => $rows,
-            'year'    => $year,
-            'years'   => $this->paymentYears(),
-            'methods' => Payment::METHODS,
+            'rows'       => $rows,
+            'year'       => $year,
+            'methods'    => Payment::METHODS,
+            'collectors' => $this->collectors(),
         ]);
     }
 
@@ -352,35 +356,13 @@ class ReportController extends Controller
     }
 
     /**
-     * Users who have collected at least one payment (for the collector filter).
+     * All users (for the collector filter).
      */
     protected function collectors()
     {
         return \App\Models\User::query()
-            ->whereIn('id', Payment::query()->distinct()->pluck('collector_id')->filter())
             ->orderBy('name')
             ->get();
-    }
-
-    /**
-     * Distinct years that have payments (for the year filter), newest first.
-     */
-    protected function paymentYears(): array
-    {
-        $years = Payment::query()
-            ->selectRaw('DISTINCT YEAR(payment_date) as y')
-            ->orderByDesc('y')
-            ->pluck('y')
-            ->map(fn ($y) => (int) $y)
-            ->all();
-
-        $current = now()->year;
-
-        if (! in_array($current, $years, true)) {
-            array_unshift($years, $current);
-        }
-
-        return $years;
     }
 
     /**
