@@ -37,6 +37,7 @@
                 </small>
             </div>
 
+            <div class="table-responsive">
             <table class="table table-bordered mb-0">
                 <tbody>
                     <tr class="table-light fw-bold">
@@ -69,6 +70,7 @@
                     </tr>
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 </div>

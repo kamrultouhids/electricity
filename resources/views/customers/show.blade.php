@@ -31,6 +31,7 @@
                 </div>
 
                 <div class="col-md-9">
+                    <div class="table-responsive">
                     <table class="table table-borderless mb-0">
                         <tbody>
                             @php
@@ -61,6 +62,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
         </div>

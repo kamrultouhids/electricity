@@ -12,6 +12,7 @@
 
     <div class="card">
         <div class="card-body">
+            <div class="table-responsive">
             <table class="table table-borderless mb-0">
                 <tbody>
                     <tr>
@@ -42,6 +43,7 @@
                     </tr>
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 </div>
