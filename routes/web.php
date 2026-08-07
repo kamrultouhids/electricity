@@ -8,6 +8,7 @@ use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\MeterReadingController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TariffController;
 use App\Http\Controllers\UserController;
 
@@ -68,6 +69,17 @@ Route::middleware(['auth'])->group(function () {
         'expense-categories' => 'expenseCategory',
     ]);
     Route::resource('expenses', ExpenseController::class)->except(['show']);
+
+    // Report Management
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [ReportController::class, 'index'])->name('index');
+        Route::get('/daily-collection', [ReportController::class, 'dailyCollection'])->name('daily-collection');
+        Route::get('/monthly-collection', [ReportController::class, 'monthlyCollection'])->name('monthly-collection');
+        Route::get('/customers', [ReportController::class, 'customer'])->name('customers');
+        Route::get('/unit-consumption', [ReportController::class, 'unitConsumption'])->name('unit-consumption');
+        Route::get('/outstanding', [ReportController::class, 'outstanding'])->name('outstanding');
+        Route::get('/income-expense', [ReportController::class, 'incomeExpense'])->name('income-expense');
+    });
 });
 
 Route::get('/phpinfo', function () {

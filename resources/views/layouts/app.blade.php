@@ -25,6 +25,10 @@
             color: #3585BC !important;
             font-weight: 600;
         }
+        @media print {
+            .no-print { display: none !important; }
+            .navbar, nav { display: none !important; }
+        }
     </style>
     @stack('styles')
 </head>
@@ -74,6 +78,19 @@
                                     <a class="dropdown-item {{ Route::is('expense-categories.*') ? 'active' : '' }}" href="{{ route('expense-categories.index') }}">Expense Categories</a>
                                     <a class="dropdown-item {{ Route::is('expenses.index') || Route::is('expenses.create') || Route::is('expenses.edit') ? 'active' : '' }}" href="{{ route('expenses.index') }}">Expenses</a>
                                     <a class="dropdown-item {{ Route::is('expenses.profit-loss') ? 'active' : '' }}" href="{{ route('expenses.profit-loss') }}">Profit &amp; Loss</a>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a id="reportDropdown" class="nav-link dropdown-toggle {{ Route::is('reports.*') ? 'active' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                   <i class="bi bi-bar-chart-line me-1"></i>Report management
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="reportDropdown">
+                                    <a class="dropdown-item {{ Route::is('reports.daily-collection') ? 'active' : '' }}" href="{{ route('reports.daily-collection') }}">Daily Collection</a>
+                                    <a class="dropdown-item {{ Route::is('reports.monthly-collection') ? 'active' : '' }}" href="{{ route('reports.monthly-collection') }}">Monthly Collection</a>
+                                    <a class="dropdown-item {{ Route::is('reports.customers') ? 'active' : '' }}" href="{{ route('reports.customers') }}">Customer Report</a>
+                                    <a class="dropdown-item {{ Route::is('reports.unit-consumption') ? 'active' : '' }}" href="{{ route('reports.unit-consumption') }}">Unit Consumption</a>
+                                    <a class="dropdown-item {{ Route::is('reports.outstanding') ? 'active' : '' }}" href="{{ route('reports.outstanding') }}">Outstanding Balance</a>
+                                    <a class="dropdown-item {{ Route::is('reports.income-expense') ? 'active' : '' }}" href="{{ route('reports.income-expense') }}">Income &amp; Expense</a>
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
