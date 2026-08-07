@@ -70,7 +70,7 @@ class HomeController extends Controller
 
         // --- Recent payments ---
         $recentPayments = Payment::query()
-            ->with('customer')
+            ->with(['customer', 'createdBy'])
             ->latest('payment_date')
             ->latest('id')
             ->limit(5)

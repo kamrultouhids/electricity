@@ -78,19 +78,21 @@
     </div>
 
     {{-- ===== Recent Payments ===== --}}
-    <div class="card border-0 shadow-sm rounded-4 mb-4">
-        <div class="card-body pb-0 d-flex justify-content-between align-items-center">
+    <div class="">
+        <div class=" mb-2 pb-0 d-flex justify-content-between align-items-center">
             <h6 class="mb-0"><i class="bi bi-clock-history text-primary me-1"></i>Recent Payments</h6>
             <a href="{{ route('payments.index') }}" class="btn btn-sm btn-link text-decoration-none">View all</a>
         </div>
         <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle mb-0">
+            <table class="table  table-bordered table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
                         <th>Customer</th>
                         <th>Date</th>
                         <th class="text-end">Amount</th>
+                        <th class="text-end">Discount</th>
                         <th>Method</th>
+                        <th>Collected By</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -105,7 +107,9 @@
                             </td>
                             <td>{{ optional($payment->payment_date)->format('d M Y') ?? '—' }}</td>
                             <td class="text-end fw-semibold">৳ {{ number_format($payment->amount, 2) }}</td>
+                            <td class="text-end">৳ {{ number_format($payment->discount, 2) }}</td>
                             <td><span class="badge rounded-pill bg-light text-dark border">{{ $payment->methodLabel() }}</span></td>
+                            <td>{{ $payment->createdBy->name ?? '—' }}</td>
                             <td>
                                 @if ($payment->status === \App\Models\Payment::STATUS_COMPLETED)
                                     <span class="badge rounded-pill bg-success-subtle text-success">Completed</span>
@@ -115,7 +119,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="5" class="text-center text-muted py-4">No payments recorded yet.</td></tr>
+                        <tr><td colspan="7" class="text-center text-muted py-4">No payments recorded yet.</td></tr>
                     @endforelse
                 </tbody>
             </table>
