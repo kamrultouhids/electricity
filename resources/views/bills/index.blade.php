@@ -78,7 +78,7 @@
                         <th class="text-end">Paid</th>
                         <th class="text-end">Due</th>
                         <th>Status</th>
-                        <th class="text-end" width="90">Actions</th>
+                        <th class="text-end" width="130">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -106,7 +106,12 @@
                                 @endif
                             </td>
                             <td class="text-end">
-                                <a href="{{ route('bills.show', $bill) }}" class="btn btn-sm btn-outline-info">View</a>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ route('bills.show', $bill) }}" class="btn btn-outline-info">View</a>
+                                    @unless ($bill->isPaid())
+                                        <a href="{{ route('payments.create', $bill->customer) }}" class="btn btn-outline-success">Pay</a>
+                                    @endunless
+                                </div>
                             </td>
                         </tr>
                     @empty

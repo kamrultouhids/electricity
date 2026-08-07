@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BillController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\MeterReadingController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\TariffController;
 use App\Http\Controllers\UserController;
 
@@ -51,6 +52,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/bills/generate/{meterReading}', [BillController::class, 'store'])->name('bills.store');
     Route::get('/bills', [BillController::class, 'index'])->name('bills.index');
     Route::get('/bills/{bill}', [BillController::class, 'show'])->name('bills.show');
+
+    // Payment Collection
+    Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+    Route::get('/customers/{customer}/pay', [PaymentController::class, 'create'])->name('payments.create');
+    Route::post('/customers/{customer}/pay', [PaymentController::class, 'store'])->name('payments.store');
+    Route::get('/payments/{payment}/receipt', [PaymentController::class, 'receipt'])->name('payments.receipt');
 });
 
 Route::get('/phpinfo', function () {

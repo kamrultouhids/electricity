@@ -13,10 +13,20 @@
     <div class="d-flex justify-content-between align-items-center mb-3 no-print">
         <h4 class="mb-0">Bill Details</h4>
         <div class="d-flex gap-2">
+            @unless ($bill->isPaid())
+                <a href="{{ route('payments.create', $bill->customer) }}" class="btn btn-success text-white">Collect Payment</a>
+            @endunless
             <button type="button" onclick="window.print()" class="btn btn-outline-secondary">Print</button>
             <a href="{{ route('bills.index') }}" class="btn btn-outline-secondary">Back to Bills</a>
         </div>
     </div>
+
+    @if (session('success'))
+        <div class="alert alert-success no-print">{{ session('success') }}</div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger no-print">{{ session('error') }}</div>
+    @endif
 
     @include('bills._document', [
         'customer'            => $customer,

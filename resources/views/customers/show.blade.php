@@ -65,5 +65,42 @@
             </div>
         </div>
     </div>
+
+    {{-- Payment history --}}
+    <div class="card mt-3">
+        <div class="card-header bg-white"><h6 class="mb-0">Payment History</h6></div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Date</th>
+                        <th class="text-end">Amount</th>
+                        <th>Method</th>
+                        <th>Collector</th>
+                        <th class="text-end" width="100">Receipt</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($customer->payments as $payment)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $payment->payment_date->format('d M Y') }}</td>
+                            <td class="text-end">{{ number_format($payment->amount, 2) }}</td>
+                            <td>{{ $payment->methodLabel() }}</td>
+                            <td>{{ $payment->collector->name ?? '—' }}</td>
+                            <td class="text-end">
+                                <a href="{{ route('payments.receipt', $payment) }}" class="btn btn-sm btn-outline-info">Receipt</a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">No payments yet.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 @endsection

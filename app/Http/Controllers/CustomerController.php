@@ -117,6 +117,8 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer)
     {
+        $customer->load(['payments.collector']);
+
         return view('customers.show', compact('customer'));
     }
 

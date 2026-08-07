@@ -52,6 +52,11 @@ class Customer extends Model
         return $this->hasMany(MeterReading::class)->latest('reading_date')->latest('id');
     }
 
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class)->latest('payment_date')->latest('id');
+    }
+
     /**
      * The customer's most recent meter reading.
      */
