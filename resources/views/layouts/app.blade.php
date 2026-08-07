@@ -50,26 +50,22 @@
                                 </li>
                             @endif
                         @else
-                            <li class="nav-item">
-                                <a class="nav-link  {{ Route::is('customers.index') ? 'active' : '' }}" href="{{ route('customers.index') }}">Customer List</a>
-                            </li>
-                             <li class="nav-item">
-                                <a class="nav-link  {{ Route::is('meter-readings.index') ? 'active' : '' }}" href="{{ route('meter-readings.index') }}">Meter Readings</a>
-                            </li>
-                             <li class="nav-item">
-                                <a class="nav-link  {{ Route::is('bills.*') ? 'active' : '' }}" href="{{ route('bills.index') }}">Bills</a>
-                            </li>
-                             <li class="nav-item">
-                                <a class="nav-link  {{ Route::is('payments.due') ? 'active' : '' }}" href="{{ route('payments.due') }}">Due List</a>
-                            </li>
-                             <li class="nav-item">
-                                <a class="nav-link  {{ Route::is('payments.index') || Route::is('payments.receipt') ? 'active' : '' }}" href="{{ route('payments.index') }}">Payments</a>
-                            </li>
                              <li class="nav-item">
                                 <a class="nav-link  {{ Route::is('users.index') ? 'active' : '' }}" href="{{ route('users.index') }}">User List</a>
                             </li>
-                             <li class="nav-item">
-                                <a class="nav-link  {{ Route::is('tariffs.index') ? 'active' : '' }}" href="{{ route('tariffs.index') }}">Rate Settings</a>
+                            <li class="nav-item dropdown">
+                                <a id="electricityDropdown" class="nav-link dropdown-toggle {{ Route::is('customers.*') || Route::is('meter-readings.*') || Route::is('bills.*') || Route::is('payments.*') || Route::is('tariffs.*') ? 'active' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                   Electricity management
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="electricityDropdown">
+                                    <a class="dropdown-item {{ Route::is('tariffs.index') ? 'active' : '' }}" href="{{ route('tariffs.index') }}">Rate Settings</a>
+                                    <a class="dropdown-item {{ Route::is('customers.*') ? 'active' : '' }}" href="{{ route('customers.index') }}">Customer List</a>
+                                    <a class="dropdown-item {{ Route::is('meter-readings.*') ? 'active' : '' }}" href="{{ route('meter-readings.index') }}">Meter Readings</a>
+                                    <a class="dropdown-item {{ Route::is('bills.pending') ? 'active' : '' }}" href="{{ route('bills.pending') }}">Pending Billing Readings</a>
+                                    <a class="dropdown-item {{ (Route::is('bills.*') && ! Route::is('bills.pending')) ? 'active' : '' }}" href="{{ route('bills.index') }}">Bills</a>
+                                    <a class="dropdown-item {{ Route::is('payments.due') ? 'active' : '' }}" href="{{ route('payments.due') }}">Due List</a>
+                                    <a class="dropdown-item {{ Route::is('payments.index') || Route::is('payments.receipt') ? 'active' : '' }}" href="{{ route('payments.index') }}">Payments</a>
+                                </div>
                             </li>
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

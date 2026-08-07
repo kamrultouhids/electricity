@@ -102,7 +102,10 @@
                             <td>{{ number_format($reading->current_reading, 2) }}</td>
                             <td>{{ number_format($reading->consumed_units, 2) }}</td>
                             <td>{{ $reading->reading_date->format('d M Y') }}</td>
-                            <td>{{ $reading->createdBy->name ?? '—' }}</td>
+                            <td>
+                                <div>{{ $reading->createdBy->name ?? '—' }}</div>
+                                <small class="text-muted d-block">{{ $reading->created_at->format('d M Y, h:i A') }}</small>
+                            </td>
                             <td>
                                 @if ($reading->isCompleted())
                                     <span class="badge bg-success">Completed</span>

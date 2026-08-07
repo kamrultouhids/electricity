@@ -181,6 +181,20 @@ class PaymentController extends Controller
                 'updated_by'  => auth()->id(),
             ]);
 
+            // The latest bill's due already carried forward all previous months.
+            // So once it is fully settled, mark those earlier bills paid too.
+            if ($newDue <= 0) {
+                Bill::query()
+                    ->where('customer_id', $customer->id)
+                    ->whereDate('billing_month', '<', $bill->billing_month)
+                    ->where('due_amount', '>', 0)
+                    ->update([
+                        'due_amount' => 0,
+                        'status'     => Bill::STATUS_PAID,
+                        'updated_by' => auth()->id(),
+                    ]);
+            }
+
             return $payment;
         });
 

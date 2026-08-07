@@ -48,7 +48,7 @@ class MeterReadingController extends Controller
             }
         }
 
-        $readings = $query->latest('reading_date')->latest('id')
+        $readings = $query->latest()
             ->paginate(15)->withQueryString();
 
         return view('meter_readings.index', [
