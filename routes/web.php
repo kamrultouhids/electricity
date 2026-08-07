@@ -54,6 +54,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/bills/{bill}', [BillController::class, 'show'])->name('bills.show');
 
     // Payment Collection
+    Route::get('/payments/due', [PaymentController::class, 'dueList'])->name('payments.due');
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
     Route::get('/customers/{customer}/pay', [PaymentController::class, 'create'])->name('payments.create');
     Route::post('/customers/{customer}/pay', [PaymentController::class, 'store'])->name('payments.store');

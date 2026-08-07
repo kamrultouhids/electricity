@@ -13,6 +13,9 @@
     @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
+    @if (session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
 
     {{-- Filters --}}
     <div class="card mb-3">
@@ -110,7 +113,9 @@
                             <td class="text-end">
                                 <div class="btn-group btn-group-sm">
                                     <a href="{{ route('meter-readings.show', $reading) }}" class="btn btn-outline-info">View</a>
-                                    <a href="{{ route('meter-readings.edit', $reading) }}" class="btn btn-outline-primary">Edit</a>
+                                    @if ($reading->isPending())
+                                        <a href="{{ route('meter-readings.edit', $reading) }}" class="btn btn-outline-primary">Edit</a>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

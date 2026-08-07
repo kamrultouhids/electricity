@@ -6,12 +6,49 @@ use App\Models\Bill;
 use App\Models\Customer;
 use App\Models\Payment;
 use App\Models\PaymentAllocation;
+use App\Models\Sheet;
 use App\Services\BillCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
+    /**
+     * List customers who have outstanding (unpaid/partial) bills, so a
+     * collector can pay against them.
+     */
+    public function dueList(Request $request)
+    {
+        $dueScope = fn ($q) => $q->where('status', '!=', Bill::STATUS_PAID)->where('due_amount', '>', 0);
+
+        $query = Customer::query()
+            ->with('sheet')
+            ->whereHas('bills', $dueScope)
+            ->withCount(['bills as due_bills_count' => $dueScope])
+            ->withSum(['bills as total_due' => $dueScope], 'due_amount');
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('serial_no', 'like', "%{$search}%")
+                    ->orWhere('name', 'like', "%{$search}%")
+                    ->orWhere('mobile_number', 'like', "%{$search}%")
+                    ->orWhere('meter_number', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('sheet_id')) {
+            $query->where('sheet_id', (int) $request->input('sheet_id'));
+        }
+
+        $customers = $query->orderByDesc('total_due')
+            ->paginate(15)->withQueryString();
+
+        return view('payments.due', [
+            'customers' => $customers,
+            'sheets'    => Sheet::orderBy('name')->get(),
+        ]);
+    }
+
     /**
      * List payments with filters (search, method, date range).
      */

@@ -118,6 +118,11 @@ class MeterReadingController extends Controller
      */
     public function edit(MeterReading $meterReading)
     {
+        if (! $meterReading->isPending()) {
+            return redirect()->route('meter-readings.index')
+                ->with('error', 'Only pending readings can be edited.');
+        }
+
         $meterReading->load('customer');
 
         return view('meter_readings.edit', [
@@ -130,6 +135,11 @@ class MeterReadingController extends Controller
      */
     public function update(Request $request, MeterReading $meterReading)
     {
+        if (! $meterReading->isPending()) {
+            return redirect()->route('meter-readings.index')
+                ->with('error', 'Only pending readings can be edited.');
+        }
+
         $data = $this->validateReading($request);
 
         if ($this->readingExists($data['customer_id'], $data['reading_date'], $meterReading->id)) {

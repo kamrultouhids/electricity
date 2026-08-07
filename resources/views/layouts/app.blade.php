@@ -60,7 +60,10 @@
                                 <a class="nav-link  {{ Route::is('bills.*') ? 'active' : '' }}" href="{{ route('bills.index') }}">Bills</a>
                             </li>
                              <li class="nav-item">
-                                <a class="nav-link  {{ Route::is('payments.*') ? 'active' : '' }}" href="{{ route('payments.index') }}">Payments</a>
+                                <a class="nav-link  {{ Route::is('payments.due') ? 'active' : '' }}" href="{{ route('payments.due') }}">Due List</a>
+                            </li>
+                             <li class="nav-item">
+                                <a class="nav-link  {{ Route::is('payments.index') || Route::is('payments.receipt') ? 'active' : '' }}" href="{{ route('payments.index') }}">Payments</a>
                             </li>
                              <li class="nav-item">
                                 <a class="nav-link  {{ Route::is('users.index') ? 'active' : '' }}" href="{{ route('users.index') }}">User List</a>
