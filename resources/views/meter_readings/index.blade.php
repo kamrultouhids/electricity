@@ -7,7 +7,7 @@
             Meter Readings
             <span class="badge bg-primary px-1 py-0 small">{{ $readings->total() }}</span>
         </h5>
-        <a href="{{ route('meter-readings.create') }}" class="btn btn-primary text-white">+ Add Reading</a>
+        <a href="{{ route('meter-readings.create') }}" class="btn btn-primary text-white"><i class="bi bi-plus-lg me-1"></i>Add Reading</a>
     </div>
 
     @if (session('success'))
@@ -53,8 +53,8 @@
                     <input type="month" name="month" value="{{ request('month') }}" class="form-control">
                 </div>
                 <div class="col-md-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary text-white w-100">Filter</button>
-                    <a href="{{ route('meter-readings.index') }}" class="btn btn-outline-secondary">Reset</a>
+                    <button type="submit" class="btn btn-primary text-white w-100"><i class="bi bi-funnel me-1"></i>Filter</button>
+                    <a href="{{ route('meter-readings.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-counterclockwise"></i></a>
                 </div>
             </form>
         </div>
@@ -76,7 +76,7 @@
                         <th>Reading Date</th>
                         <th>Reader Name</th>
                         <th>Status</th>
-                        <th class="text-end" width="120">Actions</th>
+                        <th class="text-end" width="150">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -115,9 +115,9 @@
                             </td>
                             <td class="text-end">
                                 <div class="btn-group btn-group-sm">
-                                    <a href="{{ route('meter-readings.show', $reading) }}" class="btn btn-outline-info">View</a>
+                                    <a href="{{ route('meter-readings.show', $reading) }}" class="btn btn-outline-info"><i class="bi bi-eye me-1"></i>View</a>
                                     @if ($reading->isPending())
-                                        <a href="{{ route('meter-readings.edit', $reading) }}" class="btn btn-outline-primary">Edit</a>
+                                        <a href="{{ route('meter-readings.edit', $reading) }}" class="btn btn-outline-primary"><i class="bi bi-pencil-square me-1"></i>Edit</a>
                                     @endif
                                 </div>
                             </td>

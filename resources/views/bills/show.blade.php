@@ -17,7 +17,7 @@
                 <a href="{{ route('payments.create', $bill->customer) }}" class="btn btn-success text-white">Collect Payment</a>
             @endunless
             <button type="button" onclick="window.print()" class="btn btn-outline-secondary">Print</button>
-            <a href="{{ route('bills.index') }}" class="btn btn-outline-secondary">Back to Bills</a>
+            <a href="{{ route('bills.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to Bills</a>
         </div>
     </div>
 

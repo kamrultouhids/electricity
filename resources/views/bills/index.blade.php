@@ -8,7 +8,7 @@
             <span class="badge bg-primary px-1 py-0 small">{{ $bills->total() }}</span>
         </h5>
         <a href="{{ route('bills.pending') }}" class="btn btn-primary text-white">
-            Pending Readings for Billing
+            <i class="bi bi-hourglass-split me-1"></i>Pending Readings for Billing
             <span class="badge bg-light text-dark ms-1">{{ $pendingCount }}</span>
         </a>
     </div>
@@ -56,8 +56,8 @@
                     <input type="month" name="month" value="{{ request('month') }}" class="form-control">
                 </div>
                 <div class="col-md-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary text-white w-100">Filter</button>
-                    <a href="{{ route('bills.index') }}" class="btn btn-outline-secondary">Reset</a>
+                    <button type="submit" class="btn btn-primary text-white w-100"><i class="bi bi-funnel me-1"></i>Filter</button>
+                    <a href="{{ route('bills.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-counterclockwise"></i></a>
                 </div>
             </form>
         </div>
@@ -107,9 +107,9 @@
                             </td>
                             <td class="text-end">
                                 <div class="btn-group btn-group-sm">
-                                    <a href="{{ route('bills.show', $bill) }}" class="btn btn-outline-info">View</a>
+                                    <a href="{{ route('bills.show', $bill) }}" class="btn btn-outline-info"><i class="bi bi-eye me-1"></i>View</a>
                                     @unless ($bill->isPaid())
-                                        <a href="{{ route('payments.create', $bill->customer) }}" class="btn btn-outline-success">Pay</a>
+                                        <a href="{{ route('payments.create', $bill->customer) }}" class="btn btn-outline-success"><i class="bi bi-cash-coin me-1"></i>Pay</a>
                                     @endunless
                                 </div>
                             </td>

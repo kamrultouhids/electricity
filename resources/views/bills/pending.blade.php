@@ -7,7 +7,7 @@
             Pending Readings for Billing
             <span class="badge bg-primary px-1 py-0 small">{{ $readings->total() }}</span>
         </h5>
-        <a href="{{ route('bills.index') }}" class="btn btn-outline-secondary">Generated Bills</a>
+        <a href="{{ route('bills.index') }}" class="btn btn-outline-secondary"><i class="bi bi-receipt me-1"></i>Generated Bills</a>
     </div>
 
     @if (session('success'))
@@ -42,8 +42,8 @@
                     <input type="month" name="month" value="{{ request('month') }}" class="form-control">
                 </div>
                 <div class="col-md-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary text-white w-100">Filter</button>
-                    <a href="{{ route('bills.pending') }}" class="btn btn-outline-secondary">Reset</a>
+                    <button type="submit" class="btn btn-primary text-white w-100"><i class="bi bi-funnel me-1"></i>Filter</button>
+                    <a href="{{ route('bills.pending') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-counterclockwise"></i></a>
                 </div>
             </form>
         </div>
@@ -81,7 +81,7 @@
                             <td class="text-end">{{ number_format($reading->consumed_units, 2) }}</td>
                             <td class="text-end">
                                 <a href="{{ route('bills.preview', $reading) }}" class="btn btn-sm btn-primary text-white">
-                                    Generate Bill
+                                    <i class="bi bi-receipt me-1"></i>Generate Bill
                                 </a>
                             </td>
                         </tr>

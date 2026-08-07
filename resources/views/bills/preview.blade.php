@@ -13,7 +13,7 @@
         <h4 class="mb-0">Bill Preview</h4>
         <div class="d-flex gap-2">
             <button type="button" onclick="window.print()" class="btn btn-outline-secondary">Print</button>
-            <a href="{{ route('bills.pending') }}" class="btn btn-outline-secondary">Back to Pending</a>
+            <a href="{{ route('bills.pending') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to Pending</a>
         </div>
     </div>
 

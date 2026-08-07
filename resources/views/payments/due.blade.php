@@ -7,7 +7,7 @@
             Customers with Due
             <span class="badge bg-primary px-1 py-0 small">{{ $bills->total() }}</span>
         </h5>
-        <a href="{{ route('payments.index') }}" class="btn btn-outline-secondary">Payment History</a>
+        <a href="{{ route('payments.index') }}" class="btn btn-outline-secondary"><i class="bi bi-clock-history me-1"></i>Payment History</a>
     </div>
 
     @if (session('success'))
@@ -38,8 +38,8 @@
                     </select>
                 </div>
                 <div class="col-md-4 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary text-white w-100">Filter</button>
-                    <a href="{{ route('payments.due') }}" class="btn btn-outline-secondary">Reset</a>
+                    <button type="submit" class="btn btn-primary text-white w-100"><i class="bi bi-funnel me-1"></i>Filter</button>
+                    <a href="{{ route('payments.due') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-counterclockwise"></i></a>
                 </div>
             </form>
         </div>
@@ -73,7 +73,7 @@
                             <td class="text-end fw-bold">{{ number_format($bill->due_amount, 2) }}</td>
                             <td class="text-end">
                                 <a href="{{ route('payments.create', $bill->customer) }}" class="btn btn-sm btn-success text-white">
-                                    Pay
+                                    <i class="bi bi-cash-coin me-1"></i>Pay
                                 </a>
                             </td>
                         </tr>

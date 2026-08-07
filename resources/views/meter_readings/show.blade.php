@@ -6,9 +6,9 @@
         <h4 class="mb-0">Meter Reading Details</h4>
         <div class="d-flex gap-2">
             @if ($meterReading->isPending())
-                <a href="{{ route('meter-readings.edit', $meterReading) }}" class="btn btn-outline-primary">Edit</a>
+                <a href="{{ route('meter-readings.edit', $meterReading) }}" class="btn btn-outline-primary"><i class="bi bi-pencil-square me-1"></i>Edit</a>
             @endif
-            <a href="{{ route('meter-readings.index') }}" class="btn btn-outline-secondary">Back to Readings</a>
+            <a href="{{ route('meter-readings.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to Readings</a>
         </div>
     </div>
 

@@ -4,7 +4,7 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">Add User</h4>
-        <a href="{{ route('users.index') }}" class="btn btn-outline-secondary">Back to User List</a>
+        <a href="{{ route('users.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to User List</a>
     </div>
 
     <div class="card">

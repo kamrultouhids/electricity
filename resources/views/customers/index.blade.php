@@ -7,7 +7,7 @@
             Customer Management
             <span class="badge bg-primary px-1 py-0 small">{{ $customers->total() }}</span>
         </h5>
-        <a href="{{ route('customers.create') }}" class="btn btn-primary text-white">+ Add Customer</a>
+        <a href="{{ route('customers.create') }}" class="btn btn-primary text-white"><i class="bi bi-plus-lg me-1"></i>Add Customer</a>
     </div>
 
     @if (session('success'))
@@ -54,8 +54,8 @@
                     </select>
                 </div>
                 <div class="col-md-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary text-white w-100">Filter</button>
-                    <a href="{{ route('customers.index') }}" class="btn btn-outline-secondary">Reset</a>
+                    <button type="submit" class="btn btn-primary text-white w-100"><i class="bi bi-funnel me-1"></i>Filter</button>
+                    <a href="{{ route('customers.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-counterclockwise"></i></a>
                 </div>
             </form>
         </div>
@@ -106,8 +106,8 @@
                             </td>
                             <td class="text-end">
                                 <div class="btn-group btn-group-sm">
-                                    <a href="{{ route('customers.show', $customer) }}" class="btn btn-outline-info">View</a>
-                                    <a href="{{ route('customers.edit', $customer) }}" class="btn btn-outline-primary">Edit</a>
+                                    <a href="{{ route('customers.show', $customer) }}" class="btn btn-outline-info"><i class="bi bi-eye me-1"></i>View</a>
+                                    <a href="{{ route('customers.edit', $customer) }}" class="btn btn-outline-primary"><i class="bi bi-pencil-square me-1"></i>Edit</a>
                                     <!-- <a href="{{ route('customers.delete', $customer) }}" class="btn btn-outline-danger"
                                        onclick="return confirm('Delete this customer?');">Delete</a> -->
                                 </div>

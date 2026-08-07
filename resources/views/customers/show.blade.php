@@ -5,8 +5,8 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">Customer Details</h4>
         <div>
-            <a href="{{ route('customers.edit', $customer) }}" class="btn btn-primary text-white">Edit</a>
-            <a href="{{ route('customers.index') }}" class="btn btn-outline-secondary">Back to Customer List</a>
+            <a href="{{ route('customers.edit', $customer) }}" class="btn btn-primary text-white"><i class="bi bi-pencil-square me-1"></i>Edit</a>
+            <a href="{{ route('customers.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to Customer List</a>
         </div>
     </div>
 
@@ -90,7 +90,7 @@
                             <td>{{ $payment->methodLabel() }}</td>
                             <td>{{ $payment->collector->name ?? '—' }}</td>
                             <td class="text-end">
-                                <a href="{{ route('payments.receipt', $payment) }}" class="btn btn-sm btn-outline-info">Receipt</a>
+                                <a href="{{ route('payments.receipt', $payment) }}" class="btn btn-sm btn-outline-info"><i class="bi bi-receipt me-1"></i>Receipt</a>
                             </td>
                         </tr>
                     @empty
