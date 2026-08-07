@@ -50,7 +50,7 @@
                     <td>{{ number_format($pb->units, 1) }}</td>
                     <td>{{ number_format($pb->total_amount, 1) }}</td>
                     <td>{{ number_format($pb->paid_amount, 1) }}</td>
-                    <td>0</td>
+                    <td>{{number_format($pb->discount, 1)}}</td>
                     <td>{{ number_format($pb->due_amount, 1) }}</td>
                 </tr>
             @empty

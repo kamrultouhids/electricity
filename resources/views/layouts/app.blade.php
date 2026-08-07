@@ -59,7 +59,7 @@
                                 <a class="nav-link  {{ Route::is('users.index') ? 'active' : '' }}" href="{{ route('users.index') }}"><i class="bi bi-people me-1"></i>User List</a>
                             </li>
                             <li class="nav-item dropdown">
-                                <a id="electricityDropdown" class="nav-link dropdown-toggle {{ Route::is('customers.*') || Route::is('meter-readings.*') || Route::is('bills.*') || Route::is('payments.*') || Route::is('tariffs.*') ? 'active' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                <a id="electricityDropdown" class="nav-link dropdown-toggle {{ Route::is('customers.*') || Route::is('meter-readings.*') || Route::is('bills.*') || Route::is('payments.*') || Route::is('tariffs.*') || Route::is('expenses.*') || Route::is('expense-categories.*') ? 'active' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                    <i class="bi bi-lightning-charge me-1"></i>Electricity management
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="electricityDropdown">
@@ -70,6 +70,10 @@
                                     <a class="dropdown-item {{ (Route::is('bills.*') && ! Route::is('bills.pending')) ? 'active' : '' }}" href="{{ route('bills.index') }}">Bills</a>
                                     <a class="dropdown-item {{ Route::is('payments.due') ? 'active' : '' }}" href="{{ route('payments.due') }}">Due List</a>
                                     <a class="dropdown-item {{ Route::is('payments.index') || Route::is('payments.receipt') ? 'active' : '' }}" href="{{ route('payments.index') }}">Payments</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item {{ Route::is('expense-categories.*') ? 'active' : '' }}" href="{{ route('expense-categories.index') }}">Expense Categories</a>
+                                    <a class="dropdown-item {{ Route::is('expenses.index') || Route::is('expenses.create') || Route::is('expenses.edit') ? 'active' : '' }}" href="{{ route('expenses.index') }}">Expenses</a>
+                                    <a class="dropdown-item {{ Route::is('expenses.profit-loss') ? 'active' : '' }}" href="{{ route('expenses.profit-loss') }}">Profit &amp; Loss</a>
                                 </div>
                             </li>
                             <li class="nav-item dropdown">

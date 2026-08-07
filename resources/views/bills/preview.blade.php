@@ -40,6 +40,7 @@
         'lateFee'            => $data['late_fee'],
         'fixedCharge'        => $data['fixed_charge'],
         'totalAmount'        => $data['total_amount'],
+        'discount'           => $data['discount'] ?? 0,
         'previousBills'      => $previousBills,
     ])
 

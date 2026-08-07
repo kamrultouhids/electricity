@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BillController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ExpenseCategoryController;
+use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\MeterReadingController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\TariffController;
@@ -59,6 +61,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/customers/{customer}/pay', [PaymentController::class, 'create'])->name('payments.create');
     Route::post('/customers/{customer}/pay', [PaymentController::class, 'store'])->name('payments.store');
     Route::get('/payments/{payment}/receipt', [PaymentController::class, 'receipt'])->name('payments.receipt');
+
+    // Expense Management
+    Route::get('/expenses/profit-loss', [ExpenseController::class, 'profitLoss'])->name('expenses.profit-loss');
+    Route::resource('expense-categories', ExpenseCategoryController::class)->except(['show'])->parameters([
+        'expense-categories' => 'expenseCategory',
+    ]);
+    Route::resource('expenses', ExpenseController::class)->except(['show']);
 });
 
 Route::get('/phpinfo', function () {
