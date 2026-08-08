@@ -16,29 +16,31 @@
     {{-- ===== Summary Cards ===== --}}
     <div class="row row-cols-2 row-cols-md-3 row-cols-xl-5 g-3 mb-4">
         @php
+            // [label, value, subtitle, icon, tone]
             $cards = [
-                ['Total Customers',        number_format($totalCustomers),        'bi-people-fill',        'stat-blue'],
-                ['Active / Inactive',      $activeCustomers.' / '.$inactiveCustomers, 'bi-plug-fill',      'stat-teal'],
-                ["Today's Collection",     '৳ '.number_format($todayCollection, 2), 'bi-cash-coin',        'stat-green'],
-                ['Monthly Collection',     '৳ '.number_format($monthCollection, 2), 'bi-calendar-check',   'stat-indigo'],
-                ['Discount This Month', '৳ '.number_format($monthDiscount, 2), 'bi-tags-fill',    'stat-amber'],
-                ['Due Balance',    '৳ '.number_format($totalOutstanding, 2),'bi-exclamation-circle','stat-red'],
-                ['Units This Month',       number_format($unitsThisMonth, 2),        'bi-lightning-charge-fill','stat-amber'],
-                ['Total Income',           '৳ '.number_format($totalIncome, 2),      'bi-arrow-down-circle-fill','stat-green'],
-                ['Total Expense',          '৳ '.number_format($totalExpense, 2),     'bi-arrow-up-circle-fill','stat-red'],
-                ['Net Profit',             '৳ '.number_format($netProfit, 2),        'bi-graph-up-arrow', $netProfit >= 0 ? 'stat-teal' : 'stat-red'],
+                ['Total Customers',     number_format($totalCustomers),            'Customers', 'bi-people-fill',            'stat-blue'],
+                ['Active / Inactive',   $activeCustomers.' / '.$inactiveCustomers, 'Customers', 'bi-plug-fill',             'stat-teal'],
+                ["Today's Collection",  '৳ '.number_format($todayCollection, 2),   'Today',     'bi-cash-coin',             'stat-green'],
+                ['Monthly Collection',  '৳ '.number_format($monthCollection, 2),   'This month','bi-calendar-check',        'stat-indigo'],
+                ['Discount This Month', '৳ '.number_format($monthDiscount, 2),     'This month','bi-tags-fill',             'stat-amber'],
+                ['Due Balance',         '৳ '.number_format($totalOutstanding, 2),  'Outstanding','bi-exclamation-circle',   'stat-red'],
+                ['Units This Month',    number_format($unitsThisMonth, 2),         'This month','bi-lightning-charge-fill', 'stat-amber'],
+                ['Total Income',        '৳ '.number_format($totalIncome, 2),       'This month','bi-arrow-down-circle-fill','stat-green'],
+                ['Total Expense',       '৳ '.number_format($totalExpense, 2),      'This month','bi-arrow-up-circle-fill',  'stat-red'],
+                ['Net Profit',          '৳ '.number_format($netProfit, 2),         'This month','bi-graph-up-arrow', $netProfit >= 0 ? 'stat-teal' : 'stat-red'],
             ];
         @endphp
 
-        @foreach ($cards as [$label, $value, $icon, $tone])
+        @foreach ($cards as [$label, $value, $subtitle, $icon, $tone])
             <div class="col">
-                <div class="card stat-card {{ $tone }} h-100 border-0 shadow-sm rounded-4">
-                    <div class="card-body d-flex align-items-center gap-3">
-                        <div class="stat-icon"><i class="bi {{ $icon }}"></i></div>
-                        <div class="min-w-0">
-                            <div class="stat-label text-muted small text-truncate">{{ $label }}</div>
-                            <div class="stat-value fw-bold">{{ $value }}</div>
+                <div class="card stat-card {{ $tone }} h-100 rounded-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                            <div class="stat-icon"><i class="bi {{ $icon }}"></i></div>
+                            <span class="stat-value">{{ $value }}</span>
                         </div>
+                        <div class="stat-label fw-semibold">{{ $label }}</div>
+                        <div class="stat-subtitle small">{{ $subtitle }}</div>
                     </div>
                 </div>
             </div>
@@ -132,25 +134,58 @@
 @push('styles')
 <style>
     .dashboard { max-width: 1400px; margin: 0 auto; }
-    .dashboard .card {
-        box-shadow: 0 1px 3px rgba(16,24,40,.06), 0 4px 12px rgba(16,24,40,.08) !important;
+
+    /* ===== Stat cards ===== */
+    .stat-card {
+        --tone: #3585BC;
+        background: #fff;
+        border: 1px solid #eef0f4;
+        box-shadow: 0 1px 3px rgba(16,24,40,.05) !important;
+        transition: background .18s ease, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
     }
+    .stat-card .card-body { padding: 1rem 1.1rem; }
+
     .stat-card .stat-icon {
-        width: 46px; height: 46px; flex: 0 0 46px;
-        border-radius: 12px;
+        width: 34px; height: 34px;
         display: flex; align-items: center; justify-content: center;
-        font-size: 1.25rem; color: #fff;
+        font-size: 1rem;
+        color: var(--tone);
+        background: color-mix(in srgb, var(--tone) 14%, #fff);
+        border-radius: 9px;
+        transition: background .18s ease, color .18s ease;
     }
-    .stat-card .stat-value { font-size: 1.15rem; line-height: 1.2; }
-    .stat-card .stat-label { letter-spacing: .02em; }
-    .stat-card { transition: transform .15s ease, box-shadow .15s ease; }
-    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.1) !important; }
-    .stat-blue   .stat-icon { background: linear-gradient(135deg,#3585BC,#2b6f9e); }
-    .stat-teal   .stat-icon { background: linear-gradient(135deg,#17a2b8,#128293); }
-    .stat-green  .stat-icon { background: linear-gradient(135deg,#28a745,#1e8637); }
-    .stat-indigo .stat-icon { background: linear-gradient(135deg,#6610f2,#520bc4); }
-    .stat-red    .stat-icon { background: linear-gradient(135deg,#dc3545,#b52a38); }
-    .stat-amber  .stat-icon { background: linear-gradient(135deg,#f0ad4e,#d18e2c); }
+    .stat-card .stat-label    { color: #1f2937; letter-spacing: .01em; }
+    .stat-card .stat-subtitle { color: #9aa1ad; }
+
+    /* Plain value on the right */
+    .stat-card .stat-value {
+        font-size: 1.25rem; font-weight: 700; line-height: 1.1;
+        color: var(--tone);
+        text-align: right;
+        transition: color .18s ease;
+    }
+
+    /* Hover = active: fill the card with the tone colour */
+    .stat-card:hover {
+        background: var(--tone);
+        border-color: var(--tone);
+        transform: translateY(-3px);
+        box-shadow: 0 .6rem 1.2rem rgba(16,24,40,.16) !important;
+    }
+    .stat-card:hover .stat-label,
+    .stat-card:hover .stat-subtitle { color: #fff; }
+    .stat-card:hover .stat-subtitle { opacity: .85; }
+    .stat-card:hover .stat-icon  { background: rgba(255,255,255,.22); color: #fff; }
+    .stat-card:hover .stat-value { color: #fff; }
+
+    /* Tone palette */
+    .stat-blue   { --tone: #3585BC; }
+    .stat-teal   { --tone: #17a2b8; }
+    .stat-green  { --tone: #28a745; }
+    .stat-indigo { --tone: #6610f2; }
+    .stat-red    { --tone: #dc3545; }
+    .stat-amber  { --tone: #e0932f; }
+
     .min-w-0 { min-width: 0; }
     .chart-box { position: relative; height: 300px; }
 </style>

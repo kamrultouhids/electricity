@@ -48,12 +48,17 @@ class HomeController extends Controller
             ->whereMonth('reading_date', now()->month)
             ->sum('consumed_units');
 
-        // --- Income / Expense / Net (all-time) ---
+        // --- Income / Expense / Net (this month) ---
         $totalIncome = (float) Payment::query()
+            ->whereYear('payment_date', $year)
+            ->whereMonth('payment_date', now()->month)
             ->where('status', Payment::STATUS_COMPLETED)
             ->sum('amount');
 
-        $totalExpense = (float) Expense::sum('amount');
+        $totalExpense = (float) Expense::query()
+            ->whereYear('expense_date', $year)
+            ->whereMonth('expense_date', now()->month)
+            ->sum('amount');
         $netProfit = round($totalIncome - $totalExpense, 2);
 
         // --- Charts (Jan–Dec of the current year) ---
@@ -81,7 +86,6 @@ class HomeController extends Controller
             ->latest('id')
             ->limit(5)
             ->get();
-
         return view('home', [
             'totalCustomers'    => $totalCustomers,
             'activeCustomers'   => $activeCustomers,
