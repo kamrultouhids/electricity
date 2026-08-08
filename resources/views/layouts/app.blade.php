@@ -97,6 +97,14 @@
             border-color: var(--app-primary);
         }
 
+        /* ===== Primary badge ===== */
+        .badge.bg-primary {
+            background-color: #3061B3 !important;
+            color: #fff !important;
+            border-radius: 50rem !important;
+            padding: .35em .7em !important;
+        }
+
         /* ===== List tables (all list pages, not the dashboard) ===== */
         .list-card {
             border: 1px solid #e3e7ee;
