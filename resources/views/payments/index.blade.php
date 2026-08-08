@@ -63,7 +63,7 @@
                         <th>Method</th>
                         <th>Collector</th>
                         <th>Date</th>
-                        <th class="text-end" width="100">Receipt</th>
+                        <th class="text-end" width="150">Receipt</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -79,7 +79,7 @@
                             <td>{{ $payment->collector->name ?? '—' }}</td>
                             <td>{{ $payment->payment_date->format('d M Y') }}</td>
                             <td class="text-end">
-                                <a href="{{ route('payments.receipt', $payment) }}" class="btn btn-sm btn-outline-info"><i class="bi bi-receipt me-1"></i>Receipt</a>
+                                <a href="{{ route('payments.receipt', $payment) }}" class="btn btn-outline-primary"><i class="bi bi-receipt me-1"></i>Receipt</a>
                             </td>
                         </tr>
                     @empty

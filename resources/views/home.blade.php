@@ -92,12 +92,15 @@
     {{-- ===== Recent Payments ===== --}}
     <div class="card panel-card rounded-4 mb-4">
         <div class="card-body">
-        <div class="panel-head mb-3 d-flex justify-content-between align-items-center">
+        <div class="mb-3 d-flex justify-content-between align-items-center">
             <div class="panel-head">
-                <span class="panel-icon stat-indigo"><i class="bi bi-clock-history"></i></span>
-                <h6 class="mb-0 fw-semibold">Recent Payments</h6>
+                <span class="panel-icon stat-blue"><i class="bi bi-credit-card-2-front"></i></span>
+                <div>
+                    <h6 class="mb-0 fw-semibold">Recent Payments</h6>
+                    <small class="text-muted">Latest transactions</small>
+                </div>
             </div>
-            <a href="{{ route('payments.index') }}" class="btn btn-sm btn-link text-decoration-none">View all</a>
+            <a href="{{ route('payments.index') }}" class="btn btn-sm rp-viewall rounded-pill">View all <i class="bi bi-arrow-right ms-1"></i></a>
         </div>
         <div class="table-responsive">
             <table class="table table-hover rp-table align-middle mb-0">
@@ -275,6 +278,18 @@
         color: #4b5563;
         font-weight: 600;
         border: 1px solid #e7eaf0;
+    }
+    .rp-viewall {
+        background: #eaf1ff;
+        color: #2563EB;
+        font-weight: 600;
+        border: 1px solid #dbe6ff;
+        padding: .35rem .9rem;
+    }
+    .rp-viewall:hover {
+        background: #2563EB;
+        color: #fff;
+        border-color: #2563EB;
     }
 
     .min-w-0 { min-width: 0; }
