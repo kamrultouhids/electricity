@@ -110,7 +110,22 @@ class MeterReadingController extends Controller
     {
         $meterReading->load(['customer.sheet', 'createdBy', 'updatedBy']);
 
-        return view('meter_readings.show', compact('meterReading'));
+        // All previous readings for the same customer (older than this one).
+        $history = MeterReading::query()
+            ->where('customer_id', $meterReading->customer_id)
+            ->where(function ($q) use ($meterReading) {
+                $q->where('reading_date', '<', $meterReading->reading_date)
+                    ->orWhere(function ($q2) use ($meterReading) {
+                        $q2->where('reading_date', $meterReading->reading_date)
+                            ->where('id', '<', $meterReading->id);
+                    });
+            })
+            ->with('createdBy')
+            ->orderByDesc('reading_date')
+            ->orderByDesc('id')
+            ->get();
+
+        return view('meter_readings.show', compact('meterReading', 'history'));
     }
 
     /**
