@@ -71,10 +71,7 @@
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>
-                                <div>{{ $payment->customer->name ?? '—' }}</div>
-                                <small class="text-muted d-block">Serial No: {{ $payment->customer->serial_no ?? '—' }}</small>
-                                <small class="text-muted d-block">Meter No: {{ $payment->customer->meter_number ?? '—' }}</small>
-                                <small class="text-muted d-block">Mobile: {{ $payment->customer->mobile_number ?? '—' }}</small>
+                                @include('partials.customer_cell', ['customer' => $payment->customer])
                             </td>
                             <td class="text-end">{{ number_format($payment->amount, 2) }}</td>
                             <td class="text-end">{{ number_format($payment->discount, 2) }}</td>

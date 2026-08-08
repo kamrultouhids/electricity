@@ -86,9 +86,7 @@
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>
-                                <div>{{ $bill->customer->name ?? '—' }}</div>
-                                <small class="text-muted d-block">Meter No: {{ $bill->customer->meter_number ?? '—' }}</small>
-                                <small class="text-muted d-block">Mobile: {{ $bill->customer->mobile_number ?? '—' }}</small>
+                                @include('partials.customer_cell', ['customer' => $bill->customer])
                             </td>
                             <td>{{ $bill->customer->sheet->name ?? '—' }}</td>
                             <td>{{ $bill->billing_month->format('M Y') }}</td>

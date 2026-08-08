@@ -85,17 +85,16 @@
                             <td>{{ $loop->iteration }}</td>
                             <td>
                                 @if ($reading->photo)
-                                    <img src="{{ asset('storage/' . $reading->photo) }}" alt="photo"
-                                         class="rounded" style="width:42px;height:42px;object-fit:cover;">
+                                    <a href="{{ asset('storage/' . $reading->photo) }}" target="_blank" rel="noopener" title="View full photo">
+                                        <img src="{{ asset('storage/' . $reading->photo) }}" alt="photo"
+                                             class="rounded" style="width:42px;height:42px;object-fit:cover;cursor:pointer;">
+                                    </a>
                                 @else
                                     <span class="text-muted">—</span>
                                 @endif
                             </td>
                             <td>
-                                <div>{{ $reading->customer->name ?? '—' }}</div>
-                                <small class="text-muted d-block">Serial No: {{ $reading->customer->serial_no ?? '—' }}</small>
-                                <small class="text-muted d-block">Meter No: {{ $reading->customer->meter_number ?? '—' }}</small>
-                                <small class="text-muted d-block">Mobile: {{ $reading->customer->mobile_number ?? '—' }}</small>
+                                @include('partials.customer_cell', ['customer' => $reading->customer])
                             </td>
                             <td>{{ $reading->customer->sheet->name ?? '—' }}</td>
                             <td>{{ number_format($reading->previous_reading, 2) }}</td>

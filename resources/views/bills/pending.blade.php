@@ -70,9 +70,7 @@
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>
-                                <div>{{ $reading->customer->name ?? '—' }}</div>
-                                <small class="text-muted d-block">Meter No: {{ $reading->customer->meter_number ?? '—' }}</small>
-                                <small class="text-muted d-block">Mobile: {{ $reading->customer->mobile_number ?? '—' }}</small>
+                                @include('partials.customer_cell', ['customer' => $reading->customer])
                             </td>
                             <td>{{ $reading->customer->sheet->name ?? '—' }}</td>
                             <td>{{ $reading->reading_date->format('M Y') }}</td>
