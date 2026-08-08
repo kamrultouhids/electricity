@@ -75,6 +75,7 @@
                         <th>Mobile</th>
                         <th>Meter No</th>
                         <th>Connection Type</th>
+                        <th>Connection Date</th>
                         <th>Connection Status</th>
                         <th class="text-end" width="150">Actions</th>
                     </tr>
@@ -97,6 +98,7 @@
                             <td>{{ $customer->mobile_number }}</td>
                             <td>{{ $customer->meter_number ?? '—' }}</td>
                             <td>{{ $customer->connection_type ? ucfirst($customer->connection_type) : '—' }}</td>
+                            <td>{{ $customer->connection_date ? $customer->connection_date->format('d M Y') : '—' }}</td>
                             <td>
                                 @if ($customer->isActive())
                                     <span class="badge bg-success">Active</span>
@@ -115,7 +117,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="text-center text-muted py-4">No customers found.</td>
+                            <td colspan="11" class="text-center text-muted py-4">No customers found.</td>
                         </tr>
                     @endforelse
                 </tbody>

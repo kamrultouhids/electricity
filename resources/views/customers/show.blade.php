@@ -52,6 +52,7 @@
                                     'Guardian Address'          => $customer->guardian_address,
                                     'Meter Number'              => $customer->meter_number,
                                     'Connection Type'           => $customer->connection_type ? ucfirst($customer->connection_type) : null,
+                                    'Connection Date'           => $customer->connection_date ? $customer->connection_date->format('d M Y') : null,
                                 ];
                             @endphp
                             @foreach ($rows as $label => $value)

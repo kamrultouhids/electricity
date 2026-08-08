@@ -51,11 +51,59 @@ class MeterReadingController extends Controller
         $readings = $query->latest()
             ->paginate(15)->withQueryString();
 
+        $this->flagDiscrepancies($readings->getCollection());
+
         return view('meter_readings.index', [
             'readings'      => $readings,
             'sheets'        => Sheet::orderBy('name')->get(),
             'statusOptions' => MeterReading::STATUS_LABELS,
         ]);
+    }
+
+    /**
+     * Mark each reading that breaks the meter chain: this reading's
+     * previous_reading should equal the previous (older) reading's
+     * current_reading for the same customer. Also flags a reading whose
+     * current is below its own previous. Sets a dynamic `is_flagged`
+     * attribute on each reading (the flag lands on the newer row).
+     */
+    protected function flagDiscrepancies($readings): void
+    {
+        if ($readings->isEmpty()) {
+            return;
+        }
+
+        $customerIds = $readings->pluck('customer_id')->unique()->all();
+
+        // Full ordered chain per customer (oldest -> newest).
+        $chains = MeterReading::query()
+            ->whereIn('customer_id', $customerIds)
+            ->orderBy('customer_id')
+            ->orderBy('reading_date')
+            ->orderBy('id')
+            ->get(['id', 'customer_id', 'reading_date', 'previous_reading', 'current_reading'])
+            ->groupBy('customer_id');
+
+        foreach ($readings as $reading) {
+            $chain = $chains->get($reading->customer_id);
+            $flagged = (float) $reading->current_reading < (float) $reading->previous_reading;
+            $expected = null;   // what this reading's previous should have been
+            $prevDate = null;
+
+            if ($chain) {
+                $index = $chain->search(fn ($r) => $r->id === $reading->id);
+                $older = ($index !== false && $index > 0) ? $chain->get($index - 1) : null;
+                if ($older && (float) $older->current_reading !== (float) $reading->previous_reading) {
+                    $flagged = true;
+                    $expected = $older->current_reading;
+                    $prevDate = $older->reading_date;
+                }
+            }
+
+            $reading->is_flagged = $flagged;
+            $reading->flag_expected = $expected;
+            $reading->flag_prev_date = $prevDate;
+        }
     }
 
     /**

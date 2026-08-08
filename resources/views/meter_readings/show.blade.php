@@ -99,15 +99,24 @@
                         <th class="text-end">Consumed Units</th>
                         <th>Reader Name</th>
                         <th>Status</th>
+                        <th>Flag</th>
                     </tr>
                 </thead>
                 <tbody>
+                    {{-- History is newest-first; each row's previous should equal
+                         the older reading's current. The flag lands on the newer row. --}}
                     @forelse ($history as $row)
-                        <tr>
+                        @php
+                            $older      = $history->get($loop->index + 1);   // next item = older reading
+                            $selfIssue  = (float) $row->current_reading < (float) $row->previous_reading;
+                            $chainBreak = $older && (float) $older->current_reading !== (float) $row->previous_reading;
+                            $flagged    = $selfIssue || $chainBreak;
+                        @endphp
+                        <tr class="{{ $flagged ? 'table-danger' : '' }}">
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $row->reading_date->format('d M Y') }}</td>
-                            <td class="text-end">{{ number_format($row->previous_reading, 2) }}</td>
-                            <td class="text-end">{{ number_format($row->current_reading, 2) }}</td>
+                            <td class="text-end {{ $chainBreak ? 'text-danger fw-bold' : '' }}">{{ number_format($row->previous_reading, 2) }}</td>
+                            <td class="text-end {{ $selfIssue ? 'text-danger fw-bold' : '' }}">{{ number_format($row->current_reading, 2) }}</td>
                             <td class="text-end">{{ number_format($row->consumed_units, 2) }}</td>
                             <td>{{ $row->createdBy->name ?? '—' }}</td>
                             <td>
@@ -117,10 +126,23 @@
                                     <span class="badge bg-warning text-dark">Pending</span>
                                 @endif
                             </td>
+                            <td>
+                                @if ($chainBreak)
+                                    <span class="badge bg-danger" title="This reading's previous ({{ number_format($row->previous_reading, 2) }}) does not match the last reading's current ({{ number_format($older->current_reading, 2) }}) on {{ $older->reading_date->format('d M Y') }}">
+                                        <i class="bi bi-exclamation-triangle-fill me-1"></i>Mismatch
+                                    </span>
+                                @elseif ($selfIssue)
+                                    <span class="badge bg-danger" title="Current reading ({{ number_format($row->current_reading, 2) }}) is lower than previous reading ({{ number_format($row->previous_reading, 2) }})">
+                                        <i class="bi bi-exclamation-triangle-fill me-1"></i>Discrepancy
+                                    </span>
+                                @else
+                                    <span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle me-1"></i>OK</span>
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-4">No previous readings.</td>
+                            <td colspan="8" class="text-center text-muted py-4">No previous readings.</td>
                         </tr>
                     @endforelse
                 </tbody>

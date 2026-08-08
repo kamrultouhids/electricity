@@ -56,6 +56,15 @@ class MeterReading extends Model
         return self::STATUS_LABELS[$this->status] ?? 'Unknown';
     }
 
+    /**
+     * A reading is inconsistent when the current reading is below the
+     * previous one (a cumulative meter can't run backwards).
+     */
+    public function hasDiscrepancy(): bool
+    {
+        return (float) $this->current_reading < (float) $this->previous_reading;
+    }
+
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);

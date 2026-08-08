@@ -31,6 +31,7 @@ class Customer extends Model
         'guardian_address',
         'meter_number',
         'connection_type',
+        'connection_date',
         'status',
         'created_by',
         'updated_by',
@@ -40,6 +41,7 @@ class Customer extends Model
         'sheet_id' => 'integer',
         'age' => 'integer',
         'status' => 'integer',
+        'connection_date' => 'date',
     ];
 
     public function sheet(): BelongsTo

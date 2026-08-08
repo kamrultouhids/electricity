@@ -76,12 +76,13 @@
                         <th>Reading Date</th>
                         <th>Reader Name</th>
                         <th>Status</th>
+                        <th>Flag</th>
                         <th class="text-end" width="150">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($readings as $reading)
-                        <tr>
+                        <tr class="{{ $reading->is_flagged ? 'table-danger' : '' }}">
                             <td>{{ $loop->iteration }}</td>
                             <td>
                                 @if ($reading->photo)
@@ -112,6 +113,21 @@
                                     <span class="badge bg-warning text-dark">Pending</span>
                                 @endif
                             </td>
+                            <td>
+                                @if ($reading->is_flagged)
+                                    <span class="badge bg-danger" title="This reading's previous ({{ number_format($reading->previous_reading, 2) }})@if (! is_null($reading->flag_expected)) does not match the last reading's current ({{ number_format($reading->flag_expected, 2) }}) on {{ optional($reading->flag_prev_date)->format('d M Y') }}@else is greater than current ({{ number_format($reading->current_reading, 2) }})@endif">
+                                        <i class="bi bi-exclamation-triangle-fill me-1"></i>Discrepancy
+                                    </span>
+                                    @if (! is_null($reading->flag_expected))
+                                        <div class="small text-danger mt-1">
+                                            Previous: {{ number_format($reading->previous_reading, 2) }}<br>
+                                            Expected: {{ number_format($reading->flag_expected, 2) }}
+                                        </div>
+                                    @endif
+                                @else
+                                    <span class="text-muted">—</span>
+                                @endif
+                            </td>
                             <td class="text-end">
                                 <div class="btn-group btn-group-sm">
                                     <a href="{{ route('meter-readings.show', $reading) }}" class="btn btn-outline-info"><i class="bi bi-eye me-1"></i>View</a>
@@ -123,7 +139,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="11" class="text-center text-muted py-4">No meter readings found.</td>
+                            <td colspan="12" class="text-center text-muted py-4">No meter readings found.</td>
                         </tr>
                     @endforelse
                 </tbody>

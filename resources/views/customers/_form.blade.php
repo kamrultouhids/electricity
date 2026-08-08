@@ -131,6 +131,11 @@
         </select>
     </div>
     <div class="col-md-4">
+        <label class="form-label">Connection Date <span class="text-danger">*</span></label>
+        <input type="date" name="connection_date" class="form-control" required
+               value="{{ old('connection_date', isset($customer) && $customer->connection_date ? $customer->connection_date->format('Y-m-d') : '') }}">
+    </div>
+    <div class="col-md-4">
         <label class="form-label">Connection Status <span class="text-danger">*</span></label>
         <select name="status" class="form-select" required>
             <option value="1" @selected(old('status', $customer->status ?? 1) == 1)>Active</option>

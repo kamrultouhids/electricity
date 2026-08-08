@@ -205,6 +205,7 @@ class CustomerController extends Controller
             'guardian_address'          => 'nullable|string',
             'meter_number'              => 'required|string',
             'connection_type'           => 'required|in:' . implode(',', Customer::CONNECTION_TYPES),
+            'connection_date'           => 'required|date',
             'status'                    => 'required|in:0,1',
         ], [
             'photo.max' => 'The photo field must not be greater than 2 mb.',
