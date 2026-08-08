@@ -136,7 +136,7 @@
                             <td class="text-end fw-bold text-success text-nowrap">৳ {{ number_format($payment->amount, 2) }}</td>
                             <td class="text-end text-nowrap">
                                 @if ((float) $payment->discount > 0)
-                                    <span class="text-warning fw-semibold">৳ {{ number_format($payment->discount, 2) }}</span>
+                                    <span class="text-danger fw-semibold">৳ {{ number_format($payment->discount, 2) }}</span>
                                 @else
                                     <span class="text-muted">—</span>
                                 @endif
