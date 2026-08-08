@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="container">
+    @include('partials.electricity_nav')
     <div class="d-flex justify-content-between align-items-center mb-3 no-print">
         <h5 class="mb-0">
             Customers with Due

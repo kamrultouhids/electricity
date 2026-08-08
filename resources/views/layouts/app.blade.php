@@ -124,6 +124,27 @@
             body { background: #fff !important; }
             .no-print { display: none !important; }
             .navbar, nav { display: none !important; }
+
+            /* Flatten list cards for clean printing */
+            .list-card {
+                border: none !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                overflow: visible !important;
+            }
+            /* No head background colour in print */
+            .list-card .list-head th {
+                background-color: transparent !important;
+                border-bottom: 1px solid #444 !important;
+                color: #000 !important;
+            }
+            /* Bordered, readable table on paper */
+            .list-card table.table th,
+            .list-card table.table td {
+                border: 1px solid #444 !important;
+                padding: 4px 6px !important;
+            }
+            .list-card table.table thead { display: table-header-group; }
         }
     </style>
     @stack('styles')
