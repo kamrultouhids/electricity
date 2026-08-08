@@ -17,10 +17,10 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
-    <div class="card">
+    <div class="card list-card rounded-4">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+                <thead class="list-head">
                     <tr>
                         <th>#</th>
                         <th>Name</th>

@@ -62,10 +62,10 @@
     </div>
 
     {{-- List --}}
-    <div class="card">
+    <div class="card list-card rounded-4">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+                <thead class="list-head">
                     <tr>
                         <th>#</th>
                         <th>Photo</th>
@@ -115,7 +115,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="text-center text-muted py-4">No customers found.</td>
+                            <td colspan="10" class="text-center text-muted py-4">No customers found.</td>
                         </tr>
                     @endforelse
                 </tbody>

@@ -18,14 +18,102 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
-        .btn-primary {
-            background-color:  #3585BC !important;
+        :root {
+            --app-body-bg: #F0F4F8;
+            --app-nav-bg: #1E3A5F;
+            --app-primary: #2563EB;
+            --app-primary-light: #3B82F6;
+            --app-primary-dark: #1D4ED8;
+            --bs-link-color: var(--app-primary);
+            --bs-link-hover-color: var(--app-primary-dark);
+        }
+
+        body { background-color: var(--app-body-bg); }
+
+        /* ===== Navbar ===== */
+        .navbar {
+            background-color: var(--app-nav-bg) !important;
+        }
+        .navbar .navbar-brand,
+        .navbar .navbar-nav .nav-link {
+            color: rgba(255,255,255,.82) !important;
+        }
+        .navbar .navbar-brand { font-weight: 700; color: #fff !important; }
+        .navbar .navbar-nav .nav-link:hover,
+        .navbar .navbar-nav .nav-link:focus {
+            color: #fff !important;
         }
         .navbar-nav .nav-link.active {
-            color: #3585BC !important;
+            color: #fff !important;
             font-weight: 600;
         }
+        .navbar .navbar-toggler {
+            border-color: rgba(255,255,255,.35);
+        }
+        .navbar .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,0.85)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        /* ===== Primary button ===== */
+        .btn-primary {
+            background-color: #3061B3 !important;
+            border-color: #3061B3 !important;
+            box-shadow: 0 2px 6px rgba(48,97,179,.28);
+        }
+        .btn-primary:hover,
+        .btn-primary:focus,
+        .btn-primary:active {
+            background-color: #274f93 !important;
+            border-color: #274f93 !important;
+            box-shadow: 0 4px 10px rgba(48,97,179,.35);
+        }
+
+        /* ===== Outline / link accents ===== */
+        .btn-outline-primary {
+            color: var(--app-primary);
+            border-color: var(--app-primary);
+        }
+        .btn-outline-primary:hover,
+        .btn-outline-primary:active {
+            background-color: var(--app-primary);
+            border-color: var(--app-primary);
+            color: #fff;
+        }
+        a { color: var(--app-primary); }
+        a:hover { color: var(--app-primary-dark); }
+        .text-primary { color: var(--app-primary) !important; }
+
+        /* ===== Dropdown active items ===== */
+        .dropdown-item.active,
+        .dropdown-item:active {
+            background-color: var(--app-primary);
+            color: #fff;
+        }
+
+        /* ===== Pagination ===== */
+        .page-link { color: var(--app-primary); }
+        .page-item.active .page-link {
+            background-color: var(--app-primary);
+            border-color: var(--app-primary);
+        }
+
+        /* ===== List tables (all list pages, not the dashboard) ===== */
+        .list-card {
+            border: 1px solid #e3e7ee;
+            box-shadow: 0 1px 3px rgba(16,24,40,.05);
+            overflow: hidden;            /* clip the table to the card's rounded corners */
+        }
+        .list-card .list-head th {
+            background-color: #EEF5FF;
+            border-bottom: 1px solid #dbe6f5;
+            color: #1f2937;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .list-card tbody td { font-size: 14px; }
+
         @media print {
+            body { background: #fff !important; }
             .no-print { display: none !important; }
             .navbar, nav { display: none !important; }
         }
@@ -34,7 +122,7 @@
 </head>
 <body>
     <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+        <nav class="navbar navbar-expand-md navbar-dark shadow-sm">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
                     {{ config('app.name', 'Laravel') }}

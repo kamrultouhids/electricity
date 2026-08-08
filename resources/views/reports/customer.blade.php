@@ -44,10 +44,10 @@
         </div>
     </div>
 
-    <div class="card">
+    <div class="card list-card rounded-4">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+                <thead class="list-head">
                     <tr>
                         <th>Serial No</th>
                         <th>Name</th>

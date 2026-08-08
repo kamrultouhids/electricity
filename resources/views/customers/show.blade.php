@@ -69,11 +69,11 @@
     </div>
 
     {{-- Payment history --}}
-    <div class="card mt-3">
+    <div class="card mt-3 list-card rounded-4">
         <div class="card-header bg-white"><h6 class="mb-0">Payment History</h6></div>
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+                <thead class="list-head">
                     <tr>
                         <th>#</th>
                         <th>Date</th>

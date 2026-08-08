@@ -48,7 +48,7 @@
         </div>
     </div>
 
-    <div class="card">
+    <div class="card list-card rounded-4">
         <div class="card-body pb-0">
             <div class="text-center mb-3">
                 <h6 class="mb-0">Income &amp; Expense</h6>
@@ -60,7 +60,7 @@
         </div>
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+                <thead class="list-head">
                     <tr>
                         <th>Month</th>
                         <th class="text-end">Income</th>
