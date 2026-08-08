@@ -35,6 +35,12 @@ class HomeController extends Controller
             ->where('status', Payment::STATUS_COMPLETED)
             ->sum('amount');
 
+        $monthDiscount = (float) Payment::query()
+            ->whereYear('payment_date', $year)
+            ->whereMonth('payment_date', now()->month)
+            ->where('status', Payment::STATUS_COMPLETED)
+            ->sum('discount');
+
         $totalOutstanding = (float) $this->latestBillsWithDue()->sum('bills.due_amount');
 
         $unitsThisMonth = (float) MeterReading::query()
@@ -82,6 +88,7 @@ class HomeController extends Controller
             'inactiveCustomers' => $inactiveCustomers,
             'todayCollection'   => $todayCollection,
             'monthCollection'   => $monthCollection,
+            'monthDiscount'     => $monthDiscount,
             'totalOutstanding'  => $totalOutstanding,
             'unitsThisMonth'    => $unitsThisMonth,
             'totalIncome'       => $totalIncome,

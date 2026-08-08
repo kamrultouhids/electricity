@@ -9,10 +9,7 @@ use App\Models\Bill;
  */
 class BillCalculator
 {
-    /** Units covered by the flat minimum charge. */
-    public const SLAB_UNITS = 25;
-
-    /** Minimum (slab) charge for 0..SLAB_UNITS units, by connection type. */
+    /** Minimum charge (floor) by connection type. */
     public const MIN_CHARGE_COMMERCIAL = 350;
     public const MIN_CHARGE_DEFAULT = 300; // residential, religious, others
 
@@ -52,13 +49,13 @@ class BillCalculator
     }
 
     /**
-     * Energy charge: the minimum acts as a floor. Beyond the slab the metered
-     * amount is (units - SLAB_UNITS) * rate; whichever is larger wins.
+     * Energy charge: every unit is billed at the rate (units * rate), with the
+     * connection-type minimum charge acting as a floor.
      */
     public function energyCharge(?string $type, float $units, float $rate): float
     {
         $minimum = $this->minimumCharge($type);
-        $metered = max(0.0, $units - self::SLAB_UNITS) * $rate;
+        $metered = max(0.0, $units) * $rate;
 
         return round(max($minimum, $metered), 2);
     }

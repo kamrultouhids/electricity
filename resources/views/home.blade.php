@@ -21,6 +21,7 @@
                 ['Active / Inactive',      $activeCustomers.' / '.$inactiveCustomers, 'bi-plug-fill',      'stat-teal'],
                 ["Today's Collection",     '৳ '.number_format($todayCollection, 2), 'bi-cash-coin',        'stat-green'],
                 ['Monthly Collection',     '৳ '.number_format($monthCollection, 2), 'bi-calendar-check',   'stat-indigo'],
+                ['Discount This Month', '৳ '.number_format($monthDiscount, 2), 'bi-tags-fill',    'stat-amber'],
                 ['Due Balance',    '৳ '.number_format($totalOutstanding, 2),'bi-exclamation-circle','stat-red'],
                 ['Units This Month',       number_format($unitsThisMonth, 2),        'bi-lightning-charge-fill','stat-amber'],
                 ['Total Income',           '৳ '.number_format($totalIncome, 2),      'bi-arrow-down-circle-fill','stat-green'],

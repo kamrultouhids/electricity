@@ -134,17 +134,20 @@ class ReportController extends Controller
 
         $this->applyCustomerFilters($query, $request);
 
+       
+
         $query->orderBy('serial_no');
 
         if ($request->input('export') === 'csv') {
             return $this->exportCsv('customer-report.csv',
-                ['Serial', 'Name', 'Sheet', 'Meter', 'Mobile', 'Consumption (units)', 'Collected', 'Discount', 'Outstanding'],
+                ['Serial', 'Name', 'Sheet', 'Meter', 'Mobile', 'Status', 'Consumption (units)', 'Collected', 'Discount', 'Outstanding'],
                 $query->get()->map(fn ($c) => [
                     $c->serial_no,
                     $c->name,
                     $c->sheet->name ?? '',
                     $c->meter_number,
                     $c->mobile_number,
+                    $c->isActive() ? 'Active' : 'Inactive',
                     number_format((float) $c->consumption_total, 2, '.', ''),
                     number_format((float) $c->paid_total, 2, '.', ''),
                     number_format((float) $c->discount_total, 2, '.', ''),

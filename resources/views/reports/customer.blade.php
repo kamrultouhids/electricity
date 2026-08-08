@@ -35,6 +35,7 @@
                         <option value="0" @selected(request('status') === '0')>Inactive</option>
                     </select>
                 </div>
+                
                 <div class="col-md-2 d-flex gap-2">
                     <button type="submit" class="btn btn-primary text-white "><i class="bi bi-funnel me-1"></i>Filter</button>
                     <a href="{{ route('reports.customers') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-counterclockwise"></i></a>
@@ -48,10 +49,12 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>Serial</th>
+                        <th>Serial No</th>
                         <th>Name</th>
                         <th>Sheet</th>
-                        <th>Meter</th>
+                        <th>Meter No</th>
+                        <th>Mobile</th>
+                        <th>Connection </th>
                         <th class="text-end">Consumption</th>
                         <th class="text-end">Collected</th>
                         <th class="text-end">Discount</th>
@@ -65,6 +68,14 @@
                             <td>{{ $customer->name }}</td>
                             <td>{{ $customer->sheet->name ?? '—' }}</td>
                             <td>{{ $customer->meter_number ?? '—' }}</td>
+                            <td>{{ $customer->mobile_number ?? '—' }}</td>
+                            <td>
+                                @if ($customer->isActive())
+                                    <span class="badge rounded-pill bg-success-subtle text-success">Active</span>
+                                @else
+                                    <span class="badge rounded-pill bg-danger-subtle text-danger">Inactive</span>
+                                @endif
+                            </td>
                             <td class="text-end">{{ number_format((float) $customer->consumption_total, 2) }}</td>
                             <td class="text-end">{{ number_format((float) $customer->paid_total, 2) }}</td>
                             <td class="text-end">{{ number_format((float) $customer->discount_total, 2) }}</td>
@@ -73,7 +84,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="8" class="text-center text-muted py-4">No customers found.</td></tr>
+                        <tr><td colspan="10" class="text-center text-muted py-4">No customers found.</td></tr>
                     @endforelse
                 </tbody>
             </table>
