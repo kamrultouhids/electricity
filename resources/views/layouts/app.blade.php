@@ -187,17 +187,17 @@
                                    <i class="bi bi-lightning-charge me-1"></i>Electricity management
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="electricityDropdown">
-                                    <a class="dropdown-item {{ Route::is('tariffs.index') ? 'active' : '' }}" href="{{ route('tariffs.index') }}">Rate Settings</a>
-                                    <a class="dropdown-item {{ Route::is('customers.*') ? 'active' : '' }}" href="{{ route('customers.index') }}">Customer List</a>
-                                    <a class="dropdown-item {{ Route::is('meter-readings.*') ? 'active' : '' }}" href="{{ route('meter-readings.index') }}">Meter Readings</a>
-                                    <a class="dropdown-item {{ Route::is('bills.pending') ? 'active' : '' }}" href="{{ route('bills.pending') }}">Pending Billing Readings</a>
-                                    <a class="dropdown-item {{ (Route::is('bills.*') && ! Route::is('bills.pending')) ? 'active' : '' }}" href="{{ route('bills.index') }}">Bills</a>
-                                    <a class="dropdown-item {{ Route::is('payments.due') ? 'active' : '' }}" href="{{ route('payments.due') }}">Due List</a>
-                                    <a class="dropdown-item {{ Route::is('payments.index') || Route::is('payments.receipt') ? 'active' : '' }}" href="{{ route('payments.index') }}">Payments</a>
+                                    <a class="dropdown-item {{ Route::is('tariffs.index') ? 'active' : '' }}" href="{{ route('tariffs.index') }}"><i class="bi bi-sliders me-2"></i>Rate Settings</a>
+                                    <a class="dropdown-item {{ Route::is('customers.*') ? 'active' : '' }}" href="{{ route('customers.index') }}"><i class="bi bi-people me-2"></i>Customer List</a>
+                                    <a class="dropdown-item {{ Route::is('meter-readings.*') ? 'active' : '' }}" href="{{ route('meter-readings.index') }}"><i class="bi bi-speedometer2 me-2"></i>Meter Readings</a>
+                                    <a class="dropdown-item {{ Route::is('bills.pending') ? 'active' : '' }}" href="{{ route('bills.pending') }}"><i class="bi bi-hourglass-split me-2"></i>Pending Billing Readings</a>
+                                    <a class="dropdown-item {{ (Route::is('bills.*') && ! Route::is('bills.pending')) ? 'active' : '' }}" href="{{ route('bills.index') }}"><i class="bi bi-receipt me-2"></i>Bills</a>
+                                    <a class="dropdown-item {{ Route::is('payments.due') ? 'active' : '' }}" href="{{ route('payments.due') }}"><i class="bi bi-cash-stack me-2"></i>Due List</a>
+                                    <a class="dropdown-item {{ Route::is('payments.index') || Route::is('payments.receipt') ? 'active' : '' }}" href="{{ route('payments.index') }}"><i class="bi bi-cash-coin me-2"></i>Payments</a>
                                     <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item {{ Route::is('expense-categories.*') ? 'active' : '' }}" href="{{ route('expense-categories.index') }}">Expense Categories</a>
-                                    <a class="dropdown-item {{ Route::is('expenses.index') || Route::is('expenses.create') || Route::is('expenses.edit') ? 'active' : '' }}" href="{{ route('expenses.index') }}">Expenses</a>
-                                    <a class="dropdown-item {{ Route::is('expenses.profit-loss') ? 'active' : '' }}" href="{{ route('expenses.profit-loss') }}">Profit &amp; Loss</a>
+                                    <a class="dropdown-item {{ Route::is('expense-categories.*') ? 'active' : '' }}" href="{{ route('expense-categories.index') }}"><i class="bi bi-tags me-2"></i>Expense Categories</a>
+                                    <a class="dropdown-item {{ Route::is('expenses.index') || Route::is('expenses.create') || Route::is('expenses.edit') ? 'active' : '' }}" href="{{ route('expenses.index') }}"><i class="bi bi-wallet2 me-2"></i>Expenses</a>
+                                    <a class="dropdown-item {{ Route::is('expenses.profit-loss') ? 'active' : '' }}" href="{{ route('expenses.profit-loss') }}"><i class="bi bi-graph-up-arrow me-2"></i>Profit &amp; Loss</a>
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
@@ -205,13 +205,13 @@
                                    <i class="bi bi-bar-chart-line me-1"></i>Report management
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="reportDropdown">
-                                    <a class="dropdown-item {{ Route::is('reports.daily-collection') ? 'active' : '' }}" href="{{ route('reports.daily-collection') }}">Daily Collection</a>
-                                    <a class="dropdown-item {{ Route::is('reports.monthly-collection') ? 'active' : '' }}" href="{{ route('reports.monthly-collection') }}">Monthly Collection</a>
-                                    <a class="dropdown-item {{ Route::is('reports.customers') ? 'active' : '' }}" href="{{ route('reports.customers') }}">Customer Report</a>
-                                    <a class="dropdown-item {{ Route::is('reports.unit-consumption') ? 'active' : '' }}" href="{{ route('reports.unit-consumption') }}">Unit Consumption</a>
-                                    <a class="dropdown-item {{ Route::is('reports.meter-not-read') ? 'active' : '' }}" href="{{ route('reports.meter-not-read') }}">Meter Not Read</a>
-                                    <a class="dropdown-item {{ Route::is('reports.outstanding') ? 'active' : '' }}" href="{{ route('reports.outstanding') }}">Outstanding Balance</a>
-                                    <a class="dropdown-item {{ Route::is('reports.income-expense') ? 'active' : '' }}" href="{{ route('reports.income-expense') }}">Income &amp; Expense</a>
+                                    <a class="dropdown-item {{ Route::is('reports.daily-collection') ? 'active' : '' }}" href="{{ route('reports.daily-collection') }}"><i class="bi bi-calendar-day me-2"></i>Daily Collection</a>
+                                    <a class="dropdown-item {{ Route::is('reports.monthly-collection') ? 'active' : '' }}" href="{{ route('reports.monthly-collection') }}"><i class="bi bi-calendar-month me-2"></i>Monthly Collection</a>
+                                    <a class="dropdown-item {{ Route::is('reports.customers') ? 'active' : '' }}" href="{{ route('reports.customers') }}"><i class="bi bi-people me-2"></i>Customer Report</a>
+                                    <a class="dropdown-item {{ Route::is('reports.unit-consumption') ? 'active' : '' }}" href="{{ route('reports.unit-consumption') }}"><i class="bi bi-lightning-charge me-2"></i>Unit Consumption</a>
+                                    <a class="dropdown-item {{ Route::is('reports.meter-not-read') ? 'active' : '' }}" href="{{ route('reports.meter-not-read') }}"><i class="bi bi-clipboard-x me-2"></i>Meter Not Read</a>
+                                    <a class="dropdown-item {{ Route::is('reports.outstanding') ? 'active' : '' }}" href="{{ route('reports.outstanding') }}"><i class="bi bi-exclamation-circle me-2"></i>Outstanding Balance</a>
+                                    <a class="dropdown-item {{ Route::is('reports.income-expense') ? 'active' : '' }}" href="{{ route('reports.income-expense') }}"><i class="bi bi-cash-coin me-2"></i>Income &amp; Expense</a>
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
@@ -220,12 +220,12 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a href="{{ route('password.change') }}" class="dropdown-item {{ Route::is('password.change') ? 'active' : '' }}">Change Password</a>
+                                    <a href="{{ route('password.change') }}" class="dropdown-item {{ Route::is('password.change') ? 'active' : '' }}"><i class="bi bi-key me-2"></i>Change Password</a>
 
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
+                                        <i class="bi bi-box-arrow-right me-2"></i>{{ __('Logout') }}
                                     </a>
 
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
