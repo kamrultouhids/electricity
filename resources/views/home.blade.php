@@ -48,14 +48,17 @@
     </div>
 
     {{-- ===== Quick Actions ===== --}}
-    <div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card panel-card rounded-4 mb-4">
         <div class="card-body">
-            <h6 class="text-muted mb-3"><i class="bi bi-lightning-charge me-1"></i>Quick Actions</h6>
+            <div class="panel-head mb-3">
+                <span class="panel-icon stat-amber"><i class="bi bi-lightning-charge-fill"></i></span>
+                <h6 class="mb-0 fw-semibold">Quick Actions</h6>
+            </div>
             <div class="d-flex flex-wrap gap-2">
-                <a href="{{ route('customers.create') }}" class="btn btn-primary text-white rounded-3"><i class="bi bi-person-plus me-1"></i>Add Customer</a>
-                <a href="{{ route('meter-readings.create') }}" class="btn btn-outline-primary rounded-3"><i class="bi bi-speedometer2 me-1"></i>Add Meter Reading</a>
-                <a href="{{ route('bills.pending') }}" class="btn btn-outline-primary rounded-3"><i class="bi bi-receipt me-1"></i>Generate Bills</a>
-                <a href="{{ route('payments.due') }}" class="btn btn-outline-primary rounded-3"><i class="bi bi-cash-stack me-1"></i>Record Payment</a>
+                <a href="{{ route('customers.create') }}" class="btn btn-primary text-white rounded-3 px-3"><i class="bi bi-person-plus me-1"></i>Add Customer</a>
+                <a href="{{ route('meter-readings.create') }}" class="btn btn-outline-primary rounded-3 px-3"><i class="bi bi-speedometer2 me-1"></i>Add Meter Reading</a>
+                <a href="{{ route('bills.pending') }}" class="btn btn-outline-primary rounded-3 px-3"><i class="bi bi-receipt me-1"></i>Generate Bills</a>
+                <a href="{{ route('payments.due') }}" class="btn btn-outline-primary rounded-3 px-3"><i class="bi bi-cash-stack me-1"></i>Record Payment</a>
             </div>
         </div>
     </div>
@@ -63,17 +66,23 @@
     {{-- ===== Charts ===== --}}
     <div class="row g-3 mb-4">
         <div class="col-lg-6">
-            <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card panel-card rounded-4 h-100">
                 <div class="card-body">
-                    <h6 class="mb-3"><i class="bi bi-graph-up-arrow text-primary me-1"></i>Monthly Collection <span class="text-muted small">({{ $year }})</span></h6>
+                    <div class="panel-head mb-3">
+                        <span class="panel-icon stat-blue"><i class="bi bi-graph-up-arrow"></i></span>
+                        <h6 class="mb-0 fw-semibold">Monthly Collection <span class="text-muted fw-normal small">({{ $year }})</span></h6>
+                    </div>
                     <div class="chart-box"><canvas id="collectionChart"></canvas></div>
                 </div>
             </div>
         </div>
         <div class="col-lg-6">
-            <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card panel-card rounded-4 h-100">
                 <div class="card-body">
-                    <h6 class="mb-3"><i class="bi bi-bar-chart-line text-primary me-1"></i>Monthly Electricity Consumption <span class="text-muted small">({{ $year }})</span></h6>
+                    <div class="panel-head mb-3">
+                        <span class="panel-icon stat-teal"><i class="bi bi-bar-chart-line-fill"></i></span>
+                        <h6 class="mb-0 fw-semibold">Monthly Electricity Consumption <span class="text-muted fw-normal small">({{ $year }})</span></h6>
+                    </div>
                     <div class="chart-box"><canvas id="consumptionChart"></canvas></div>
                 </div>
             </div>
@@ -81,14 +90,18 @@
     </div>
 
     {{-- ===== Recent Payments ===== --}}
-    <div class="">
-        <div class=" mb-2 pb-0 d-flex justify-content-between align-items-center">
-            <h6 class="mb-0"><i class="bi bi-clock-history text-primary me-1"></i>Recent Payments</h6>
+    <div class="card panel-card rounded-4 mb-4">
+        <div class="card-body">
+        <div class="panel-head mb-3 d-flex justify-content-between align-items-center">
+            <div class="panel-head">
+                <span class="panel-icon stat-indigo"><i class="bi bi-clock-history"></i></span>
+                <h6 class="mb-0 fw-semibold">Recent Payments</h6>
+            </div>
             <a href="{{ route('payments.index') }}" class="btn btn-sm btn-link text-decoration-none">View all</a>
         </div>
         <div class="table-responsive">
-            <table class="table  table-bordered table-hover align-middle mb-0">
-                <thead class="table-light">
+            <table class="table table-hover rp-table align-middle mb-0">
+                <thead>
                     <tr>
                         <th>Customer</th>
                         <th>Date</th>
@@ -96,36 +109,54 @@
                         <th class="text-end">Discount</th>
                         <th>Method</th>
                         <th>Collected By</th>
-                        <th>Status</th>
+                        <th class="text-end">Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($recentPayments as $payment)
                         <tr>
                             <td>
-                                <div>{{ $payment->customer->name ?? '—' }}</div>
-                                <small class="text-muted d-block">Serial No: {{ $payment->customer->serial_no ?? '—' }}</small>
-                                <small class="text-muted d-block">Meter No: {{ $payment->customer->meter_number ?? '—' }}</small>
-                                <small class="text-muted d-block">Mobile: {{ $payment->customer->mobile_number ?? '—' }}</small>
+                                <div class="d-flex align-items-center gap-2">
+                                    @if ($payment->customer && $payment->customer->photo)
+                                        <img src="{{ asset('storage/' . $payment->customer->photo) }}" alt="photo" class="rp-avatar rp-avatar-img">
+                                    @else
+                                        <span class="rp-avatar">{{ strtoupper(mb_substr($payment->customer->name ?? '?', 0, 1)) }}</span>
+                                    @endif
+                                    <div class="min-w-0">
+                                        <div class="fw-semibold text-truncate">{{ $payment->customer->name ?? '—' }}</div>
+                                        <small class="text-muted d-block">Serial: {{ $payment->customer->serial_no ?? '—' }} · Meter: {{ $payment->customer->meter_number ?? '—' }}</small>
+                                        <small class="text-muted d-block">Mobile: {{ $payment->customer->mobile_number ?? '—' }}</small>
+                                    </div>
+                                </div>
                             </td>
-                            <td>{{ optional($payment->payment_date)->format('d M Y') ?? '—' }}</td>
-                            <td class="text-end fw-semibold">৳ {{ number_format($payment->amount, 2) }}</td>
-                            <td class="text-end">৳ {{ number_format($payment->discount, 2) }}</td>
-                            <td><span class="badge rounded-pill bg-light text-dark border">{{ $payment->methodLabel() }}</span></td>
-                            <td>{{ $payment->createdBy->name ?? '—' }}</td>
-                            <td>
-                                @if ($payment->status === \App\Models\Payment::STATUS_COMPLETED)
-                                    <span class="badge rounded-pill bg-success-subtle text-success">Completed</span>
+                            <td class="text-nowrap">{{ optional($payment->payment_date)->format('d M Y') ?? '—' }}</td>
+                            <td class="text-end fw-bold text-success text-nowrap">৳ {{ number_format($payment->amount, 2) }}</td>
+                            <td class="text-end text-nowrap">
+                                @if ((float) $payment->discount > 0)
+                                    <span class="text-warning fw-semibold">৳ {{ number_format($payment->discount, 2) }}</span>
                                 @else
-                                    <span class="badge rounded-pill bg-danger-subtle text-danger">Cancelled</span>
+                                    <span class="text-muted">—</span>
+                                @endif
+                            </td>
+                            <td><span class="badge rounded-pill rp-method">{{ $payment->methodLabel() }}</span></td>
+                            <td class="text-truncate">{{ $payment->createdBy->name ?? '—' }}</td>
+                            <td class="text-end">
+                                @if ($payment->status === \App\Models\Payment::STATUS_COMPLETED)
+                                    <span class="badge rounded-pill bg-success-subtle text-success"><i class="bi bi-check-circle-fill me-1"></i>Completed</span>
+                                @else
+                                    <span class="badge rounded-pill bg-danger-subtle text-danger"><i class="bi bi-x-circle-fill me-1"></i>Cancelled</span>
                                 @endif
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="7" class="text-center text-muted py-4">No payments recorded yet.</td></tr>
+                        <tr><td colspan="7" class="text-center text-muted py-5">
+                            <i class="bi bi-inbox d-block mb-2" style="font-size:1.6rem;opacity:.5;"></i>
+                            No payments recorded yet.
+                        </td></tr>
                     @endforelse
                 </tbody>
             </table>
+        </div>
         </div>
     </div>
 </div>
@@ -185,6 +216,66 @@
     .stat-indigo { --tone: #6610f2; }
     .stat-red    { --tone: #dc3545; }
     .stat-amber  { --tone: #e0932f; }
+
+    /* ===== Panels (quick actions, charts, recent payments) ===== */
+    .panel-card {
+        background: #fff;
+        border: 1px solid #eef0f4;
+        box-shadow: 0 1px 3px rgba(16,24,40,.05) !important;
+        transition: box-shadow .18s ease, transform .18s ease, border-color .18s ease;
+    }
+    .panel-card:hover {
+        box-shadow: 0 .6rem 1.2rem rgba(16,24,40,.10) !important;
+        border-color: #e3e7ee;
+        transform: translateY(-2px);
+    }
+    .panel-head { display: flex; align-items: center; gap: .6rem; }
+    .panel-head h6 { color: #1f2937; }
+    .panel-icon {
+        --tone: #3585BC;
+        width: 34px; height: 34px; flex: 0 0 34px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1rem;
+        color: var(--tone);
+        background: color-mix(in srgb, var(--tone) 14%, #fff);
+        border-radius: 9px;
+    }
+
+    /* ===== Recent Payments table ===== */
+    .rp-table thead th {
+        border: 0;
+        border-bottom: 1px solid #eef0f4;
+        background: transparent;
+        color: #9aa1ad;
+        font-size: .72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        padding: .6rem .75rem;
+    }
+    .rp-table tbody td {
+        border: 0;
+        border-bottom: 1px solid #f4f5f8;
+        padding: .7rem .75rem;
+        vertical-align: middle;
+    }
+    .rp-table tbody tr:last-child td { border-bottom: 0; }
+    .rp-avatar {
+        width: 38px; height: 38px; flex: 0 0 38px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 50%;
+        background: color-mix(in srgb, #6610f2 12%, #fff);
+        color: #6610f2;
+        font-weight: 700; font-size: .95rem;
+        overflow: hidden;
+    }
+    .rp-avatar-img { object-fit: cover; }
+    .rp-method {
+        background: #f1f3f7;
+        color: #4b5563;
+        font-weight: 600;
+        border: 1px solid #e7eaf0;
+    }
 
     .min-w-0 { min-width: 0; }
     .chart-box { position: relative; height: 300px; }
