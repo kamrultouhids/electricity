@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\MeterReading;
+use App\Services\ImageService;
 use App\Models\Sheet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -139,7 +140,7 @@ class MeterReadingController extends Controller
         $data['status'] = MeterReading::STATUS_PENDING;
 
         if ($request->hasFile('photo')) {
-            $data['photo'] = $request->file('photo')->store('meter_readings', 'public');
+            $data['photo'] = app(ImageService::class)->storeAsWebp($request->file('photo'), 'meter_readings');
         }
 
         $data['created_by'] = auth()->id();
@@ -225,7 +226,7 @@ class MeterReadingController extends Controller
             if ($meterReading->photo) {
                 Storage::disk('public')->delete($meterReading->photo);
             }
-            $data['photo'] = $request->file('photo')->store('meter_readings', 'public');
+            $data['photo'] = app(ImageService::class)->storeAsWebp($request->file('photo'), 'meter_readings');
         }
 
         $data['updated_by'] = auth()->id();

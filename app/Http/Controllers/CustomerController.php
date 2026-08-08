@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\Sheet;
 use Illuminate\Http\Request;
+use App\Services\ImageService;
 use Illuminate\Support\Facades\Storage;
 
 class CustomerController extends Controller
@@ -100,7 +101,7 @@ class CustomerController extends Controller
         $data = $this->validateCustomer($request);
 
         if ($request->hasFile('photo')) {
-            $data['photo'] = $request->file('photo')->store('customers', 'public');
+            $data['photo'] = app(ImageService::class)->storeAsWebp($request->file('photo'), 'customers');
         }
 
         $data['created_by'] = auth()->id();
@@ -145,7 +146,7 @@ class CustomerController extends Controller
             if ($customer->photo) {
                 Storage::disk('public')->delete($customer->photo);
             }
-            $data['photo'] = $request->file('photo')->store('customers', 'public');
+            $data['photo'] = app(ImageService::class)->storeAsWebp($request->file('photo'), 'customers');
         }
 
         $data['updated_by'] = auth()->id();
