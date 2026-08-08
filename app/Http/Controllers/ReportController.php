@@ -219,6 +219,58 @@ class ReportController extends Controller
     }
 
     /**
+     * Meter Not Read report — customers connected on/before the selected
+     * month who have NO meter reading in that month/year.
+     */
+    public function meterNotRead(Request $request)
+    {
+        $monthInput = $request->input('month', now()->format('Y-m'));
+        [$year, $month] = array_pad(explode('-', $monthInput), 2, null);
+        $year  = (int) $year ?: now()->year;
+        $month = (int) $month ?: now()->month;
+        $monthInput = sprintf('%04d-%02d', $year, $month);
+        $periodEnd = \Illuminate\Support\Carbon::create($year, $month, 1)->endOfMonth();
+
+        $query = Customer::query()
+            ->with('sheet')
+            // Only customers whose connection was active by the selected month.
+            ->whereNotNull('connection_date')
+            ->whereDate('connection_date', '<=', $periodEnd)
+            // ...and who have no reading in that month/year.
+            ->whereDoesntHave('readings', function ($q) use ($year, $month) {
+                $q->whereYear('reading_date', $year)
+                    ->whereMonth('reading_date', $month);
+            });
+
+        $this->applyCustomerFilters($query, $request);
+
+        $query->orderBy('serial_no');
+
+        if ($request->input('export') === 'csv') {
+            return $this->exportCsv("meter-not-read-{$monthInput}.csv",
+                ['Serial', 'Name', 'Sheet', 'Meter', 'Mobile', 'Connection Date', 'Status'],
+                $query->get()->map(fn ($c) => [
+                    $c->serial_no,
+                    $c->name,
+                    $c->sheet->name ?? '',
+                    $c->meter_number,
+                    $c->mobile_number,
+                    optional($c->connection_date)->format('Y-m-d'),
+                    $c->isActive() ? 'Active' : 'Inactive',
+                ])
+            );
+        }
+
+        return view('reports.meter_not_read', [
+            'customers'  => $query->paginate(20)->withQueryString(),
+            'sheets'     => Sheet::orderBy('name')->get(),
+            'year'       => $year,
+            'month'      => $month,
+            'monthInput' => $monthInput,
+        ]);
+    }
+
+    /**
      * Outstanding balance report — customers whose latest bill still has a due.
      */
     public function outstanding(Request $request)

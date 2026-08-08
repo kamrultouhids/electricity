@@ -13,6 +13,7 @@
                 ['reports.monthly-collection', 'Monthly Collection',  'Collections grouped by month.',          'bi-calendar-month'],
                 ['reports.customers',          'Customer Report',     'Per-customer collection & outstanding.', 'bi-people'],
                 ['reports.unit-consumption',   'Unit Consumption',    'Consumed units per customer.',           'bi-lightning-charge'],
+                ['reports.meter-not-read',     'Meter Not Read',      'Connected customers with no reading this month.', 'bi-clipboard-x'],
                 ['reports.outstanding',        'Outstanding Balance', 'Customers with pending dues.',           'bi-exclamation-circle'],
                 ['reports.income-expense',     'Income & Expense',    'Collections vs expenses by month.',      'bi-cash-coin'],
             ];

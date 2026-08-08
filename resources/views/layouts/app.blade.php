@@ -188,6 +188,7 @@
                                     <a class="dropdown-item {{ Route::is('reports.monthly-collection') ? 'active' : '' }}" href="{{ route('reports.monthly-collection') }}">Monthly Collection</a>
                                     <a class="dropdown-item {{ Route::is('reports.customers') ? 'active' : '' }}" href="{{ route('reports.customers') }}">Customer Report</a>
                                     <a class="dropdown-item {{ Route::is('reports.unit-consumption') ? 'active' : '' }}" href="{{ route('reports.unit-consumption') }}">Unit Consumption</a>
+                                    <a class="dropdown-item {{ Route::is('reports.meter-not-read') ? 'active' : '' }}" href="{{ route('reports.meter-not-read') }}">Meter Not Read</a>
                                     <a class="dropdown-item {{ Route::is('reports.outstanding') ? 'active' : '' }}" href="{{ route('reports.outstanding') }}">Outstanding Balance</a>
                                     <a class="dropdown-item {{ Route::is('reports.income-expense') ? 'active' : '' }}" href="{{ route('reports.income-expense') }}">Income &amp; Expense</a>
                                 </div>

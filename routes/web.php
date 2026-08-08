@@ -78,6 +78,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/monthly-collection', [ReportController::class, 'monthlyCollection'])->name('monthly-collection');
         Route::get('/customers', [ReportController::class, 'customer'])->name('customers');
         Route::get('/unit-consumption', [ReportController::class, 'unitConsumption'])->name('unit-consumption');
+        Route::get('/meter-not-read', [ReportController::class, 'meterNotRead'])->name('meter-not-read');
         Route::get('/outstanding', [ReportController::class, 'outstanding'])->name('outstanding');
         Route::get('/income-expense', [ReportController::class, 'incomeExpense'])->name('income-expense');
     });
