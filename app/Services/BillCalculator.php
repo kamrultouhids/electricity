@@ -74,9 +74,8 @@ class BillCalculator
     }
 
     /**
-     * Penalty on previous outstanding.
-     * Residential: 1..999 -> flat 100, above 999 -> 10%.
-     * Other types: flat 10% for now (may change per type later).
+     * Penalty on previous outstanding (same for all connection types).
+     * 1..999 -> flat 100, above 999 -> 10%.
      */
     public function lateFee(?string $type, float $previousOutstanding): float
     {
@@ -84,7 +83,7 @@ class BillCalculator
             return 0.0;
         }
 
-        if ($type === 'residential' && $previousOutstanding <= self::OUTSTANDING_FLAT_LIMIT) {
+        if ($previousOutstanding <= self::OUTSTANDING_FLAT_LIMIT) {
             return (float) self::OUTSTANDING_FLAT_FEE;
         }
 
