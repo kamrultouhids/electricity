@@ -51,6 +51,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Billing
     Route::get('/bills/pending', [BillController::class, 'pending'])->name('bills.pending');
+    Route::post('/bills/generate-all', [BillController::class, 'generateAll'])->name('bills.generate-all');
     Route::get('/bills/generate/{meterReading}', [BillController::class, 'preview'])->name('bills.preview');
     Route::post('/bills/generate/{meterReading}', [BillController::class, 'store'])->name('bills.store');
     Route::get('/bills', [BillController::class, 'index'])->name('bills.index');

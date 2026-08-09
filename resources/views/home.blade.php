@@ -25,6 +25,7 @@
                 ['Discount This Month', '৳ '.number_format($monthDiscount, 2),     'This month','bi-tags-fill',             'stat-amber'],
                 ['Due Balance',         '৳ '.number_format($totalOutstanding, 2),  'Outstanding','bi-exclamation-circle',   'stat-red'],
                 ['Units This Month',    number_format($unitsThisMonth, 2),         'This month','bi-lightning-charge-fill', 'stat-amber'],
+                ['Pending Bill Generation', number_format($pendingBills),         'Readings',  'bi-hourglass-split',       'stat-red'],
                 ['Total Income',        '৳ '.number_format($totalIncome, 2),       'This month','bi-arrow-down-circle-fill','stat-green'],
                 ['Total Expense',       '৳ '.number_format($totalExpense, 2),      'This month','bi-arrow-up-circle-fill',  'stat-red'],
                 ['Net Profit',          '৳ '.number_format($netProfit, 2),         'This month','bi-graph-up-arrow', $netProfit >= 0 ? 'stat-teal' : 'stat-red'],

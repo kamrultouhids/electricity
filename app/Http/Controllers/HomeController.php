@@ -48,6 +48,10 @@ class HomeController extends Controller
             ->whereMonth('reading_date', now()->month)
             ->sum('consumed_units');
 
+        $pendingBills = MeterReading::query()
+            ->where('status', MeterReading::STATUS_PENDING)
+            ->count();
+
         // --- Income / Expense / Net (this month) ---
         $totalIncome = (float) Payment::query()
             ->whereYear('payment_date', $year)
@@ -95,6 +99,7 @@ class HomeController extends Controller
             'monthDiscount'     => $monthDiscount,
             'totalOutstanding'  => $totalOutstanding,
             'unitsThisMonth'    => $unitsThisMonth,
+            'pendingBills'      => $pendingBills,
             'totalIncome'       => $totalIncome,
             'totalExpense'      => $totalExpense,
             'netProfit'         => $netProfit,

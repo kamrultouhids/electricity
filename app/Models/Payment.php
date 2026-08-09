@@ -54,6 +54,22 @@ class Payment extends Model
         return self::METHODS[$this->method] ?? ucfirst($this->method);
     }
 
+    /**
+     * Formatted receipt number: RCP-YYYYMMDD-NNNN, where NNNN is this
+     * payment's sequence within its payment date.
+     */
+    public function receiptNo(): string
+    {
+        $date = $this->payment_date ?? $this->created_at;
+
+        $sequence = static::query()
+            ->whereDate('payment_date', $this->payment_date)
+            ->where('id', '<=', $this->id)
+            ->count();
+
+        return 'RCP-'.$date->format('Ymd').'-'.str_pad((string) $sequence, 4, '0', STR_PAD_LEFT);
+    }
+
     public function allocations(): HasMany
     {
         return $this->hasMany(PaymentAllocation::class);

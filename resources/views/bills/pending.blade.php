@@ -8,7 +8,21 @@
             Pending Readings for Billing
             <span class="badge bg-primary px-1 py-0 small">{{ $readings->total() }}</span>
         </h5>
-        <a href="{{ route('bills.index') }}" class="btn btn-outline-secondary"><i class="bi bi-receipt me-1"></i>Generated Bills</a>
+        <div class="d-flex gap-2">
+            @if ($readings->total() > 0)
+                <form method="POST" action="{{ route('bills.generate-all') }}"
+                      onsubmit="return confirm('Generate bills for all {{ $readings->total() }} pending reading(s) matching the current filters?');">
+                    @csrf
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+                    <input type="hidden" name="sheet_id" value="{{ request('sheet_id') }}">
+                    <input type="hidden" name="month" value="{{ request('month') }}">
+                    <button type="submit" class="btn btn-primary text-white">
+                        <i class="bi bi-lightning-charge-fill me-1"></i>Generate All
+                    </button>
+                </form>
+            @endif
+            <a href="{{ route('bills.index') }}" class="btn btn-outline-secondary"><i class="bi bi-receipt me-1"></i>Generated Bills</a>
+        </div>
     </div>
 
     @if (session('success'))

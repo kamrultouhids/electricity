@@ -97,6 +97,53 @@ class BillController extends Controller
     }
 
     /**
+     * One-click bulk generate — generate bills for every pending reading that
+     * matches the current filters (oldest reading first so outstanding chains
+     * and the oldest-first rule stay correct).
+     */
+    public function generateAll(Request $request, BillGenerator $generator)
+    {
+        $query = MeterReading::query()
+            ->with('customer')
+            ->where('status', MeterReading::STATUS_PENDING);
+
+        if ($search = $request->input('search')) {
+            $query->whereHas('customer', function ($q) use ($search) {
+                $q->where('serial_no', 'like', "%{$search}%")
+                    ->orWhere('name', 'like', "%{$search}%")
+                    ->orWhere('mobile_number', 'like', "%{$search}%")
+                    ->orWhere('meter_number', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('sheet_id')) {
+            $query->whereHas('customer', fn ($q) => $q->where('sheet_id', (int) $request->input('sheet_id')));
+        }
+
+        if ($request->filled('month')) {
+            [$year, $month] = array_pad(explode('-', $request->input('month')), 2, null);
+            if ($year && $month) {
+                $query->whereYear('reading_date', $year)->whereMonth('reading_date', $month);
+            }
+        }
+
+        // Oldest first: guarantees each customer's earlier readings bill before
+        // later ones, so previous_outstanding is computed correctly.
+        $readings = $query->orderBy('reading_date')->orderBy('id')->get();
+
+        $generated = 0;
+        $skipped = 0;
+        foreach ($readings as $reading) {
+            $generator->generateForReading($reading, auth()->id()) ? $generated++ : $skipped++;
+        }
+
+        $message = "Generated {$generated} bill(s).".($skipped ? " Skipped {$skipped} (inactive or already billed)." : '');
+
+        return redirect()->route('bills.pending', $request->only('search', 'sheet_id', 'month'))
+            ->with($generated ? 'success' : 'error', $generated ? $message : 'No bills were generated. '.$message);
+    }
+
+    /**
      * Step 2 — preview the computed bill for a reading before generating.
      */
     public function preview(MeterReading $meterReading, BillGenerator $generator)

@@ -17,7 +17,7 @@
     <div class="receipt-copy">
         <div class="text-center">
             <div class="receipt-title">পেমেন্ট রসিদ / Payment Receipt</div>
-            <div class="small text-muted">Receipt No: #{{ str_pad($payment->id, 6, '0', STR_PAD_LEFT) }}</div>
+            <div class="small text-muted">Receipt No: {{ $payment->receiptNo() }}</div>
         </div>
 
         <div class="row g-0 receipt-block">
