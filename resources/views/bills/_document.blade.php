@@ -17,6 +17,13 @@
     $bnMonthYear = fn ($d) => $d ? $bnMonths[$d->month] . ' - ' . $bn($d->format('Y')) : '—';
 @endphp
 <div class="bill-copy">
+    @isset($verifyUrl)
+        <div class="bill-qr">
+            <img src="{{ \App\Support\Qr::dataUri($verifyUrl) }}" alt="Verify QR">
+            <div class="bill-qr-cap">যাচাই করুন</div>
+        </div>
+    @endisset
+
     {{-- Organisation masthead --}}
     <div class="bill-org text-center px-2 pt-2">
         <div class="org-bismillah">বিসমিল্লাহির রাহমানির রাহিম</div>
@@ -181,6 +188,7 @@
         margin: 0 auto;
         border: 1px solid #000;
         background: #fff;
+        position: relative;
     }
     .bill-org { line-height: 1.35; }
     .bill-org .org-bismillah { font-size: 12px; }
@@ -205,6 +213,9 @@
         line-height: 24px;
     }
     .bill-copy-tag { position: absolute; right: 8px; top: 10px; font-size: 12px; }
+    .bill-qr { position: absolute; left: 8px; top: 8px; width: 74px; text-align: center; z-index: 2; }
+    .bill-qr img { width: 66px; height: 66px; display: block; margin: 0 auto; }
+    .bill-qr-cap { font-size: 8px; line-height: 1.1; margin-top: 1px; }
     .bill-block { border-top: 1px solid #000; }
     .bill-copy .kv { display: flex; font-size: 13px; padding: 1px 0; }
     .bill-copy .kv > span { min-width: 130px; }

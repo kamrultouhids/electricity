@@ -41,6 +41,7 @@
         'totalAmount'        => $bill->total_amount,
         'discount'           => $bill->discount,
         'previousBills'      => $previousBills,
+        'verifyUrl'          => route('portal.bills.show', $bill),
     ])
 </div>
 @endsection
