@@ -17,10 +17,10 @@ class User extends Authenticatable
      */
     public const USER_TYPES = [
         'admin'            => 'Admin',
-        // 'manager'          => 'Manager',
-        // 'billing-operator' => 'Billing Operator',
-        'meter-reader'     => 'Meter Reader',
-        'cash-collector'   => 'Cash Collector',
+        'manager'          => 'Manager',
+        'operator' => 'Operator',
+        'reader'     => 'Reader',
+        'collector'   => 'Collector',
     ];
 
     /**
