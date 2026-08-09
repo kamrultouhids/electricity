@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasSource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MeterReading extends Model
 {
-    use SoftDeletes;
+    use HasSource, SoftDeletes;
 
     protected $fillable = [
         'customer_id',
@@ -18,6 +19,7 @@ class MeterReading extends Model
         'reading_date',
         'photo',
         'status',
+        'source',
         'created_by',
         'updated_by',
     ];

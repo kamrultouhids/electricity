@@ -106,6 +106,7 @@ class CustomerController extends Controller
             $data['photo'] = app(ImageService::class)->storeAsWebp($request->file('photo'), 'customers');
         }
 
+        $data['source'] = Customer::SOURCE_MANUAL;
         $data['created_by'] = auth()->id();
         $data['updated_by'] = auth()->id();
 
@@ -195,9 +196,12 @@ class CustomerController extends Controller
                 continue;
             }
 
+            // Blank cells become null, not '' — an empty string slips past a
+            // "nullable" rule and then fails on a non-string column (e.g. age).
             $data = [];
             foreach ($header as $i => $key) {
-                $data[$key] = isset($row[$i]) ? trim((string) $row[$i]) : null;
+                $value = isset($row[$i]) ? trim((string) $row[$i]) : '';
+                $data[$key] = $value === '' ? null : $value;
             }
 
             // Resolve sheet (accept name or numeric id) and normalise a few fields.
@@ -237,6 +241,7 @@ class CustomerController extends Controller
                       'guardian_relationship', 'guardian_address'] as $opt) {
                 $valid[$opt] = $data[$opt] ?? null;
             }
+            $valid['source'] = Customer::SOURCE_CSV;
             $valid['created_by'] = auth()->id();
             $valid['updated_by'] = auth()->id();
 

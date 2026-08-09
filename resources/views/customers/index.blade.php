@@ -98,6 +98,7 @@
                         <th>Connection Type</th>
                         <th>Connection Date</th>
                         <th>Connection Status</th>
+                        <th>Source</th>
                         <th class="text-end" width="150">Actions</th>
                     </tr>
                 </thead>
@@ -127,6 +128,13 @@
                                     <span class="badge bg-secondary">Inactive</span>
                                 @endif
                             </td>
+                            <td>
+                                @if ($customer->isImported())
+                                    <span class="badge bg-info text-dark"><i class="bi bi-filetype-csv me-1"></i>CSV Import</span>
+                                @else
+                                    <span class="badge bg-light text-dark border"><i class="bi bi-pencil me-1"></i>Manual</span>
+                                @endif
+                            </td>
                             <td class="text-end">
                                 <div class="btn-group btn-group-sm">
                                     <a href="{{ route('customers.show', $customer) }}" class="btn btn-outline-info"><i class="bi bi-eye me-1"></i>View</a>
@@ -140,7 +148,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="11" class="text-center text-muted py-4">No customers found.</td>
+                            <td colspan="12" class="text-center text-muted py-4">No customers found.</td>
                         </tr>
                     @endforelse
                 </tbody>
