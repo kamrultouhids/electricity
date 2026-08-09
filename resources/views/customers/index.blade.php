@@ -8,7 +8,9 @@
             Customer Management
             <span class="badge bg-primary px-1 py-0 small">{{ $customers->total() }}</span>
         </h5>
-        <a href="{{ route('customers.create') }}" class="btn btn-primary text-white"><i class="bi bi-plus-lg me-1"></i>Add Customer</a>
+        @can('manage-customers')
+            <a href="{{ route('customers.create') }}" class="btn btn-primary text-white"><i class="bi bi-plus-lg me-1"></i>Add Customer</a>
+        @endcan
     </div>
 
     @if (session('success'))
@@ -110,7 +112,9 @@
                             <td class="text-end">
                                 <div class="btn-group btn-group-sm">
                                     <a href="{{ route('customers.show', $customer) }}" class="btn btn-outline-info"><i class="bi bi-eye me-1"></i>View</a>
-                                    <a href="{{ route('customers.edit', $customer) }}" class="btn btn-outline-primary"><i class="bi bi-pencil-square me-1"></i>Edit</a>
+                                    @can('manage-customers')
+                                        <a href="{{ route('customers.edit', $customer) }}" class="btn btn-outline-primary"><i class="bi bi-pencil-square me-1"></i>Edit</a>
+                                    @endcan
                                     <!-- <a href="{{ route('customers.delete', $customer) }}" class="btn btn-outline-danger"
                                        onclick="return confirm('Delete this customer?');">Delete</a> -->
                                 </div>

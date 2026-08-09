@@ -24,6 +24,32 @@ class User extends Authenticatable
     ];
 
     /**
+     * Ability => roles allowed. Admin & manager can do everything; the rest
+     * are scoped per the business rules.
+     */
+    public const ABILITIES = [
+        'manage-customers'      => ['admin', 'manager', 'operator'],
+        'access-meter-readings' => ['admin', 'manager', 'operator', 'reader'],
+        'generate-bills'        => ['admin', 'manager', 'operator'],
+        'collect-payments'      => ['admin', 'manager', 'operator', 'collector'],
+        'view-due-list'         => ['admin', 'manager', 'operator', 'collector'],
+        'view-reports'          => ['admin', 'manager', 'operator'],
+        'manage-expenses'       => ['admin', 'manager'],
+        'rate-settings'         => ['admin'],
+        'manage-users'          => ['admin'],
+        'view-bills'            => ['admin', 'manager', 'operator', 'collector'],
+        'view-payments'         => ['admin', 'manager', 'operator', 'collector'],
+    ];
+
+    /**
+     * Whether this user's role is allowed the given ability.
+     */
+    public function hasAbility(string $ability): bool
+    {
+        return in_array($this->user_type, self::ABILITIES[$ability] ?? [], true);
+    }
+
+    /**
      * Status constants.
      */
     public const STATUS_ACTIVE = 1;

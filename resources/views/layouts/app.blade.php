@@ -179,27 +179,44 @@
                              <li class="nav-item">
                                 <a class="nav-link {{ Route::is('home') ? 'active' : '' }}" href="{{ route('home') }}"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
                             </li>
+                            @can('manage-users')
                              <li class="nav-item">
                                 <a class="nav-link  {{ Route::is('users.index') ? 'active' : '' }}" href="{{ route('users.index') }}"><i class="bi bi-people me-1"></i>User List</a>
                             </li>
+                            @endcan
                             <li class="nav-item dropdown">
                                 <a id="electricityDropdown" class="nav-link dropdown-toggle {{ Route::is('customers.*') || Route::is('meter-readings.*') || Route::is('bills.*') || Route::is('payments.*') || Route::is('tariffs.*') || Route::is('expenses.*') || Route::is('expense-categories.*') ? 'active' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                    <i class="bi bi-lightning-charge me-1"></i>Electricity management
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="electricityDropdown">
+                                    @can('rate-settings')
                                     <a class="dropdown-item {{ Route::is('tariffs.index') ? 'active' : '' }}" href="{{ route('tariffs.index') }}"><i class="bi bi-sliders me-2"></i>Rate Settings</a>
+                                    @endcan
                                     <a class="dropdown-item {{ Route::is('customers.*') ? 'active' : '' }}" href="{{ route('customers.index') }}"><i class="bi bi-people me-2"></i>Customer List</a>
+                                    @can('access-meter-readings')
                                     <a class="dropdown-item {{ Route::is('meter-readings.*') ? 'active' : '' }}" href="{{ route('meter-readings.index') }}"><i class="bi bi-speedometer2 me-2"></i>Meter Readings</a>
+                                    @endcan
+                                    @can('generate-bills')
                                     <a class="dropdown-item {{ Route::is('bills.pending') ? 'active' : '' }}" href="{{ route('bills.pending') }}"><i class="bi bi-hourglass-split me-2"></i>Pending Billing Readings</a>
+                                    @endcan
+                                    @can('view-bills')
                                     <a class="dropdown-item {{ (Route::is('bills.*') && ! Route::is('bills.pending')) ? 'active' : '' }}" href="{{ route('bills.index') }}"><i class="bi bi-receipt me-2"></i>Bills</a>
+                                    @endcan
+                                    @can('view-due-list')
                                     <a class="dropdown-item {{ Route::is('payments.due') ? 'active' : '' }}" href="{{ route('payments.due') }}"><i class="bi bi-cash-stack me-2"></i>Due List</a>
+                                    @endcan
+                                    @can('view-payments')
                                     <a class="dropdown-item {{ Route::is('payments.index') || Route::is('payments.receipt') ? 'active' : '' }}" href="{{ route('payments.index') }}"><i class="bi bi-cash-coin me-2"></i>Payments</a>
+                                    @endcan
+                                    @can('manage-expenses')
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item {{ Route::is('expense-categories.*') ? 'active' : '' }}" href="{{ route('expense-categories.index') }}"><i class="bi bi-tags me-2"></i>Expense Categories</a>
                                     <a class="dropdown-item {{ Route::is('expenses.index') || Route::is('expenses.create') || Route::is('expenses.edit') ? 'active' : '' }}" href="{{ route('expenses.index') }}"><i class="bi bi-wallet2 me-2"></i>Expenses</a>
                                     <a class="dropdown-item {{ Route::is('expenses.profit-loss') ? 'active' : '' }}" href="{{ route('expenses.profit-loss') }}"><i class="bi bi-graph-up-arrow me-2"></i>Profit &amp; Loss</a>
+                                    @endcan
                                 </div>
                             </li>
+                            @can('view-reports')
                             <li class="nav-item dropdown">
                                 <a id="reportDropdown" class="nav-link dropdown-toggle {{ Route::is('reports.*') ? 'active' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                    <i class="bi bi-bar-chart-line me-1"></i>Report management
@@ -214,6 +231,7 @@
                                     <a class="dropdown-item {{ Route::is('reports.income-expense') ? 'active' : '' }}" href="{{ route('reports.income-expense') }}"><i class="bi bi-cash-coin me-2"></i>Income &amp; Expense</a>
                                 </div>
                             </li>
+                            @endcan
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle {{ Route::is('password.change') ? 'active' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     <i class="bi bi-person-circle me-1"></i>{{ Auth::user()->name }}

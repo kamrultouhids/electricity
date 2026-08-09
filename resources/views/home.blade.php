@@ -56,10 +56,18 @@
                 <h6 class="mb-0 fw-semibold">Quick Actions</h6>
             </div>
             <div class="d-flex flex-wrap gap-2">
-                <a href="{{ route('customers.create') }}" class="btn btn-primary text-white rounded-3 px-3"><i class="bi bi-person-plus me-1"></i>Add Customer</a>
-                <a href="{{ route('meter-readings.create') }}" class="btn btn-outline-primary rounded-3 px-3"><i class="bi bi-speedometer2 me-1"></i>Add Meter Reading</a>
-                <a href="{{ route('bills.pending') }}" class="btn btn-outline-primary rounded-3 px-3"><i class="bi bi-receipt me-1"></i>Generate Bills</a>
-                <a href="{{ route('payments.due') }}" class="btn btn-outline-primary rounded-3 px-3"><i class="bi bi-cash-stack me-1"></i>Record Payment</a>
+                @can('manage-customers')
+                    <a href="{{ route('customers.create') }}" class="btn btn-primary text-white rounded-3 px-3"><i class="bi bi-person-plus me-1"></i>Add Customer</a>
+                @endcan
+                @can('access-meter-readings')
+                    <a href="{{ route('meter-readings.create') }}" class="btn btn-outline-primary rounded-3 px-3"><i class="bi bi-speedometer2 me-1"></i>Add Meter Reading</a>
+                @endcan
+                @can('generate-bills')
+                    <a href="{{ route('bills.pending') }}" class="btn btn-outline-primary rounded-3 px-3"><i class="bi bi-receipt me-1"></i>Generate Bills</a>
+                @endcan
+                @can('view-due-list')
+                    <a href="{{ route('payments.due') }}" class="btn btn-outline-primary rounded-3 px-3"><i class="bi bi-cash-stack me-1"></i>Record Payment</a>
+                @endcan
             </div>
         </div>
     </div>

@@ -8,10 +8,12 @@
             Bills
             <span class="badge bg-primary px-1 py-0 small">{{ $bills->total() }}</span>
         </h5>
-        <a href="{{ route('bills.pending') }}" class="btn btn-primary text-white">
-            <i class="bi bi-hourglass-split me-1"></i>Pending Readings for Billing
-            <span class="badge bg-light text-dark ms-1">{{ $pendingCount }}</span>
-        </a>
+        @can('generate-bills')
+            <a href="{{ route('bills.pending') }}" class="btn btn-primary text-white">
+                <i class="bi bi-hourglass-split me-1"></i>Pending Readings for Billing
+                <span class="badge bg-light text-dark ms-1">{{ $pendingCount }}</span>
+            </a>
+        @endcan
     </div>
 
     @if (session('success'))
@@ -108,7 +110,9 @@
                                 <div class="btn-group btn-group-sm">
                                     <a href="{{ route('bills.show', $bill) }}" class="btn btn-outline-info"><i class="bi bi-eye me-1"></i>View</a>
                                     @unless ($bill->isPaid())
-                                        <a href="{{ route('payments.create', $bill->customer) }}" class="btn btn-outline-success"><i class="bi bi-cash-coin me-1"></i>Pay</a>
+                                        @can('collect-payments')
+                                            <a href="{{ route('payments.create', $bill->customer) }}" class="btn btn-outline-success"><i class="bi bi-cash-coin me-1"></i>Pay</a>
+                                        @endcan
                                     @endunless
                                 </div>
                             </td>

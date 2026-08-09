@@ -82,9 +82,11 @@
                             <td>{{ $bill->billing_month->format('M Y') }}</td>
                             <td class="text-end fw-bold">{{ number_format($bill->due_amount, 2) }}</td>
                             <td class="text-end no-print">
-                                <a href="{{ route('payments.create', $bill->customer) }}" class="btn btn-sm btn-success text-white">
-                                    <i class="bi bi-cash-coin me-1"></i>Pay
-                                </a>
+                                @can('collect-payments')
+                                    <a href="{{ route('payments.create', $bill->customer) }}" class="btn btn-sm btn-success text-white">
+                                        <i class="bi bi-cash-coin me-1"></i>Pay
+                                    </a>
+                                @endcan
                             </td>
                         </tr>
                     @empty
