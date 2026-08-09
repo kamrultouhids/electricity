@@ -262,6 +262,39 @@
         </main>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script>
+        // Adds a show/hide eye button to every password field on the page.
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('input[type="password"]').forEach(function (input) {
+                var group = document.createElement('div');
+                group.className = 'input-group has-validation';
+                input.parentNode.insertBefore(group, input);
+                group.appendChild(input);
+
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn btn-outline-secondary';
+                btn.setAttribute('aria-label', 'Show password');
+                btn.innerHTML = '<i class="bi bi-eye"></i>';
+                group.appendChild(btn);
+
+                // Bootstrap only shows feedback as a sibling of the input, so pull it inside the group.
+                var next = group.nextElementSibling;
+                while (next && (next.classList.contains('invalid-feedback') || next.classList.contains('valid-feedback'))) {
+                    var feedback = next;
+                    next = next.nextElementSibling;
+                    group.appendChild(feedback);
+                }
+
+                btn.addEventListener('click', function () {
+                    var show = input.type === 'password';
+                    input.type = show ? 'text' : 'password';
+                    btn.innerHTML = show ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+                    btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+                });
+            });
+        });
+    </script>
     @stack('scripts')
 </body>
 </html>
