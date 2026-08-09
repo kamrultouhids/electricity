@@ -33,6 +33,8 @@ Route::middleware(['auth'])->group(function () {
     // Customer Management (view for all; add/edit/delete restricted)
     Route::get('/customers-search', [CustomerController::class, 'search'])->name('customers.search');
     Route::middleware('can:manage-customers')->group(function () {
+        Route::get('/customers/import/template', [CustomerController::class, 'importTemplate'])->name('customers.import.template');
+        Route::post('/customers/import', [CustomerController::class, 'import'])->name('customers.import');
         Route::get('/customers/{customer}/delete', [CustomerController::class, 'destroy'])->name('customers.delete');
         Route::resource('customers', CustomerController::class)->only(['create', 'store', 'edit', 'update', 'destroy']);
     });

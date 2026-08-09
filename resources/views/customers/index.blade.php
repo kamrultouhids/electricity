@@ -9,12 +9,30 @@
             <span class="badge bg-primary px-1 py-0 small">{{ $customers->total() }}</span>
         </h5>
         @can('manage-customers')
-            <a href="{{ route('customers.create') }}" class="btn btn-primary text-white"><i class="bi bi-plus-lg me-1"></i>Add Customer</a>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#importCsvModal">
+                    <i class="bi bi-upload me-1"></i>Import CSV
+                </button>
+                <a href="{{ route('customers.create') }}" class="btn btn-primary text-white"><i class="bi bi-plus-lg me-1"></i>Add Customer</a>
+            </div>
         @endcan
     </div>
 
     @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+    @if (session('import_errors'))
+        <div class="alert alert-warning">
+            <div class="fw-semibold mb-1">Some rows were skipped:</div>
+            <ul class="mb-0 small">
+                @foreach (session('import_errors') as $err)
+                    <li>{{ $err }}</li>
+                @endforeach
+            </ul>
+        </div>
     @endif
 
     {{-- Search & Filters --}}
@@ -134,4 +152,52 @@
         {{ $customers->links() }}
     </div>
 </div>
+
+@can('manage-customers')
+{{-- Import CSV modal --}}
+<div class="modal fade" id="importCsvModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content rounded-4">
+            <form method="POST" action="{{ route('customers.import') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-header">
+                    <h6 class="modal-title"><i class="bi bi-upload me-1"></i>Import Customers from CSV</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="small text-muted">
+                        Upload a CSV with a header row. Use the template so the columns match.
+                        
+                        {{ implode(', ', \App\Models\Customer::CONNECTION_TYPES) }}.
+                    </p>
+                    <a href="{{ route('customers.import.template') }}" class="btn btn-sm btn-outline-secondary mb-3">
+                        <i class="bi bi-download me-1"></i>Download template
+                    </a>
+                    <div>
+                        <label class="form-label">CSV File <span class="text-danger">*</span></label>
+                        <input type="file" name="file" accept=".csv,text/csv" class="form-control @error('file') is-invalid @enderror" required>
+                        @error('file')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary text-white"><i class="bi bi-upload me-1"></i>Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endcan
 @endsection
+
+@if ($errors->has('file'))
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        new bootstrap.Modal(document.getElementById('importCsvModal')).show();
+    });
+</script>
+@endpush
+@endif
