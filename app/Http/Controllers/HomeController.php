@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Expense;
 use App\Models\MeterReading;
 use App\Models\Payment;
+use App\Models\User;
 
 class HomeController extends Controller
 {
@@ -20,6 +21,10 @@ class HomeController extends Controller
         $year = now()->year;
 
         // --- Summary cards ---
+        $totalUsers = User::where('email','!=', 'superadmin@gmail.com')->count();
+        $activeUsers = User::where('email','!=', 'superadmin@gmail.com')->where('status', User::STATUS_ACTIVE)->count();
+        $inactiveUsers = $totalUsers - $activeUsers;
+
         $totalCustomers = Customer::count();
         $activeCustomers = Customer::where('status', Customer::STATUS_ACTIVE)->count();
         $inactiveCustomers = Customer::where('status', Customer::STATUS_INACTIVE)->count();
@@ -50,6 +55,17 @@ class HomeController extends Controller
 
         $pendingBills = MeterReading::query()
             ->where('status', MeterReading::STATUS_PENDING)
+            ->count();
+
+        // Customers connected by this month who still have no reading for it
+        // (same rule as the "Meter Not Read" report).
+        $meterNotRead = Customer::query()
+            ->whereNotNull('connection_date')
+            ->whereDate('connection_date', '<=', now()->endOfMonth())
+            ->whereDoesntHave('readings', function ($q) use ($year) {
+                $q->whereYear('reading_date', $year)
+                    ->whereMonth('reading_date', now()->month);
+            })
             ->count();
 
         // --- Income / Expense / Net (this month) ---
@@ -91,6 +107,9 @@ class HomeController extends Controller
             ->limit(5)
             ->get();
         return view('home', [
+            'totalUsers'        => $totalUsers,
+            'activeUsers'       => $activeUsers,
+            'inactiveUsers'     => $inactiveUsers,
             'totalCustomers'    => $totalCustomers,
             'activeCustomers'   => $activeCustomers,
             'inactiveCustomers' => $inactiveCustomers,
@@ -100,6 +119,7 @@ class HomeController extends Controller
             'totalOutstanding'  => $totalOutstanding,
             'unitsThisMonth'    => $unitsThisMonth,
             'pendingBills'      => $pendingBills,
+            'meterNotRead'      => $meterNotRead,
             'totalIncome'       => $totalIncome,
             'totalExpense'      => $totalExpense,
             'netProfit'         => $netProfit,

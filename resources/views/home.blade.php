@@ -18,14 +18,17 @@
         @php
             // [label, value, subtitle, icon, tone]
             $cards = [
+                ['Total Users',         number_format($totalUsers),                'Users',     'bi-person-badge-fill',      'stat-indigo'],
+                ['Active / Inactive',   $activeUsers.' / '.$inactiveUsers,         'Users',     'bi-person-check-fill',      'stat-teal'],
                 ['Total Customers',     number_format($totalCustomers),            'Customers', 'bi-people-fill',            'stat-blue'],
                 ['Active / Inactive',   $activeCustomers.' / '.$inactiveCustomers, 'Customers', 'bi-plug-fill',             'stat-teal'],
                 ["Today's Collection",  '৳ '.number_format($todayCollection, 2),   'Today',     'bi-cash-coin',             'stat-green'],
                 ['Monthly Collection',  '৳ '.number_format($monthCollection, 2),   'This month','bi-calendar-check',        'stat-indigo'],
                 ['Discount This Month', '৳ '.number_format($monthDiscount, 2),     'This month','bi-tags-fill',             'stat-amber'],
                 ['Due Balance',         '৳ '.number_format($totalOutstanding, 2),  'Outstanding','bi-exclamation-circle',   'stat-red'],
-                ['Units This Month',    number_format($unitsThisMonth, 2),         'This month','bi-lightning-charge-fill', 'stat-amber'],
+                ['Total Consumption',   number_format($unitsThisMonth, 2).' units', 'This month','bi-lightning-charge-fill','stat-amber'],
                 ['Pending Bill Generation', number_format($pendingBills),         'Readings',  'bi-hourglass-split',       'stat-red'],
+                ['Meter Not Read',      number_format($meterNotRead),             'This month','bi-clipboard-x',           'stat-amber'],
                 ['Total Income',        '৳ '.number_format($totalIncome, 2),       'This month','bi-arrow-down-circle-fill','stat-green'],
                 ['Total Expense',       '৳ '.number_format($totalExpense, 2),      'This month','bi-arrow-up-circle-fill',  'stat-red'],
                 ['Net Profit',          '৳ '.number_format($netProfit, 2),         'This month','bi-graph-up-arrow', $netProfit >= 0 ? 'stat-teal' : 'stat-red'],
