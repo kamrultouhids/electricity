@@ -1,13 +1,13 @@
 @php
-    $reportLinks = [
-        ['reports.daily-collection',   'Daily Collection',    'bi-calendar-day'],
-        ['reports.monthly-collection', 'Monthly Collection',  'bi-calendar-month'],
-        ['reports.customers',          'Customer Report',     'bi-people'],
-        ['reports.unit-consumption',   'Unit Consumption',    'bi-lightning-charge'],
-        ['reports.meter-not-read',     'Meter Not Read',      'bi-clipboard-x'],
-        ['reports.outstanding',        'Outstanding Balance', 'bi-exclamation-circle'],
-        ['reports.income-expense',     'Income & Expense',    'bi-cash-coin'],
-    ];
+    $reportLinks = [];
+
+    // ['reports.daily-collection',   'Daily Collection',    'bi-calendar-day'],
+    // ['reports.monthly-collection', 'Monthly Collection',  'bi-calendar-month'],
+    // ['reports.customers',          'Customer Report',     'bi-people'],
+    // ['reports.unit-consumption',   'Unit Consumption',    'bi-lightning-charge'],
+    // ['reports.meter-not-read',     'Meter Not Read',      'bi-clipboard-x'],
+    // ['reports.outstanding',        'Outstanding Balance', 'bi-exclamation-circle'],
+    // ['reports.income-expense',     'Income & Expense',    'bi-cash-coin'],
 @endphp
 
 <div class="report-nav no-print mb-3">
