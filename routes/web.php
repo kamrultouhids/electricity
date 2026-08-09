@@ -107,15 +107,17 @@ Route::middleware(['auth'])->group(function () {
 /*
 | Customer Portal (separate "customer" guard, login by mobile number)
 */
-Route::prefix('portal')->name('portal.')->group(function () {
+Route::prefix('customer')->name('portal.')->group(function () {
     Route::get('/login', [\App\Http\Controllers\Portal\AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [\App\Http\Controllers\Portal\AuthController::class, 'login']);
     Route::post('/logout', [\App\Http\Controllers\Portal\AuthController::class, 'logout'])->name('logout');
 
+    // Public bill download (accessible without login)
+    Route::get('/bills/{bill}', [\App\Http\Controllers\Portal\DashboardController::class, 'bill'])->name('bills.show');
+
     Route::middleware('auth:customer')->group(function () {
         Route::get('/', [\App\Http\Controllers\Portal\DashboardController::class, 'index'])->name('dashboard');
         Route::get('/payments/{payment}/receipt', [\App\Http\Controllers\Portal\DashboardController::class, 'receipt'])->name('payments.receipt');
-        Route::get('/bills/{bill}', [\App\Http\Controllers\Portal\DashboardController::class, 'bill'])->name('bills.show');
     });
 });
 

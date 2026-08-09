@@ -14,7 +14,9 @@
         <h4 class="mb-0">Bill — {{ $billMonth->format('M Y') }}</h4>
         <div class="d-flex gap-2">
             <button type="button" onclick="window.print()" class="btn btn-primary text-white"><i class="bi bi-download me-1"></i>Download / Print</button>
-            <a href="{{ route('portal.dashboard') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            @auth('customer')
+                <a href="{{ route('portal.dashboard') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            @endauth
         </div>
     </div>
 

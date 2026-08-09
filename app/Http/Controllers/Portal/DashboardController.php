@@ -60,16 +60,10 @@ class DashboardController extends Controller
     }
 
     /**
-     * Show a printable bill document for one of the customer's own bills.
+     * Show a printable bill document. Public — anyone with the link can view.
      */
     public function bill(Bill $bill)
     {
-        $customer = Auth::guard('customer')->user();
-
-        if ($bill->customer_id !== $customer->id) {
-            throw new NotFoundHttpException();
-        }
-
         $bill->load(['customer.sheet', 'meterReading', 'createdBy']);
 
         $previousBills = Bill::query()
