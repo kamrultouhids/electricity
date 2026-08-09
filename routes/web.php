@@ -54,6 +54,8 @@ Route::middleware(['auth'])->group(function () {
 
     // Meter Reading (collector has no access)
     Route::middleware('can:access-meter-readings')->group(function () {
+        Route::get('/meter-readings/import/template', [MeterReadingController::class, 'importTemplate'])->name('meter-readings.import.template');
+        Route::post('/meter-readings/import', [MeterReadingController::class, 'import'])->name('meter-readings.import');
         Route::get('/meter-readings/{meterReading}/delete', [MeterReadingController::class, 'destroy'])->name('meter-readings.delete');
         Route::resource('meter-readings', MeterReadingController::class)->parameters([
             'meter-readings' => 'meterReading',

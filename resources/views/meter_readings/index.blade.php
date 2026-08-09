@@ -8,7 +8,12 @@
             Meter Readings
             <span class="badge bg-primary px-1 py-0 small">{{ $readings->total() }}</span>
         </h5>
-        <a href="{{ route('meter-readings.create') }}" class="btn btn-primary text-white"><i class="bi bi-plus-lg me-1"></i>Add Reading</a>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#importReadingsModal">
+                <i class="bi bi-upload me-1"></i>Import CSV
+            </button>
+            <a href="{{ route('meter-readings.create') }}" class="btn btn-primary text-white"><i class="bi bi-plus-lg me-1"></i>Add Reading</a>
+        </div>
     </div>
 
     @if (session('success'))
@@ -16,6 +21,16 @@
     @endif
     @if (session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+    @if (session('import_errors'))
+        <div class="alert alert-warning">
+            <div class="fw-semibold mb-1">Some rows were skipped:</div>
+            <ul class="mb-0 small">
+                @foreach (session('import_errors') as $err)
+                    <li>{{ $err }}</li>
+                @endforeach
+            </ul>
+        </div>
     @endif
 
     {{-- Filters --}}
@@ -77,6 +92,7 @@
                         <th>Reading Date</th>
                         <th>Reader Name</th>
                         <th>Status</th>
+                        <th>Source</th>
                         <th>Flag</th>
                         <th class="text-end" width="150">Actions</th>
                     </tr>
@@ -115,6 +131,13 @@
                                 @endif
                             </td>
                             <td>
+                                @if ($reading->isImported())
+                                    <span class="badge bg-info text-dark"><i class="bi bi-filetype-csv me-1"></i>CSV Import</span>
+                                @else
+                                    <span class="badge bg-light text-dark border"><i class="bi bi-pencil me-1"></i>Manual</span>
+                                @endif
+                            </td>
+                            <td>
                                 @if ($reading->is_flagged)
                                     <span class="badge bg-danger" title="This reading's previous ({{ number_format($reading->previous_reading, 2) }})@if (! is_null($reading->flag_expected)) does not match the last reading's current ({{ number_format($reading->flag_expected, 2) }}) on {{ optional($reading->flag_prev_date)->format('d M Y') }}@else is greater than current ({{ number_format($reading->current_reading, 2) }})@endif">
                                         <i class="bi bi-exclamation-triangle-fill me-1"></i>Discrepancy
@@ -140,7 +163,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="12" class="text-center text-muted py-4">No meter readings found.</td>
+                            <td colspan="13" class="text-center text-muted py-4">No meter readings found.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -152,5 +175,53 @@
         {{ $readings->links() }}
     </div>
 </div>
+
+{{-- Import CSV modal --}}
+<div class="modal fade" id="importReadingsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content rounded-4">
+            <form method="POST" action="{{ route('meter-readings.import') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-header">
+                    <h6 class="modal-title"><i class="bi bi-upload me-1"></i>Import Meter Readings from CSV</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="small text-muted mb-2">
+                        Upload a CSV with a header row: <code>meter_number</code>, <code>previous_units</code>,
+                        <code>current_units</code>, <code>reading_date</code> (use <code>YYYY-MM-DD</code>).
+                        The customer is matched by meter number.
+                        Rows are skipped when the meter is unknown, the current units are below the previous, or the
+                        customer already has a reading for that month.
+                    </p>
+                    <a href="{{ route('meter-readings.import.template') }}" class="btn btn-sm btn-outline-secondary mb-3">
+                        <i class="bi bi-download me-1"></i>Download template
+                    </a>
+                    <div>
+                        <label class="form-label">CSV File <span class="text-danger">*</span></label>
+                        <input type="file" name="file" accept=".csv,text/csv" class="form-control @error('file') is-invalid @enderror" required>
+                        @error('file')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary text-white"><i class="bi bi-upload me-1"></i>Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
+
+@if ($errors->has('file'))
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        new bootstrap.Modal(document.getElementById('importReadingsModal')).show();
+    });
+</script>
+@endpush
+@endif
 

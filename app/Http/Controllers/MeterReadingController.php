@@ -7,7 +7,9 @@ use App\Models\MeterReading;
 use App\Services\ImageService;
 use App\Models\Sheet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class MeterReadingController extends Controller
 {
@@ -138,6 +140,7 @@ class MeterReadingController extends Controller
 
         $data['consumed_units'] = (float) $data['current_reading'] - $previous;
         $data['status'] = MeterReading::STATUS_PENDING;
+        $data['source'] = MeterReading::SOURCE_MANUAL;
 
         if ($request->hasFile('photo')) {
             $data['photo'] = app(ImageService::class)->storeAsWebp($request->file('photo'), 'meter_readings');
@@ -150,6 +153,186 @@ class MeterReadingController extends Controller
 
         return redirect()->route('meter-readings.index')
             ->with('success', 'Meter reading added successfully!');
+    }
+
+    /**
+     * Column headers for the meter reading CSV import/template.
+     */
+    protected const IMPORT_COLUMNS = [
+        'meter_number', 'previous_units', 'current_units', 'reading_date',
+    ];
+
+    /**
+     * Download a CSV template with the expected headers and a few sample rows.
+     */
+    public function importTemplate()
+    {
+        $headers = self::IMPORT_COLUMNS;
+
+        // Seed the template with real meter numbers when there are customers to show.
+        $meters = Customer::query()
+            ->whereNotNull('meter_number')
+            ->where('meter_number', '!=', '')
+            ->orderBy('serial_no')
+            ->limit(5)
+            ->pluck('meter_number')
+            ->all();
+
+        if (! $meters) {
+            $meters = ['MTR-2001', 'MTR-2002', 'MTR-2003', 'MTR-2004', 'MTR-2005'];
+        }
+
+        $date = now()->startOfMonth()->toDateString();
+        $rows = [];
+        foreach ($meters as $i => $meter) {
+            $previous = 1000 + ($i * 100);
+            $rows[] = [$meter, $previous, $previous + 85, $date];
+        }
+
+        return response()->streamDownload(function () use ($headers, $rows) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF"); // UTF-8 BOM for Excel
+            fputcsv($out, $headers);
+            foreach ($rows as $row) {
+                fputcsv($out, $row);
+            }
+            fclose($out);
+        }, 'meter-reading-import-template.csv', ['Content-Type' => 'text/csv']);
+    }
+
+    /**
+     * Bulk import meter readings from an uploaded CSV. Rows are matched to a
+     * customer by meter number; anything that fails is reported and skipped.
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt',
+        ]);
+
+        $handle = fopen($request->file('file')->getRealPath(), 'r');
+        if ($handle === false) {
+            return back()->with('error', 'Could not read the uploaded file.');
+        }
+
+        $header = fgetcsv($handle);
+        if (! $header) {
+            fclose($handle);
+            return back()->with('error', 'The CSV file is empty.');
+        }
+        // Strip the UTF-8 BOM (Excel adds it) so the first header key isn't "\u{FEFF}meter_number".
+        $header = array_map(fn ($h) => strtolower(trim(str_replace("\xEF\xBB\xBF", '', (string) $h))), $header);
+
+        // Meter number -> customer id. Meter numbers aren't unique in the schema,
+        // so keep every match and reject the ambiguous ones per row.
+        $metersToIds = Customer::query()
+            ->whereNotNull('meter_number')
+            ->where('meter_number', '!=', '')
+            ->get(['id', 'meter_number'])
+            ->groupBy(fn ($c) => strtolower(trim($c->meter_number)))
+            ->map(fn ($group) => $group->pluck('id')->all());
+
+        $created = 0;
+        $errors = [];
+        $line = 1; // header is line 1
+
+        while (($row = fgetcsv($handle)) !== false) {
+            $line++;
+
+            // Skip fully blank lines.
+            if (count(array_filter($row, fn ($v) => trim((string) $v) !== '')) === 0) {
+                continue;
+            }
+
+            // Blank cells become null, not '', so the "required" rules below catch them.
+            $data = [];
+            foreach ($header as $i => $key) {
+                $value = isset($row[$i]) ? trim((string) $row[$i]) : '';
+                $data[$key] = $value === '' ? null : $value;
+            }
+
+            // Accept either the "units" wording from the template or the db column names.
+            $meterNumber = (string) ($data['meter_number'] ?? '');
+            $previous    = $data['previous_units'] ?? $data['previous_reading'] ?? null;
+            $current     = $data['current_units'] ?? $data['current_reading'] ?? null;
+            $readingDate = $data['reading_date'] ?? null;
+
+            if (! empty($readingDate)) {
+                try {
+                    $readingDate = Carbon::parse($readingDate)->toDateString();
+                } catch (\Throwable $e) {
+                    // leave as-is; validation will flag it
+                }
+            }
+
+            $matches = $metersToIds[strtolower(trim($meterNumber))] ?? [];
+            if (count($matches) > 1) {
+                $errors[] = "Row {$line}: meter number \"{$meterNumber}\" matches " . count($matches) . ' customers.';
+                continue;
+            }
+
+            $payload = [
+                'meter_number'     => $meterNumber,
+                'customer_id'      => $matches[0] ?? null,
+                'previous_reading' => $previous,
+                'current_reading'  => $current,
+                'reading_date'     => $readingDate,
+            ];
+
+            $validator = Validator::make($payload, [
+                'meter_number'     => 'required|string',
+                'customer_id'      => 'required|exists:customers,id',
+                'previous_reading' => 'required|numeric|min:0',
+                'current_reading'  => 'required|numeric|min:0',
+                'reading_date'     => 'required|date',
+            ], [
+                'customer_id.required' => "No customer found for meter number \"{$meterNumber}\".",
+                'customer_id.exists'   => "No customer found for meter number \"{$meterNumber}\".",
+            ]);
+
+            if ($validator->fails()) {
+                $errors[] = "Row {$line}: " . $validator->errors()->first();
+                continue;
+            }
+
+            $valid = $validator->validated();
+
+            if ((float) $valid['current_reading'] < (float) $valid['previous_reading']) {
+                $errors[] = "Row {$line}: current units ({$valid['current_reading']}) is below previous units ({$valid['previous_reading']}).";
+                continue;
+            }
+
+            // Catches both an existing reading and a duplicate earlier in this file,
+            // since each accepted row is saved before the next one is checked.
+            if ($this->readingExists($valid['customer_id'], $valid['reading_date'])) {
+                $errors[] = "Row {$line}: meter \"{$meterNumber}\" already has a reading for that month.";
+                continue;
+            }
+
+            MeterReading::create([
+                'customer_id'      => $valid['customer_id'],
+                'previous_reading' => $valid['previous_reading'],
+                'current_reading'  => $valid['current_reading'],
+                'consumed_units'   => (float) $valid['current_reading'] - (float) $valid['previous_reading'],
+                'reading_date'     => $valid['reading_date'],
+                'status'           => MeterReading::STATUS_PENDING,
+                'source'           => MeterReading::SOURCE_CSV,
+                'created_by'       => auth()->id(),
+                'updated_by'       => auth()->id(),
+            ]);
+            $created++;
+        }
+
+        fclose($handle);
+
+        $message = "Imported {$created} meter reading(s).";
+        if ($errors) {
+            $message .= ' ' . count($errors) . ' row(s) skipped.';
+            session()->flash('import_errors', array_slice($errors, 0, 15));
+        }
+
+        return redirect()->route('meter-readings.index')
+            ->with($created ? 'success' : 'error', $message);
     }
 
     /**
