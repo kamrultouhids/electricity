@@ -159,7 +159,7 @@ class MeterReadingController extends Controller
      * Column headers for the meter reading CSV import/template.
      */
     protected const IMPORT_COLUMNS = [
-        'meter_number', 'previous_units', 'current_units', 'reading_date',
+        'meter_number', 'current_units', 'reading_date',
     ];
 
     /**
@@ -185,8 +185,7 @@ class MeterReadingController extends Controller
         $date = now()->startOfMonth()->toDateString();
         $rows = [];
         foreach ($meters as $i => $meter) {
-            $previous = 1000 + ($i * 100);
-            $rows[] = [$meter, $previous, $previous + 85, $date];
+            $rows[] = [$meter, 1085 + ($i * 100), $date];
         }
 
         return response()->streamDownload(function () use ($headers, $rows) {
@@ -253,7 +252,6 @@ class MeterReadingController extends Controller
 
             // Accept either the "units" wording from the template or the db column names.
             $meterNumber = (string) ($data['meter_number'] ?? '');
-            $previous    = $data['previous_units'] ?? $data['previous_reading'] ?? null;
             $current     = $data['current_units'] ?? $data['current_reading'] ?? null;
             $readingDate = $data['reading_date'] ?? null;
 
@@ -272,19 +270,17 @@ class MeterReadingController extends Controller
             }
 
             $payload = [
-                'meter_number'     => $meterNumber,
-                'customer_id'      => $matches[0] ?? null,
-                'previous_reading' => $previous,
-                'current_reading'  => $current,
-                'reading_date'     => $readingDate,
+                'meter_number'    => $meterNumber,
+                'customer_id'     => $matches[0] ?? null,
+                'current_reading' => $current,
+                'reading_date'    => $readingDate,
             ];
 
             $validator = Validator::make($payload, [
-                'meter_number'     => 'required|string',
-                'customer_id'      => 'required|exists:customers,id',
-                'previous_reading' => 'required|numeric|min:0',
-                'current_reading'  => 'required|numeric|min:0',
-                'reading_date'     => 'required|date',
+                'meter_number'    => 'required|string',
+                'customer_id'     => 'required|exists:customers,id',
+                'current_reading' => 'required|numeric|min:0',
+                'reading_date'    => 'required|date',
             ], [
                 'customer_id.required' => "No customer found for meter number \"{$meterNumber}\".",
                 'customer_id.exists'   => "No customer found for meter number \"{$meterNumber}\".",
@@ -297,8 +293,12 @@ class MeterReadingController extends Controller
 
             $valid = $validator->validated();
 
-            if ((float) $valid['current_reading'] < (float) $valid['previous_reading']) {
-                $errors[] = "Row {$line}: current units ({$valid['current_reading']}) is below previous units ({$valid['previous_reading']}).";
+            // The previous reading is never taken from the file — it carries over
+            // from the customer's last reading before this date (0 for the first).
+            $previous = $this->carriedPreviousReading($valid['customer_id'], $valid['reading_date']);
+
+            if ((float) $valid['current_reading'] < $previous) {
+                $errors[] = "Row {$line}: current units ({$valid['current_reading']}) is below meter \"{$meterNumber}\" last reading ({$previous}).";
                 continue;
             }
 
@@ -311,9 +311,9 @@ class MeterReadingController extends Controller
 
             MeterReading::create([
                 'customer_id'      => $valid['customer_id'],
-                'previous_reading' => $valid['previous_reading'],
+                'previous_reading' => $previous,
                 'current_reading'  => $valid['current_reading'],
-                'consumed_units'   => (float) $valid['current_reading'] - (float) $valid['previous_reading'],
+                'consumed_units'   => (float) $valid['current_reading'] - $previous,
                 'reading_date'     => $valid['reading_date'],
                 'status'           => MeterReading::STATUS_PENDING,
                 'source'           => MeterReading::SOURCE_CSV,
@@ -451,6 +451,20 @@ class MeterReadingController extends Controller
      * Whether the customer already has a reading in the same month.
      * Pass $ignoreId to exclude the record being updated.
      */
+    /**
+     * The reading a new one should start from: the current reading of the
+     * customer's latest reading before that date, or 0 when they have none.
+     */
+    protected function carriedPreviousReading(int $customerId, string $readingDate): float
+    {
+        return (float) (MeterReading::query()
+            ->where('customer_id', $customerId)
+            ->whereDate('reading_date', '<', $readingDate)
+            ->orderByDesc('reading_date')
+            ->orderByDesc('id')
+            ->value('current_reading') ?? 0);
+    }
+
     protected function readingExists(int $customerId, string $readingDate, ?int $ignoreId = null): bool
     {
         $date = \Illuminate\Support\Carbon::parse($readingDate);

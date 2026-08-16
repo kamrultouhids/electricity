@@ -188,11 +188,12 @@
                 </div>
                 <div class="modal-body">
                     <p class="small text-muted mb-2">
-                        Upload a CSV with a header row: <code>meter_number</code>, <code>previous_units</code>,
-                        <code>current_units</code>, <code>reading_date</code> (use <code>YYYY-MM-DD</code>).
-                        The customer is matched by meter number.
-                        Rows are skipped when the meter is unknown, the current units are below the previous, or the
-                        customer already has a reading for that month.
+                        Upload a CSV with a header row: <code>meter_number</code>, <code>current_units</code>,
+                        <code>reading_date</code> (use <code>YYYY-MM-DD</code>).
+                        The customer is matched by meter number, and the previous units carry over automatically
+                        from that customer's last reading (0 for their first).
+                        Rows are skipped when the meter is unknown, the current units are below the last reading, or
+                        the customer already has a reading for that month.
                     </p>
                     <a href="{{ route('meter-readings.import.template') }}" class="btn btn-sm btn-outline-secondary mb-3">
                         <i class="bi bi-download me-1"></i>Download template
