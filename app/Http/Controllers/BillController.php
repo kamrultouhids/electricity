@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 class BillController extends Controller
 {
     /** Rows-per-page choices offered on the bill list — also caps a print run. */
-    public const PER_PAGE_OPTIONS = [2,15, 25, 50, 100];
+    public const PER_PAGE_OPTIONS = [15, 25, 50, 100];
 
     /**
      * List generated bills with filters (month, sheet, status, rows per page).
