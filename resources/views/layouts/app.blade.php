@@ -202,6 +202,9 @@
                                     @can('view-bills')
                                     <a class="dropdown-item {{ (Route::is('bills.*') && ! Route::is('bills.pending')) ? 'active' : '' }}" href="{{ route('bills.index') }}"><i class="bi bi-receipt me-2"></i>Bills</a>
                                     @endcan
+                                    @can('collect-payments')
+                                    <a class="dropdown-item {{ Route::is('payments.collect') || Route::is('payments.create') ? 'active' : '' }}" href="{{ route('payments.collect') }}"><i class="bi bi-wallet me-2"></i>Collect Payment</a>
+                                    @endcan
                                     @can('view-due-list')
                                     <a class="dropdown-item {{ Route::is('payments.due') ? 'active' : '' }}" href="{{ route('payments.due') }}"><i class="bi bi-cash-stack me-2"></i>Due List</a>
                                     @endcan

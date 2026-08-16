@@ -77,6 +77,7 @@ Route::middleware(['auth'])->group(function () {
     // Payment Collection
     Route::get('/payments/due', [PaymentController::class, 'dueList'])->middleware('can:view-due-list')->name('payments.due');
     Route::middleware('can:collect-payments')->group(function () {
+        Route::get('/payments/collect', [PaymentController::class, 'collect'])->name('payments.collect');
         Route::get('/customers/{customer}/pay', [PaymentController::class, 'create'])->name('payments.create');
         Route::post('/customers/{customer}/pay', [PaymentController::class, 'store'])->name('payments.store');
     });

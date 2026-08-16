@@ -95,24 +95,68 @@ class PaymentController extends Controller
     }
 
     /**
-     * Show the collect-payment form (against the customer's latest due bill).
+     * Collect a payment: search for the customer by serial no, name, mobile or
+     * meter no, pick one, and record the payment — all on the one page.
+     */
+    public function collect(Request $request)
+    {
+        $search = trim((string) $request->input('search'));
+        $customers = collect();
+        $dueBills = collect();
+
+        // The picked customer's payment panel is rendered inline below the search.
+        $selectedCustomer = $request->filled('customer')
+            ? Customer::with('sheet')->find($request->integer('customer'))
+            : null;
+
+        if ($search !== '') {
+            $customers = Customer::query()
+                ->with('sheet')
+                ->where(function ($q) use ($search) {
+                    $q->where('serial_no', 'like', "%{$search}%")
+                        ->orWhere('name', 'like', "%{$search}%")
+                        ->orWhere('mobile_number', 'like', "%{$search}%")
+                        ->orWhere('meter_number', 'like', "%{$search}%");
+                })
+                ->orderBy('name')
+                ->paginate(15)
+                ->withQueryString();
+
+            // Latest due bill per matched customer — ascending so keyBy keeps the newest.
+            $dueBills = Bill::query()
+                ->whereIn('customer_id', $customers->pluck('id'))
+                ->where('due_amount', '>', 0)
+                ->orderBy('billing_month')
+                ->orderBy('id')
+                ->get()
+                ->keyBy('customer_id');
+
+            // One match is unambiguous — open its payment form straight away
+            // instead of making the collector click through a single row.
+            if (! $selectedCustomer && $customers->total() === 1) {
+                $selectedCustomer = $customers->first();
+            }
+        }
+
+        $selectedBill = $selectedCustomer ? $this->latestDueBill($selectedCustomer) : null;
+
+        return view('payments.collect', [
+            'search'    => $search,
+            'customers' => $customers,
+            'dueBills'  => $dueBills,
+            'customer'  => $selectedCustomer,
+            'bill'      => $selectedBill,
+            'methods'   => Payment::METHODS,
+        ]);
+    }
+
+    /**
+     * Kept for the links that point straight at a customer (due list, customer
+     * page) — collecting happens on the one collect page.
      */
     public function create(Customer $customer)
     {
-        $bill = $this->latestDueBill($customer);
-
-        if (! $bill) {
-            return redirect()->route('customers.show', $customer)
-                ->with('error', 'This customer has no due.');
-        }
-
-        $bill->load('customer.sheet');
-
-        return view('payments.create', [
-            'customer' => $customer,
-            'bill'     => $bill,
-            'methods'  => Payment::METHODS,
-        ]);
+        return redirect()->route('payments.collect', ['customer' => $customer->id]);
     }
 
     /**
@@ -191,8 +235,14 @@ class PaymentController extends Controller
             return $payment;
         });
 
-        return redirect()->route('payments.receipt', $payment)
-            ->with('success', 'Payment recorded successfully!');
+        // Stay on the collect page (with the search intact) so the next payment
+        // can be taken right away; the receipt is one click from the flash.
+        return redirect()->route('payments.collect', array_filter([
+            'customer' => $customer->id,
+            'search'   => $request->input('search'),
+        ]))
+            ->with('success', 'Payment recorded successfully!')
+            ->with('receipt_payment_id', $payment->id);
     }
 
     /**
