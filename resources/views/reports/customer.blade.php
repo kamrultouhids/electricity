@@ -38,7 +38,15 @@
                         <option value="0" @selected(request('status') === '0')>Inactive</option>
                     </select>
                 </div>
-                
+                <div class="col-md-2">
+                    <label class="form-label mb-1">Outstanding</label>
+                    <select name="outstanding" class="form-select">
+                        <option value="" @selected(! in_array(request('outstanding'), ['with', 'without'], true))>All</option>
+                        <option value="with" @selected(request('outstanding') === 'with')>Has Outstanding</option>
+                        <option value="without" @selected(request('outstanding') === 'without')>No Outstanding</option>
+                    </select>
+                </div>
+
                 <div class="col-md-2 d-flex gap-2">
                     <button type="submit" class="btn btn-primary text-white "><i class="bi bi-funnel me-1"></i>Filter</button>
                     <a href="{{ route('reports.customers') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-counterclockwise"></i></a>

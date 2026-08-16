@@ -119,22 +119,35 @@ class ReportController extends Controller
      */
     public function customer(Request $request)
     {
+        // The customer's outstanding is the due on their latest bill — it already
+        // carries forward every earlier month.
+        $latestDue = Bill::query()
+            ->selectRaw('due_amount')
+            ->whereColumn('customer_id', 'customers.id')
+            ->orderByDesc('billing_month')
+            ->orderByDesc('id')
+            ->limit(1);
+
         $query = Customer::query()
             ->with('sheet')
             ->withSum('payments as paid_total', 'amount')
             ->withSum('payments as discount_total', 'discount')
             ->withSum('readings as consumption_total', 'consumed_units')
-            ->addSelect(['outstanding' => Bill::query()
-                ->selectRaw('due_amount')
-                ->whereColumn('customer_id', 'customers.id')
-                ->orderByDesc('billing_month')
-                ->orderByDesc('id')
-                ->limit(1),
-            ]);
+            ->addSelect(['outstanding' => $latestDue]);
 
         $this->applyCustomerFilters($query, $request);
 
-       
+        // Filtered as a where (not a having on the alias) so the paginator's
+        // count query keeps working. Customers with no bill count as no due.
+        $outstanding = $request->input('outstanding');
+
+        if (in_array($outstanding, ['with', 'without'], true)) {
+            $comparison = $outstanding === 'with' ? '>' : '<=';
+            $query->whereRaw(
+                "COALESCE(({$latestDue->toSql()}), 0) {$comparison} 0",
+                $latestDue->getBindings()
+            );
+        }
 
         $query->orderBy('serial_no');
 
