@@ -167,11 +167,10 @@ class BillController extends Controller
 
         $customer = $meterReading->customer;
 
-        $previousBills = Bill::query()
-            ->where('customer_id', $customer->id)
-            ->orderByDesc('billing_month')
-            ->limit(3)
-            ->get();
+        $data = $generator->buildData($meterReading);
+
+        // Preview the exact history that will be frozen onto the bill.
+        $previousBills = Bill::mapHistoryRows($data['previous_bills_snapshot']);
 
         $previousReading = MeterReading::query()
             ->where('customer_id', $customer->id)
@@ -181,7 +180,7 @@ class BillController extends Controller
 
         return view('bills.preview', [
             'meterReading'    => $meterReading,
-            'data'            => $generator->buildData($meterReading),
+            'data'            => $data,
             'previousBills'   => $previousBills,
             'previousReading' => $previousReading,
         ]);
@@ -215,12 +214,7 @@ class BillController extends Controller
     {
         $bill->load(['customer.sheet', 'meterReading', 'createdBy', 'updatedBy']);
 
-        $previousBills = Bill::query()
-            ->where('customer_id', $bill->customer_id)
-            ->whereDate('billing_month', '<', $bill->billing_month)
-            ->orderByDesc('billing_month')
-            ->limit(3)
-            ->get();
+        $previousBills = $bill->historyRows();
 
         $previousReading = $bill->meterReading
             ? MeterReading::query()

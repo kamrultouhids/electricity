@@ -67,8 +67,33 @@ class BillGenerator
             'total_amount'         => $computed['total_amount'],
             'paid_amount'          => 0,
             'due_amount'           => $computed['due_amount'],
+            'previous_bills_snapshot' => $this->previousBillsSnapshot($customer->id, $billingMonth),
             'status'               => $computed['status'],
         ];
+    }
+
+    /**
+     * Freeze the previous months as they stand right now, so reprinting an old
+     * bill later shows the same history as the copy handed to the customer
+     * (payments made afterwards would otherwise rewrite those figures).
+     */
+    protected function previousBillsSnapshot(int $customerId, string $billingMonth): array
+    {
+        return Bill::query()
+            ->where('customer_id', $customerId)
+            ->whereDate('billing_month', '<', $billingMonth)
+            ->orderByDesc('billing_month')
+            ->limit(Bill::HISTORY_MONTHS)
+            ->get(['billing_month', 'units', 'total_amount', 'paid_amount', 'discount', 'due_amount'])
+            ->map(fn (Bill $bill) => [
+                'billing_month' => $bill->billing_month->toDateString(),
+                'units'         => (float) $bill->units,
+                'total_amount'  => (float) $bill->total_amount,
+                'paid_amount'   => (float) $bill->paid_amount,
+                'discount'      => (float) $bill->discount,
+                'due_amount'    => (float) $bill->due_amount,
+            ])
+            ->all();
     }
 
     /**

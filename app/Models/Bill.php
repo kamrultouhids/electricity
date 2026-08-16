@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 class Bill extends Model
 {
@@ -29,6 +31,7 @@ class Bill extends Model
         'paid_amount',
         'discount',
         'due_amount',
+        'previous_bills_snapshot',
         'status',
         'created_by',
         'updated_by',
@@ -50,12 +53,16 @@ class Bill extends Model
         'paid_amount' => 'decimal:2',
         'discount' => 'decimal:2',
         'due_amount' => 'decimal:2',
+        'previous_bills_snapshot' => 'array',
         'status' => 'integer',
     ];
 
     /**
      * Status constants.
      */
+    /** How many previous months the bill document shows. */
+    public const HISTORY_MONTHS = 3;
+
     public const STATUS_UNPAID = 1;
     public const STATUS_PARTIAL = 2;
     public const STATUS_PAID = 3;
@@ -84,6 +91,40 @@ class Bill extends Model
     public function statusLabel(): string
     {
         return self::STATUS_LABELS[$this->status] ?? 'Unknown';
+    }
+
+    /**
+     * The previous-months rows for the bill document, taken from the snapshot
+     * stored at generation time. Falls back to a live lookup for bills that
+     * were generated before snapshots existed.
+     */
+    public function historyRows(): Collection
+    {
+        if (is_array($this->previous_bills_snapshot)) {
+            return self::mapHistoryRows($this->previous_bills_snapshot);
+        }
+
+        return static::query()
+            ->where('customer_id', $this->customer_id)
+            ->whereDate('billing_month', '<', $this->billing_month)
+            ->orderByDesc('billing_month')
+            ->limit(self::HISTORY_MONTHS)
+            ->get();
+    }
+
+    /**
+     * Shape raw snapshot rows into objects the bill document can render.
+     */
+    public static function mapHistoryRows(?array $rows): Collection
+    {
+        return collect($rows ?? [])->map(fn (array $row) => (object) [
+            'billing_month' => Carbon::parse($row['billing_month']),
+            'units'         => (float) ($row['units'] ?? 0),
+            'total_amount'  => (float) ($row['total_amount'] ?? 0),
+            'paid_amount'   => (float) ($row['paid_amount'] ?? 0),
+            'discount'      => (float) ($row['discount'] ?? 0),
+            'due_amount'    => (float) ($row['due_amount'] ?? 0),
+        ]);
     }
 
     public function customer(): BelongsTo

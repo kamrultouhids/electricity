@@ -66,12 +66,7 @@ class DashboardController extends Controller
     {
         $bill->load(['customer.sheet', 'meterReading', 'createdBy']);
 
-        $previousBills = Bill::query()
-            ->where('customer_id', $bill->customer_id)
-            ->whereDate('billing_month', '<', $bill->billing_month)
-            ->orderByDesc('billing_month')
-            ->limit(3)
-            ->get();
+        $previousBills = $bill->historyRows();
 
         $previousReading = $bill->meterReading
             ? MeterReading::query()
