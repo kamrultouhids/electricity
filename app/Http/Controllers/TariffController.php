@@ -19,12 +19,13 @@ class TariffController extends Controller
             return Tariff::firstOrCreate(
                 ['connection_type' => $type],
                 [
-                    'per_unit_rate'  => 0,
-                    'line_charge'    => 0,
-                    'service_charge' => 0,
-                    'demand_charge'  => 0,
-                    'created_by'     => auth()->id(),
-                    'updated_by'     => auth()->id(),
+                    'per_unit_rate'    => 0,
+                    'line_charge'      => 0,
+                    'service_charge'   => 0,
+                    'demand_charge'    => 0,
+                    'electricity_duty' => 0,
+                    'created_by'       => auth()->id(),
+                    'updated_by'       => auth()->id(),
                 ],
             );
         });
@@ -64,6 +65,9 @@ class TariffController extends Controller
             'service_charges.*' => 'nullable|numeric|min:0',
             'demand_charges'    => 'nullable|array',
             'demand_charges.*'  => 'nullable|numeric|min:0',
+            // Percentage of the energy charge, so it is capped at 100.
+            'duties'            => 'nullable|array',
+            'duties.*'          => 'nullable|numeric|min:0|max:100',
         ]);
 
         foreach ($data['rates'] as $type => $rate) {
@@ -74,17 +78,19 @@ class TariffController extends Controller
             $tariff = Tariff::firstOrNew(['connection_type' => $type]);
 
             $old = [
-                'per_unit_rate'  => (float) ($tariff->per_unit_rate ?? 0),
-                'line_charge'    => (float) ($tariff->line_charge ?? 0),
-                'service_charge' => (float) ($tariff->service_charge ?? 0),
-                'demand_charge'  => (float) ($tariff->demand_charge ?? 0),
+                'per_unit_rate'    => (float) ($tariff->per_unit_rate ?? 0),
+                'line_charge'      => (float) ($tariff->line_charge ?? 0),
+                'service_charge'   => (float) ($tariff->service_charge ?? 0),
+                'demand_charge'    => (float) ($tariff->demand_charge ?? 0),
+                'electricity_duty' => (float) ($tariff->electricity_duty ?? 0),
             ];
 
             $new = [
-                'per_unit_rate'  => (float) $rate,
-                'line_charge'    => (float) ($data['line_charges'][$type] ?? 0),
-                'service_charge' => (float) ($data['service_charges'][$type] ?? 0),
-                'demand_charge'  => (float) ($data['demand_charges'][$type] ?? 0),
+                'per_unit_rate'    => (float) $rate,
+                'line_charge'      => (float) ($data['line_charges'][$type] ?? 0),
+                'service_charge'   => (float) ($data['service_charges'][$type] ?? 0),
+                'demand_charge'    => (float) ($data['demand_charges'][$type] ?? 0),
+                'electricity_duty' => (float) ($data['duties'][$type] ?? 0),
             ];
 
             // Log only when a value actually changed on an existing tariff.
@@ -113,6 +119,8 @@ class TariffController extends Controller
                     'new_service_charge' => $new['service_charge'],
                     'old_demand_charge'  => $old['demand_charge'],
                     'new_demand_charge'  => $new['demand_charge'],
+                    'old_electricity_duty' => $old['electricity_duty'],
+                    'new_electricity_duty' => $new['electricity_duty'],
                     'changed_by'         => auth()->id(),
                 ]);
             }

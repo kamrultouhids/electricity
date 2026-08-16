@@ -38,6 +38,8 @@
         'lineCharge'         => $data['line_charge'],
         'serviceCharge'      => $data['service_charge'],
         'demandCharge'       => $data['demand_charge'],
+        'electricityDutyRate' => $data['electricity_duty_rate'],
+        'electricityDuty'    => $data['electricity_duty'],
         'previousOutstanding' => $data['previous_outstanding'],
         'lateFee'            => $data['late_fee'],
         'fixedCharge'        => $data['fixed_charge'],

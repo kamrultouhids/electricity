@@ -32,6 +32,7 @@ class BillGenerator
         $lineCharge    = (float) ($tariff?->line_charge ?? 0);
         $serviceCharge = (float) ($tariff?->service_charge ?? 0);
         $demandCharge  = (float) ($tariff?->demand_charge ?? 0);
+        $dutyRate      = (float) ($tariff?->electricity_duty ?? 0);
 
         // Carry forward the latest prior bill's due (it already rolls up earlier months).
         $previousOutstanding = (float) (Bill::query()
@@ -47,6 +48,7 @@ class BillGenerator
             'line_charge'          => $lineCharge,
             'service_charge'       => $serviceCharge,
             'demand_charge'        => $demandCharge,
+            'electricity_duty_rate' => $dutyRate,
             'previous_outstanding' => $previousOutstanding,
         ]);
 
@@ -60,6 +62,8 @@ class BillGenerator
             'line_charge'          => $lineCharge,
             'service_charge'       => $serviceCharge,
             'demand_charge'        => $demandCharge,
+            'electricity_duty_rate' => $dutyRate,
+            'electricity_duty'     => $computed['electricity_duty'],
             'fixed_charge'         => 0,
             'meter_rent'           => 0,
             'previous_outstanding' => $previousOutstanding,

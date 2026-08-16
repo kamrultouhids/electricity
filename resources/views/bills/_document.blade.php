@@ -4,6 +4,7 @@
              $serialNo, $accountNo, $preparerName,
              $currentReading, $previousReading, $currentReadingDate, $previousReadingDate,
              $units, $energyCharge, $lineCharge, $serviceCharge, $demandCharge,
+             $electricityDutyRate, $electricityDuty,
              $previousOutstanding, $lateFee, $fixedCharge, $totalAmount,
              $previousBills (Collection of Bill)
 --}}
@@ -11,6 +12,8 @@
     $lineCharge = $lineCharge ?? 0;
     $serviceCharge = $serviceCharge ?? 0;
     $demandCharge = $demandCharge ?? 0;
+    $electricityDutyRate = $electricityDutyRate ?? 0;
+    $electricityDuty = $electricityDuty ?? 0;
 
     // Convert western digits to Bengali numerals for bill figures.
     $bn = fn ($v) => strtr((string) $v, ['0' => '০', '1' => '১', '2' => '২', '3' => '৩', '4' => '৪', '5' => '৫', '6' => '৬', '7' => '৭', '8' => '৮', '9' => '৯']);
@@ -130,7 +133,10 @@
                     <tr><td>বকেয়া বিল</td><td class="text-end">{{ $bn(number_format($previousOutstanding, 2)) }}</td></tr>
                     <tr><td>বকেয়া বিলের জরিমানা</td><td class="text-end">{{ $bn(number_format($lateFee, 2)) }}</td></tr>
                     <tr><td>অতিরিক্ত চার্জ</td><td class="text-end">{{ $bn(number_format($fixedCharge, 2)) }}</td></tr>
-                    <tr><td>বিদ্যুৎ শুল্ক(%)</td><td class="text-end">{{ $bn(0) }}</td></tr>
+                    <tr>
+                        <td>বিদ্যুৎ শুল্ক{{ $electricityDutyRate > 0 ? ' ('.$bn(rtrim(rtrim(number_format($electricityDutyRate, 2), '0'), '.')).'%)' : '(%)' }}</td>
+                        <td class="text-end">{{ $bn(number_format($electricityDuty, 2)) }}</td>
+                    </tr>
                     @php $discount = $discount ?? 0; @endphp
                     <tr class="fw-bold"><td>মোট বিল</td><td class="text-end">{{ $bn(number_format($totalAmount, 2)) }}</td></tr>
                     <tr><td>ছাড়(-)</td><td class="text-end">{{ $bn(number_format($discount, 2)) }}</td></tr>

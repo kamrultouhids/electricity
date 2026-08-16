@@ -21,7 +21,7 @@ class BillCalculator
     /**
      * Compute the derived amounts for a bill from its raw inputs.
      *
-     * @return array{energy_charge: float, late_fee: float, total_amount: float, due_amount: float, status: int}
+     * @return array{energy_charge: float, late_fee: float, electricity_duty: float, total_amount: float, due_amount: float, status: int}
      */
     public function compute(array $input): array
     {
@@ -31,6 +31,7 @@ class BillCalculator
         $line      = (float) ($input['line_charge'] ?? 0);
         $service   = (float) ($input['service_charge'] ?? 0);
         $demand    = (float) ($input['demand_charge'] ?? 0);
+        $dutyRate  = (float) ($input['electricity_duty_rate'] ?? 0);
         $fixed     = (float) ($input['fixed_charge'] ?? 0);
         $meterRent = (float) ($input['meter_rent'] ?? 0);
         $previous  = (float) ($input['previous_outstanding'] ?? 0);
@@ -38,17 +39,30 @@ class BillCalculator
 
         $energyCharge = $this->energyCharge($type, $units, $rate);
         $lateFee = $this->lateFee($type, $previous);
+        $duty = $this->electricityDuty($energyCharge, $lateFee, $dutyRate);
 
-        $total = round($energyCharge + $line + $service + $demand + $fixed + $meterRent + $previous + $lateFee, 2);
+        $total = round($energyCharge + $line + $service + $demand + $duty + $fixed + $meterRent + $previous + $lateFee, 2);
         $due = round($total - $paid, 2);
 
         return [
-            'energy_charge' => $energyCharge,
-            'late_fee'      => $lateFee,
-            'total_amount'  => $total,
-            'due_amount'    => $due,
-            'status'        => $this->status($total, $paid),
+            'energy_charge'    => $energyCharge,
+            'late_fee'         => $lateFee,
+            'electricity_duty' => $duty,
+            'total_amount'     => $total,
+            'due_amount'       => $due,
+            'status'           => $this->status($total, $paid),
         ];
+    }
+
+    /**
+     * Electricity duty — a percentage of the energy charge.
+     */
+    public function electricityDuty(float $energyCharge, float $lateFee, float $dutyRate): float
+    {
+        if ($dutyRate <= 0) {
+            return 0.0;
+        }
+        return round($energyCharge * $dutyRate / 100, 2);
     }
 
     /**

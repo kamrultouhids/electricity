@@ -37,6 +37,8 @@
         'lineCharge'         => $bill->line_charge,
         'serviceCharge'      => $bill->service_charge,
         'demandCharge'       => $bill->demand_charge,
+        'electricityDutyRate' => $bill->electricity_duty_rate,
+        'electricityDuty'    => $bill->electricity_duty,
         'previousOutstanding' => $bill->previous_outstanding,
         'lateFee'            => $bill->late_fee,
         'fixedCharge'        => $bill->fixed_charge,

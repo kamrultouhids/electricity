@@ -16,6 +16,7 @@ class Tariff extends Model
         'line_charge',
         'service_charge',
         'demand_charge',
+        'electricity_duty',
         'status',
         'created_by',
         'updated_by',
@@ -26,6 +27,7 @@ class Tariff extends Model
         'line_charge' => 'decimal:2',
         'service_charge' => 'decimal:2',
         'demand_charge' => 'decimal:2',
+        'electricity_duty' => 'decimal:2',
         'status' => 'integer',
     ];
 

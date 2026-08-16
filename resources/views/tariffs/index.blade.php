@@ -37,6 +37,7 @@
                                 <th width="200">Line Charge</th>
                                 <th width="200">Service Charge</th>
                                 <th width="200">Demand Charge</th>
+                                <th width="180">Electricity Duty</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -79,6 +80,15 @@
                                                    name="demand_charges[{{ $tariff->connection_type }}]"
                                                    class="form-control"
                                                    value="{{ old('demand_charges.'.$tariff->connection_type, $tariff->demand_charge) }}">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="input-group">
+                                            <input type="number" step="0.01" min="0" max="100"
+                                                   name="duties[{{ $tariff->connection_type }}]"
+                                                   class="form-control"
+                                                   value="{{ old('duties.'.$tariff->connection_type, $tariff->electricity_duty) }}">
+                                            <span class="input-group-text">%</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -136,6 +146,7 @@
                         <th>Line Charge</th>
                         <th>Service Charge</th>
                         <th>Demand Charge</th>
+                        <th>Electricity Duty</th>
                         <th>Changed By</th>
                         <th>Changed At</th>
                     </tr>
@@ -143,24 +154,29 @@
                 <tbody>
                     @forelse ($logs as $log)
                         @php
+                            // [old, new, isPercent] — the duty is a rate, the rest are amounts.
                             $changes = [
-                                [$log->old_rate, $log->new_rate],
-                                [$log->old_line_charge, $log->new_line_charge],
-                                [$log->old_service_charge, $log->new_service_charge],
-                                [$log->old_demand_charge, $log->new_demand_charge],
+                                [$log->old_rate, $log->new_rate, false],
+                                [$log->old_line_charge, $log->new_line_charge, false],
+                                [$log->old_service_charge, $log->new_service_charge, false],
+                                [$log->old_demand_charge, $log->new_demand_charge, false],
+                                [$log->old_electricity_duty, $log->new_electricity_duty, true],
                             ];
+                            $money = fn ($v, $percent) => $percent
+                                ? number_format($v, 2).'%'
+                                : '৳ '.number_format($v, 2);
                         @endphp
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ ucfirst($log->connection_type) }}</td>
-                            @foreach ($changes as [$oldValue, $newValue])
+                            @foreach ($changes as [$oldValue, $newValue, $isPercent])
                                 <td class="text-nowrap">
                                     @if ((float) $oldValue === (float) $newValue)
-                                        <span class="text-muted">৳ {{ number_format($newValue, 2) }}</span>
+                                        <span class="text-muted">{{ $money($newValue, $isPercent) }}</span>
                                     @else
-                                        <span class="text-muted">৳ {{ number_format($oldValue, 2) }}</span>
+                                        <span class="text-muted">{{ $money($oldValue, $isPercent) }}</span>
                                         <i class="bi bi-arrow-right mx-1"></i>
-                                        <span class="fw-semibold">৳ {{ number_format($newValue, 2) }}</span>
+                                        <span class="fw-semibold">{{ $money($newValue, $isPercent) }}</span>
                                     @endif
                                 </td>
                             @endforeach
@@ -169,7 +185,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center text-muted py-4">No rate changes found.</td>
+                            <td colspan="9" class="text-center text-muted py-4">No rate changes found.</td>
                         </tr>
                     @endforelse
                 </tbody>

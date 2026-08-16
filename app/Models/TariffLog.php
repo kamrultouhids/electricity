@@ -18,6 +18,8 @@ class TariffLog extends Model
         'new_service_charge',
         'old_demand_charge',
         'new_demand_charge',
+        'old_electricity_duty',
+        'new_electricity_duty',
         'changed_by',
     ];
 
@@ -30,6 +32,8 @@ class TariffLog extends Model
         'new_service_charge' => 'decimal:2',
         'old_demand_charge' => 'decimal:2',
         'new_demand_charge' => 'decimal:2',
+        'old_electricity_duty' => 'decimal:2',
+        'new_electricity_duty' => 'decimal:2',
     ];
 
     public function tariff(): BelongsTo

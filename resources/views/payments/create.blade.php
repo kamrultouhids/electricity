@@ -74,7 +74,7 @@
                             <div class="col-md-6">
                                 <label class="form-label">Settling (Amount + Discount)</label>
                                 <input type="number" id="settling" class="form-control" readonly>
-                                <small class="text-muted">Remaining due after: <span id="remaining"></span></small>
+                                <h6 class="text-bold">Remaining due after: <span id="remaining"></span></h6>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Payment Date <span class="text-danger">*</span></label>
