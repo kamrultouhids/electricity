@@ -23,6 +23,9 @@
 
     // Render a Carbon date as "মাস - বছর" in Bengali.
     $bnMonthYear = fn ($d) => $d ? $bnMonths[$d->month] . ' - ' . $bn($d->format('Y')) : '—';
+
+    // Render a Carbon date as "দিন-মাস-বছর" in Bengali.
+    $bnDate = fn ($d) => $d ? $bn($d->format('d')) . '-' . $bnMonths[$d->month] . '-' . $bn($d->format('Y')) : '—';
 @endphp
 <div class="bill-copy">
     @isset($verifyUrl)
@@ -60,8 +63,8 @@
         </div>
         <div class="col-5 p-2">
             <div class="kv"><span>বিলের মাস</span><b>{{ $bnMonthYear($billMonth) }}</b></div>
-            <div class="kv"><span>বিল প্রস্তুতের তারিখ</span><b>{{ $prepDate->format('d-M-Y') }}</b></div>
-            <div class="kv"><span>পরিশোধের শেষ তারিখ</span><b>{{ $lastDate->format('d-M-Y') }}</b></div>
+            <div class="kv"><span>বিল প্রস্তুতের তারিখ</span><b>{{ $bnDate($prepDate) }}</b></div>
+            <div class="kv"><span>পরিশোধের শেষ তারিখ</span><b>{{ $bnDate($lastDate) }}</b></div>
         </div>
     </div>
 

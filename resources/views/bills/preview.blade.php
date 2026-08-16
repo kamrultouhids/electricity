@@ -4,7 +4,8 @@
     $customer = $meterReading->customer;
     $billMonth = \Illuminate\Support\Carbon::parse($data['billing_month']);
     $prepDate = now();
-    $lastDate = now()->day(20);
+    // Payable by the 20th of the month after the billing month.
+    $lastDate = $billMonth->copy()->addMonth()->day(20);
 @endphp
 
 @section('content')

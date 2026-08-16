@@ -4,7 +4,8 @@
     $customer = $bill->customer;
     $billMonth = $bill->billing_month;
     $prepDate = $bill->created_at;
-    $lastDate = $bill->created_at->copy()->day(20);
+    // Payable by the 20th of the month after the billing month.
+    $lastDate = $billMonth->copy()->addMonth()->day(20);
     $mr = $bill->meterReading;
 @endphp
 
