@@ -28,6 +28,9 @@ class BillCalculator
         $type      = $input['connection_type'] ?? null;
         $units     = (float) ($input['units'] ?? 0);
         $rate      = (float) ($input['per_unit_rate'] ?? 0);
+        $line      = (float) ($input['line_charge'] ?? 0);
+        $service   = (float) ($input['service_charge'] ?? 0);
+        $demand    = (float) ($input['demand_charge'] ?? 0);
         $fixed     = (float) ($input['fixed_charge'] ?? 0);
         $meterRent = (float) ($input['meter_rent'] ?? 0);
         $previous  = (float) ($input['previous_outstanding'] ?? 0);
@@ -36,7 +39,7 @@ class BillCalculator
         $energyCharge = $this->energyCharge($type, $units, $rate);
         $lateFee = $this->lateFee($type, $previous);
 
-        $total = round($energyCharge + $fixed + $meterRent + $previous + $lateFee, 2);
+        $total = round($energyCharge + $line + $service + $demand + $fixed + $meterRent + $previous + $lateFee, 2);
         $due = round($total - $paid, 2);
 
         return [

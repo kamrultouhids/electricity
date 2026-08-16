@@ -24,7 +24,14 @@ class BillGenerator
         $customer = $reading->customer;
         $billingMonth = Carbon::parse($reading->reading_date)->startOfMonth()->toDateString();
 
-        $rate = (float) (Tariff::resolveFor($customer->connection_type)?->per_unit_rate ?? 0);
+        // Snapshot the connection type's tariff onto the bill so later tariff
+        // edits never change an already generated bill.
+        $tariff = Tariff::resolveFor($customer->connection_type);
+
+        $rate          = (float) ($tariff?->per_unit_rate ?? 0);
+        $lineCharge    = (float) ($tariff?->line_charge ?? 0);
+        $serviceCharge = (float) ($tariff?->service_charge ?? 0);
+        $demandCharge  = (float) ($tariff?->demand_charge ?? 0);
 
         // Carry forward the latest prior bill's due (it already rolls up earlier months).
         $previousOutstanding = (float) (Bill::query()
@@ -37,6 +44,9 @@ class BillGenerator
             'connection_type'      => $customer->connection_type,
             'units'                => $reading->consumed_units,
             'per_unit_rate'        => $rate,
+            'line_charge'          => $lineCharge,
+            'service_charge'       => $serviceCharge,
+            'demand_charge'        => $demandCharge,
             'previous_outstanding' => $previousOutstanding,
         ]);
 
@@ -47,6 +57,9 @@ class BillGenerator
             'units'                => (float) $reading->consumed_units,
             'per_unit_rate'        => $rate,
             'energy_charge'        => $computed['energy_charge'],
+            'line_charge'          => $lineCharge,
+            'service_charge'       => $serviceCharge,
+            'demand_charge'        => $demandCharge,
             'fixed_charge'         => 0,
             'meter_rent'           => 0,
             'previous_outstanding' => $previousOutstanding,

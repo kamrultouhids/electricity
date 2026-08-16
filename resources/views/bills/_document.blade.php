@@ -3,10 +3,15 @@
     Expects: $customer, $billMonth, $prepDate, $lastDate (Carbon),
              $serialNo, $accountNo, $preparerName,
              $currentReading, $previousReading, $currentReadingDate, $previousReadingDate,
-             $units, $energyCharge, $meterRent, $previousOutstanding, $lateFee, $fixedCharge, $totalAmount,
+             $units, $energyCharge, $lineCharge, $serviceCharge, $demandCharge,
+             $previousOutstanding, $lateFee, $fixedCharge, $totalAmount,
              $previousBills (Collection of Bill)
 --}}
 @php
+    $lineCharge = $lineCharge ?? 0;
+    $serviceCharge = $serviceCharge ?? 0;
+    $demandCharge = $demandCharge ?? 0;
+
     // Convert western digits to Bengali numerals for bill figures.
     $bn = fn ($v) => strtr((string) $v, ['0' => '০', '1' => '১', '2' => '২', '3' => '৩', '4' => '৪', '5' => '৫', '6' => '৬', '7' => '৭', '8' => '৮', '9' => '৯']);
 
@@ -119,9 +124,9 @@
                 </thead>
                 <tbody>
                     <tr><td>ব্যবহৃত ইউনিট মূল্য</td><td class="text-end">{{ $bn(number_format($energyCharge, 2)) }}</td></tr>
-                    <tr><td>লাইন চার্জ</td><td class="text-end">{{ $bn(0) }}</td></tr>
-                    <tr><td>সার্ভিস চার্জ</td><td class="text-end">{{ $bn(0) }}</td></tr>
-                    <tr><td>ডিমান্ড চার্জ</td><td class="text-end">{{ $bn(number_format($meterRent, 2)) }}</td></tr>
+                    <tr><td>লাইন চার্জ</td><td class="text-end">{{ $bn(number_format($lineCharge, 2)) }}</td></tr>
+                    <tr><td>সার্ভিস চার্জ</td><td class="text-end">{{ $bn(number_format($serviceCharge, 2)) }}</td></tr>
+                    <tr><td>ডিমান্ড চার্জ</td><td class="text-end">{{ $bn(number_format($demandCharge, 2)) }}</td></tr>
                     <tr><td>বকেয়া বিল</td><td class="text-end">{{ $bn(number_format($previousOutstanding, 2)) }}</td></tr>
                     <tr><td>বকেয়া বিলের জরিমানা</td><td class="text-end">{{ $bn(number_format($lateFee, 2)) }}</td></tr>
                     <tr><td>অতিরিক্ত চার্জ</td><td class="text-end">{{ $bn(number_format($fixedCharge, 2)) }}</td></tr>
