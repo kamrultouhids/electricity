@@ -184,19 +184,9 @@ class PaymentController extends Controller
                 'updated_by'  => auth()->id(),
             ]);
 
-            // The latest bill's due already carried forward all previous months.
-            // So once it is fully settled, mark those earlier bills paid too.
-            if ($newDue <= 0) {
-                Bill::query()
-                    ->where('customer_id', $customer->id)
-                    ->whereDate('billing_month', '<', $bill->billing_month)
-                    ->where('due_amount', '>', 0)
-                    ->update([
-                        'due_amount' => 0,
-                        'status'     => Bill::STATUS_PAID,
-                        'updated_by' => auth()->id(),
-                    ]);
-            }
+            // The latest bill's due already carried forward all previous months,
+            // so the same money settles those earlier bills as well.
+            $this->settleEarlierBills($customer, $bill, round($amount + $discount, 2));
 
             return $payment;
         });
@@ -213,6 +203,43 @@ class PaymentController extends Controller
         $payment->load(['customer.sheet', 'collector', 'allocations.bill']);
 
         return view('payments.receipt', compact('payment'));
+    }
+
+    /**
+     * Spread the settled amount over the customer's earlier due bills, oldest
+     * first, capped at each bill's own due. A bill is only marked Paid when the
+     * amount actually covers it — anything less leaves it Partial with the
+     * remainder still showing as due.
+     */
+    protected function settleEarlierBills(Customer $customer, Bill $currentBill, float $settled): void
+    {
+        $earlierBills = Bill::query()
+            ->where('customer_id', $customer->id)
+            ->whereDate('billing_month', '<', $currentBill->billing_month)
+            ->where('due_amount', '>', 0)
+            ->orderBy('billing_month')
+            ->orderBy('id')
+            ->get();
+
+        $remaining = $settled;
+
+        foreach ($earlierBills as $earlier) {
+            if ($remaining < 0.01) {
+                break;
+            }
+
+            $applied = min($remaining, (float) $earlier->due_amount);
+            $newDue = round((float) $earlier->due_amount - $applied, 2);
+
+            $earlier->update([
+                'paid_amount' => round((float) $earlier->paid_amount + $applied, 2),
+                'due_amount'  => $newDue,
+                'status'      => $newDue <= 0 ? Bill::STATUS_PAID : Bill::STATUS_PARTIAL,
+                'updated_by'  => auth()->id(),
+            ]);
+
+            $remaining = round($remaining - $applied, 2);
+        }
     }
 
     /**
