@@ -248,13 +248,14 @@ class ReportController extends Controller
 
         if ($request->input('export') === 'csv') {
             return $this->exportCsv("meter-not-read-{$monthInput}.csv",
-                ['Serial', 'Name', 'Sheet', 'Meter', 'Mobile', 'Connection Date', 'Status'],
+                ['Serial', 'Name', 'Sheet', 'Meter', 'Mobile', 'Address', 'Connection Date', 'Status'],
                 $query->get()->map(fn ($c) => [
                     $c->serial_no,
                     $c->name,
                     $c->sheet->name ?? '',
                     $c->meter_number,
                     $c->mobile_number,
+                    $c->address,
                     optional($c->connection_date)->format('Y-m-d'),
                     $c->isActive() ? 'Active' : 'Inactive',
                 ])

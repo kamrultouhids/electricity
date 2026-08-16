@@ -58,6 +58,7 @@
                         <th>Sheet</th>
                         <th>Meter No</th>
                         <th>Mobile</th>
+                        <th>Address</th>
                         <th>Connection Date</th>
                         <th class="text-end no-print" width="120">Action</th>
                     </tr>
@@ -71,6 +72,7 @@
                             <td>{{ $customer->sheet->name ?? '—' }}</td>
                             <td>{{ $customer->meter_number ?? '—' }}</td>
                             <td>{{ $customer->mobile_number ?? '—' }}</td>
+                            <td>{{ $customer->address ?? '—' }}</td>
                             <td>{{ $customer->connection_date ? $customer->connection_date->format('d M Y') : '—' }}</td>
                             <td class="text-end no-print">
                                 <a href="{{ route('meter-readings.create') }}" class="btn btn-sm btn-outline-primary">
@@ -79,7 +81,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="8" class="text-center text-muted py-4">All connected customers have a reading for this month.</td></tr>
+                        <tr><td colspan="9" class="text-center text-muted py-4">All connected customers have a reading for this month.</td></tr>
                     @endforelse
                 </tbody>
             </table>
