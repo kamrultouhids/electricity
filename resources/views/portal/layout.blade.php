@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('logo.png') }}">
-    <title>Customer Portal — {{ config('app.name', 'Electricity') }}</title>
+    <title>{{ config('app.name', 'Electricity') }} : @yield('title', 'Customer Portal')</title>
 
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">

@@ -1,5 +1,7 @@
 @extends('portal.layout')
 
+@section('title', 'Customer Login')
+
 @section('content')
 <div class="container" style="max-width: 460px;">
     <div class="text-center mb-4 mt-4">

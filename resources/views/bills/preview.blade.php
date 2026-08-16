@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Bill Preview')
+
 @php
     $customer = $meterReading->customer;
     $billMonth = \Illuminate\Support\Carbon::parse($data['billing_month']);

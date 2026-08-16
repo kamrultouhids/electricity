@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Outstanding Report')
+
 @section('content')
 <div class="container">
     @include('reports._nav')

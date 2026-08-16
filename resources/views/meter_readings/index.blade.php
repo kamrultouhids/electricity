@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Meter Readings')
+
 @section('content')
 <div class="container">
     @include('partials.electricity_nav')

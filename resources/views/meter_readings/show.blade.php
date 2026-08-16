@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Meter Reading Details')
+
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">

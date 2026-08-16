@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Meter Not Read')
+
 @section('content')
 <div class="container">
     @include('reports._nav')

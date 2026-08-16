@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Unit Consumption Report')
+
 @section('content')
 <div class="container">
     @include('reports._nav')

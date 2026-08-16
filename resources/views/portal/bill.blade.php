@@ -1,5 +1,7 @@
 @extends('portal.layout')
 
+@section('title', 'My Bill')
+
 @php
     $customer = $bill->customer;
     $billMonth = $bill->billing_month;

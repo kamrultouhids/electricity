@@ -1,5 +1,7 @@
 @extends('portal.layout')
 
+@section('title', 'My Receipt')
+
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3 no-print">

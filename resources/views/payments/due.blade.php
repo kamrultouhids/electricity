@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Due List')
+
 @section('content')
 <div class="container">
     @include('partials.electricity_nav')

@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Bill Details')
+
 @php
     $customer = $bill->customer;
     $billMonth = $bill->billing_month;
