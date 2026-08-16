@@ -195,6 +195,7 @@
     </div>
 </div>
 
+@once
 @push('styles')
 <style>
     .bill-copy {
@@ -263,3 +264,4 @@
     }
 </style>
 @endpush
+@endonce

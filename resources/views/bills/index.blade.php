@@ -8,12 +8,19 @@
             Bills
             <span class="badge bg-primary px-1 py-0 small">{{ $bills->total() }}</span>
         </h5>
-        @can('generate-bills')
-            <a href="{{ route('bills.pending') }}" class="btn btn-primary text-white">
-                <i class="bi bi-hourglass-split me-1"></i>Pending Readings for Billing
-                <span class="badge bg-light text-dark ms-1">{{ $pendingCount }}</span>
-            </a>
-        @endcan
+        <div class="d-flex gap-2">
+            @if ($bills->count())
+                {{-- Prints exactly the bills shown below — same filters, same
+                     per-page — into a hidden frame, so we stay on this page. --}}
+                <button type="button" id="printAllBtn" class="btn btn-outline-secondary"
+                        data-url="{{ route('bills.print-all', request()->only('search', 'sheet_id', 'status', 'month', 'per_page', 'page')) }}"
+                        title="Print the bills shown on this page">
+                    <i class="bi bi-printer me-1"></i>Print
+                    <span class="badge bg-light text-dark ms-1">{{ $bills->count() }}</span>
+                </button>
+            @endif
+            
+        </div>
     </div>
 
     @if (session('success'))
@@ -58,7 +65,17 @@
                     <label class="form-label mb-1">Month</label>
                     <input type="month" name="month" value="{{ request('month') }}" class="form-control">
                 </div>
-                <div class="col-md-3 d-flex gap-2">
+                <div class="col-md-1">
+                    <label class="form-label mb-1">Per Page</label>
+                    {{-- Applies straight away; page resets so the range stays valid. --}}
+                    <select name="per_page" class="form-select" onchange="this.form.page.value = 1; this.form.submit();">
+                        @foreach ($perPageOptions as $option)
+                            <option value="{{ $option }}" @selected($perPage === $option)>{{ $option }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <input type="hidden" name="page" value="1">
+                <div class="col-md-2 d-flex gap-2">
                     <button type="submit" class="btn btn-primary text-white "><i class="bi bi-funnel me-1"></i>Filter</button>
                     <a href="{{ route('bills.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-counterclockwise"></i></a>
                 </div>
@@ -132,3 +149,49 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    // Print All loads the bill documents into an off-screen iframe and prints
+    // that, so the browser's print dialog opens without leaving this page.
+    (function () {
+        const btn = document.getElementById('printAllBtn');
+        if (! btn) return;
+
+        const label = btn.innerHTML;
+        let frame = null;
+
+        function cleanup() {
+            btn.disabled = false;
+            btn.innerHTML = label;
+            if (frame) {
+                frame.remove();
+                frame = null;
+            }
+        }
+
+        btn.addEventListener('click', function () {
+            if (btn.disabled) return;
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Preparing…';
+
+            frame = document.createElement('iframe');
+            frame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;';
+            frame.src = btn.dataset.url;
+
+            frame.addEventListener('load', function () {
+                const win = frame.contentWindow;
+                // Fires after the dialog closes, whether printed or cancelled.
+                win.addEventListener('afterprint', cleanup);
+                win.focus();
+                win.print();
+                // Safety net for browsers that never fire afterprint.
+                setTimeout(cleanup, 60000);
+            });
+
+            document.body.appendChild(frame);
+        });
+    })();
+</script>
+@endpush

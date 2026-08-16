@@ -71,6 +71,7 @@ Route::middleware(['auth'])->group(function () {
     });
     Route::middleware('can:view-bills')->group(function () {
         Route::get('/bills', [BillController::class, 'index'])->name('bills.index');
+        Route::get('/bills/print-all', [BillController::class, 'printAll'])->name('bills.print-all');
         Route::get('/bills/{bill}', [BillController::class, 'show'])->name('bills.show');
     });
 

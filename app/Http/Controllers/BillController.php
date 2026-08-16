@@ -10,12 +10,50 @@ use Illuminate\Http\Request;
 
 class BillController extends Controller
 {
+    /** Rows-per-page choices offered on the bill list — also caps a print run. */
+    public const PER_PAGE_OPTIONS = [2,15, 25, 50, 100];
+
     /**
-     * List generated bills with filters (month, sheet, status).
+     * List generated bills with filters (month, sheet, status, rows per page).
      */
     public function index(Request $request)
     {
-        $query = Bill::query()->with(['customer.sheet']);
+        $perPage = $this->perPage($request);
+
+        $bills = $this->filteredBills($request)
+            ->with(['customer.sheet'])
+            ->latest('billing_month')->latest('id')
+            ->paginate($perPage)->withQueryString();
+
+        return view('bills.index', [
+            'bills'          => $bills,
+            'sheets'         => Sheet::orderBy('id')->get(),
+            'statusOptions'  => Bill::STATUS_LABELS,
+            'pendingCount'   => MeterReading::where('status', MeterReading::STATUS_PENDING)->count(),
+            'perPage'        => $perPage,
+            'perPageOptions' => self::PER_PAGE_OPTIONS,
+        ]);
+    }
+
+    /**
+     * Rows per page, restricted to the offered choices.
+     */
+    protected function perPage(Request $request): int
+    {
+        $perPage = (int) $request->input('per_page', self::PER_PAGE_OPTIONS[0]);
+
+        return in_array($perPage, self::PER_PAGE_OPTIONS, true)
+            ? $perPage
+            : self::PER_PAGE_OPTIONS[0];
+    }
+
+    /**
+     * The bill list filters (search, sheet, status, month), shared by the list
+     * and the bulk print so both always cover exactly the same bills.
+     */
+    protected function filteredBills(Request $request)
+    {
+        $query = Bill::query();
 
         if ($search = $request->input('search')) {
             $query->whereHas('customer', function ($q) use ($search) {
@@ -44,14 +82,37 @@ class BillController extends Controller
             }
         }
 
-        $bills = $query->latest('billing_month')->latest('id')
-            ->paginate(15)->withQueryString();
+        return $query;
+    }
 
-        return view('bills.index', [
-            'bills'         => $bills,
-            'sheets'        => Sheet::orderBy('id')->get(),
-            'statusOptions' => Bill::STATUS_LABELS,
-            'pendingCount'  => MeterReading::where('status', MeterReading::STATUS_PENDING)->count(),
+    /**
+     * Print the bills currently on screen — same filters, same rows-per-page and
+     * page, same order — as full bill documents, one per sheet of paper.
+     */
+    public function printAll(Request $request)
+    {
+        $bills = $this->filteredBills($request)
+            ->with(['customer.sheet', 'meterReading', 'createdBy'])
+            ->latest('billing_month')->latest('id')
+            ->paginate($this->perPage($request))
+            ->withQueryString();
+
+        if ($bills->isEmpty()) {
+            return redirect()->route('bills.index', $request->query())
+                ->with('error', 'No bills match the current filter.');
+        }
+
+        // Every reading for the customers on this run, so each bill can name the
+        // month of its preceding reading without a query per bill.
+        $readingsByCustomer = MeterReading::query()
+            ->whereIn('customer_id', $bills->pluck('customer_id')->unique())
+            ->orderBy('reading_date')
+            ->get()
+            ->groupBy('customer_id');
+
+        return view('bills.print_all', [
+            'bills'              => $bills,
+            'readingsByCustomer' => $readingsByCustomer,
         ]);
     }
 
