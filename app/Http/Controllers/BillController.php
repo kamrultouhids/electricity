@@ -49,7 +49,7 @@ class BillController extends Controller
 
         return view('bills.index', [
             'bills'         => $bills,
-            'sheets'        => Sheet::orderBy('name')->get(),
+            'sheets'        => Sheet::orderBy('id')->get(),
             'statusOptions' => Bill::STATUS_LABELS,
             'pendingCount'  => MeterReading::where('status', MeterReading::STATUS_PENDING)->count(),
         ]);
@@ -92,7 +92,7 @@ class BillController extends Controller
 
         return view('bills.pending', [
             'readings' => $readings,
-            'sheets'   => Sheet::orderBy('name')->get(),
+            'sheets'   => Sheet::orderBy('id')->get(),
         ]);
     }
 

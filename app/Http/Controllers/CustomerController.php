@@ -49,7 +49,7 @@ class CustomerController extends Controller
         return view('customers.index', [
             'customers'      => $customers,
             'connectionTypes' => Customer::CONNECTION_TYPES,
-            'sheets'         => Sheet::orderBy('name')->get(),
+            'sheets'         => Sheet::orderBy('id')->get(),
         ]);
     }
 
@@ -91,7 +91,7 @@ class CustomerController extends Controller
     {
         return view('customers.create', [
             'connectionTypes' => Customer::CONNECTION_TYPES,
-            'sheets'          => Sheet::orderBy('name')->get(),
+            'sheets'          => Sheet::orderBy('id')->get(),
         ]);
     }
 
@@ -292,7 +292,7 @@ class CustomerController extends Controller
         return view('customers.edit', [
             'customer'        => $customer,
             'connectionTypes' => Customer::CONNECTION_TYPES,
-            'sheets'          => Sheet::orderBy('name')->get(),
+            'sheets'          => Sheet::orderBy('id')->get(),
         ]);
     }
 

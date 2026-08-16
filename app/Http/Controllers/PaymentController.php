@@ -52,7 +52,7 @@ class PaymentController extends Controller
 
         return view('payments.due', [
             'bills'    => $bills,
-            'sheets'   => Sheet::orderBy('name')->get(),
+            'sheets'   => Sheet::orderBy('id')->get(),
             'totalDue' => $totalDue,
         ]);
     }

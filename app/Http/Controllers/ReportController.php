@@ -158,7 +158,7 @@ class ReportController extends Controller
 
         return view('reports.customer', [
             'customers' => $query->paginate(20)->withQueryString(),
-            'sheets'    => Sheet::orderBy('name')->get(),
+            'sheets'    => Sheet::orderBy('id')->get(),
         ]);
     }
 
@@ -212,7 +212,7 @@ class ReportController extends Controller
 
         return view('reports.unit_consumption', [
             'rows'   => $query->paginate(20)->withQueryString(),
-            'sheets' => Sheet::orderBy('name')->get(),
+            'sheets' => Sheet::orderBy('id')->get(),
             'from'   => $request->input('from_date'),
             'to'     => $request->input('to_date'),
         ]);
@@ -263,7 +263,7 @@ class ReportController extends Controller
 
         return view('reports.meter_not_read', [
             'customers'  => $query->paginate(20)->withQueryString(),
-            'sheets'     => Sheet::orderBy('name')->get(),
+            'sheets'     => Sheet::orderBy('id')->get(),
             'year'       => $year,
             'month'      => $month,
             'monthInput' => $monthInput,
@@ -320,7 +320,7 @@ class ReportController extends Controller
 
         return view('reports.outstanding', [
             'bills'  => $query->paginate(20)->withQueryString(),
-            'sheets' => Sheet::orderBy('name')->get(),
+            'sheets' => Sheet::orderBy('id')->get(),
             'total'  => (float) (clone $query)->sum('bills.due_amount'),
         ]);
     }

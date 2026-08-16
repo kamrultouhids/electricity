@@ -58,7 +58,7 @@ class MeterReadingController extends Controller
 
         return view('meter_readings.index', [
             'readings'      => $readings,
-            'sheets'        => Sheet::orderBy('name')->get(),
+            'sheets'        => Sheet::orderBy('id')->get(),
             'statusOptions' => MeterReading::STATUS_LABELS,
         ]);
     }
