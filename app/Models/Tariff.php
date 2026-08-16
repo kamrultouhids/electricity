@@ -13,6 +13,9 @@ class Tariff extends Model
     protected $fillable = [
         'connection_type',
         'per_unit_rate',
+        'line_charge',
+        'service_charge',
+        'demand_charge',
         'status',
         'created_by',
         'updated_by',
@@ -20,6 +23,9 @@ class Tariff extends Model
 
     protected $casts = [
         'per_unit_rate' => 'decimal:2',
+        'line_charge' => 'decimal:2',
+        'service_charge' => 'decimal:2',
+        'demand_charge' => 'decimal:2',
         'status' => 'integer',
     ];
 

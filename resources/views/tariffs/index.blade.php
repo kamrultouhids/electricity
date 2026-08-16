@@ -33,7 +33,10 @@
                             <tr>
                                 <th>#</th>
                                 <th>Connection Type</th>
-                                <th width="260">Per Unit Rate</th>
+                                <th width="200">Per Unit Rate</th>
+                                <th width="200">Line Charge</th>
+                                <th width="200">Service Charge</th>
+                                <th width="200">Demand Charge</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -49,6 +52,33 @@
                                                    class="form-control"
                                                    value="{{ old('rates.'.$tariff->connection_type, $tariff->per_unit_rate) }}"
                                                    required>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="input-group">
+                                            <span class="input-group-text">৳</span>
+                                            <input type="number" step="0.01" min="0"
+                                                   name="line_charges[{{ $tariff->connection_type }}]"
+                                                   class="form-control"
+                                                   value="{{ old('line_charges.'.$tariff->connection_type, $tariff->line_charge) }}">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="input-group">
+                                            <span class="input-group-text">৳</span>
+                                            <input type="number" step="0.01" min="0"
+                                                   name="service_charges[{{ $tariff->connection_type }}]"
+                                                   class="form-control"
+                                                   value="{{ old('service_charges.'.$tariff->connection_type, $tariff->service_charge) }}">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="input-group">
+                                            <span class="input-group-text">৳</span>
+                                            <input type="number" step="0.01" min="0"
+                                                   name="demand_charges[{{ $tariff->connection_type }}]"
+                                                   class="form-control"
+                                                   value="{{ old('demand_charges.'.$tariff->connection_type, $tariff->demand_charge) }}">
                                         </div>
                                     </td>
                                 </tr>
@@ -102,25 +132,44 @@
                     <tr>
                         <th>#</th>
                         <th>Connection Type</th>
-                        <th>Old Rate</th>
-                        <th>New Rate</th>
+                        <th>Per Unit Rate</th>
+                        <th>Line Charge</th>
+                        <th>Service Charge</th>
+                        <th>Demand Charge</th>
                         <th>Changed By</th>
                         <th>Changed At</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($logs as $log)
+                        @php
+                            $changes = [
+                                [$log->old_rate, $log->new_rate],
+                                [$log->old_line_charge, $log->new_line_charge],
+                                [$log->old_service_charge, $log->new_service_charge],
+                                [$log->old_demand_charge, $log->new_demand_charge],
+                            ];
+                        @endphp
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ ucfirst($log->connection_type) }}</td>
-                            <td>৳ {{ number_format($log->old_rate, 2) }}</td>
-                            <td>৳ {{ number_format($log->new_rate, 2) }}</td>
+                            @foreach ($changes as [$oldValue, $newValue])
+                                <td class="text-nowrap">
+                                    @if ((float) $oldValue === (float) $newValue)
+                                        <span class="text-muted">৳ {{ number_format($newValue, 2) }}</span>
+                                    @else
+                                        <span class="text-muted">৳ {{ number_format($oldValue, 2) }}</span>
+                                        <i class="bi bi-arrow-right mx-1"></i>
+                                        <span class="fw-semibold">৳ {{ number_format($newValue, 2) }}</span>
+                                    @endif
+                                </td>
+                            @endforeach
                             <td>{{ $log->changedBy->name ?? '—' }}</td>
                             <td>{{ $log->created_at->format('d M Y, h:i A') }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-4">No rate changes found.</td>
+                            <td colspan="8" class="text-center text-muted py-4">No rate changes found.</td>
                         </tr>
                     @endforelse
                 </tbody>
