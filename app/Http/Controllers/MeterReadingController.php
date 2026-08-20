@@ -8,6 +8,7 @@ use App\Models\MeterReading;
 use App\Services\ImageService;
 use App\Models\Sheet;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -143,8 +144,8 @@ class MeterReadingController extends Controller
         $data['status'] = MeterReading::STATUS_PENDING;
         $data['source'] = MeterReading::SOURCE_MANUAL;
 
-        if ($request->hasFile('photo')) {
-            $data['photo'] = app(ImageService::class)->storeAsWebp($request->file('photo'), 'meter_readings');
+        if ($photo = $this->photoFile($request)) {
+            $data['photo'] = app(ImageService::class)->storeAsWebp($photo, 'meter_readings');
         }
 
         $data['created_by'] = auth()->id();
@@ -418,11 +419,11 @@ class MeterReadingController extends Controller
 
         $data['consumed_units'] = (float) $data['current_reading'] - $previous;
 
-        if ($request->hasFile('photo')) {
+        if ($photo = $this->photoFile($request)) {
             if ($meterReading->photo) {
                 Storage::disk('public')->delete($meterReading->photo);
             }
-            $data['photo'] = app(ImageService::class)->storeAsWebp($request->file('photo'), 'meter_readings');
+            $data['photo'] = app(ImageService::class)->storeAsWebp($photo, 'meter_readings');
         }
 
         $data['updated_by'] = auth()->id();
@@ -447,17 +448,36 @@ class MeterReadingController extends Controller
     /**
      * Shared validation rules.
      */
+    /** Upload ceiling for a meter photo, in kilobytes — phone cameras shoot big. */
+    protected const PHOTO_MAX_KB = 5120;
+
     protected function validateReading(Request $request): array
     {
-        return $request->validate([
+        $data = $request->validate([
             'customer_id'      => 'required|exists:customers,id',
             'previous_reading' => 'required|numeric|min:0',
             'current_reading'  => 'required|numeric|min:0',
             'reading_date'     => 'required|date',
-            'photo'            => 'nullable|image|max:2048',
+            // Two inputs: one straight from the camera, one from the file picker.
+            'photo'            => 'nullable|image|max:'.self::PHOTO_MAX_KB,
+            'photo_camera'     => 'nullable|image|max:'.self::PHOTO_MAX_KB,
         ], [
-            'photo.max' => 'The meter Photo must not be greater than 2 mb.',
+            'photo.max'        => 'The meter photo must not be greater than 5 mb.',
+            'photo_camera.max' => 'The meter photo must not be greater than 5 mb.',
         ]);
+
+        // Never reaches the model — it only carries the file.
+        unset($data['photo_camera']);
+
+        return $data;
+    }
+
+    /**
+     * The uploaded meter photo, from whichever of the two inputs was used.
+     */
+    protected function photoFile(Request $request): ?UploadedFile
+    {
+        return $request->file('photo_camera') ?? $request->file('photo');
     }
 
     /**

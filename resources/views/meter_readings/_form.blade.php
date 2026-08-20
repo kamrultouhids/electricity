@@ -70,13 +70,59 @@
 
     <div class="col-md-4">
         <label class="form-label">Meter Photo</label>
-        <input type="file" name="photo" accept="image/*" class="form-control" id="photoInput"
-               onchange="previewPhoto(event)">
+        {{-- Camera shoots in place through the webcam on a desktop, and hands off
+             to the phone's camera app on a touch device. The picker keeps gallery
+             shots and plain file uploads working everywhere. --}}
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-secondary flex-fill" id="cameraBtn">
+                <i class="bi bi-camera me-1"></i>Camera
+            </button>
+            <label class="btn btn-outline-secondary flex-fill mb-0">
+                <i class="bi bi-image me-1"></i>Choose File
+                <input type="file" name="photo" accept="image/*"
+                       class="d-none" id="photoInput" onchange="previewPhoto(event)">
+            </label>
+        </div>
+        {{-- Carries the captured shot, or the phone camera's own file. --}}
+        <input type="file" name="photo_camera" accept="image/*" capture="environment"
+               class="d-none" id="photoCameraInput" onchange="previewPhoto(event)">
+        <div id="photoName" class="small text-muted mt-1"></div>
         <img id="photoPreview"
              src="{{ ($meterReading && $meterReading->photo) ? asset('storage/' . $meterReading->photo) : '' }}"
              alt="preview"
              class="rounded mt-2 {{ ($meterReading && $meterReading->photo) ? '' : 'd-none' }}"
              style="width:120px;height:120px;object-fit:cover;">
+    </div>
+</div>
+
+{{-- Webcam capture --}}
+<div class="modal fade" id="cameraModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title"><i class="bi bi-camera me-1"></i>Take Meter Photo</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="cameraError" class="alert alert-warning d-none mb-3"></div>
+                <video id="cameraVideo" autoplay playsinline muted
+                       class="rounded bg-dark w-100" style="max-height:60vh;object-fit:contain;"></video>
+                <canvas id="cameraCanvas" class="d-none"></canvas>
+                <img id="cameraShot" alt="captured" class="rounded d-none w-100" style="max-height:60vh;object-fit:contain;">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-outline-secondary d-none" id="cameraRetake">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i>Retake
+                </button>
+                <button type="button" class="btn btn-primary text-white" id="cameraCapture">
+                    <i class="bi bi-camera-fill me-1"></i>Capture
+                </button>
+                <button type="button" class="btn btn-success text-white d-none" id="cameraUse">
+                    <i class="bi bi-check-lg me-1"></i>Use Photo
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -141,10 +187,121 @@
         function previewPhoto(event) {
             const input = event.target;
             const preview = document.getElementById('photoPreview');
-            if (input.files && input.files[0]) {
-                preview.src = URL.createObjectURL(input.files[0]);
-                preview.classList.remove('d-none');
+
+            if (! input.files || ! input.files[0]) return;
+
+            // Only one of the two inputs may carry a file, or the server would
+            // keep using whichever it prefers instead of the latest pick.
+            const other = input.id === 'photoCameraInput'
+                ? document.getElementById('photoInput')
+                : document.getElementById('photoCameraInput');
+            if (other) other.value = '';
+
+            const file = input.files[0];
+            preview.src = URL.createObjectURL(file);
+            preview.classList.remove('d-none');
+
+            const name = document.getElementById('photoName');
+            if (name) {
+                name.textContent = file.name + ' (' + (file.size / 1048576).toFixed(1) + ' MB)';
             }
         }
+
+        // Camera button: shoot in place via the webcam where that is possible,
+        // otherwise hand off to the device's own camera app.
+        (function () {
+            const btn = document.getElementById('cameraBtn');
+            const cameraInput = document.getElementById('photoCameraInput');
+            if (! btn) return;
+
+            // A file input can attach a captured blob only through DataTransfer.
+            const canAttach = typeof DataTransfer !== 'undefined' && 'items' in new DataTransfer();
+            // getUserMedia needs a secure context (https or localhost).
+            const hasWebcam = !! (navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+            // On a phone the native camera app beats an in-page preview.
+            const isTouch = window.matchMedia('(pointer: coarse)').matches;
+
+            if (! hasWebcam || ! canAttach || isTouch) {
+                btn.addEventListener('click', () => cameraInput.click());
+                return;
+            }
+
+            const modalEl = document.getElementById('cameraModal');
+            const modal = new bootstrap.Modal(modalEl);
+            const video = document.getElementById('cameraVideo');
+            const canvas = document.getElementById('cameraCanvas');
+            const shot = document.getElementById('cameraShot');
+            const error = document.getElementById('cameraError');
+            const captureBtn = document.getElementById('cameraCapture');
+            const retakeBtn = document.getElementById('cameraRetake');
+            const useBtn = document.getElementById('cameraUse');
+            let stream = null;
+
+            function showLive() {
+                video.classList.remove('d-none');
+                shot.classList.add('d-none');
+                captureBtn.classList.remove('d-none');
+                retakeBtn.classList.add('d-none');
+                useBtn.classList.add('d-none');
+            }
+
+            function stopStream() {
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
+            }
+
+            btn.addEventListener('click', async function () {
+                error.classList.add('d-none');
+                showLive();
+                modal.show();
+
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: 'environment', width: { ideal: 1600 } },
+                        audio: false,
+                    });
+                    video.srcObject = stream;
+                } catch (e) {
+                    stopStream();
+                    error.textContent = 'Could not open the camera (' + (e.name || 'error') + '). Use Choose File instead.';
+                    error.classList.remove('d-none');
+                    captureBtn.classList.add('d-none');
+                }
+            });
+
+            captureBtn.addEventListener('click', function () {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                shot.src = canvas.toDataURL('image/jpeg', 0.9);
+                video.classList.add('d-none');
+                shot.classList.remove('d-none');
+                captureBtn.classList.add('d-none');
+                retakeBtn.classList.remove('d-none');
+                useBtn.classList.remove('d-none');
+            });
+
+            retakeBtn.addEventListener('click', showLive);
+
+            useBtn.addEventListener('click', function () {
+                canvas.toBlob(function (blob) {
+                    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+                    const file = new File([blob], 'meter-' + stamp + '.jpg', { type: 'image/jpeg' });
+
+                    const transfer = new DataTransfer();
+                    transfer.items.add(file);
+                    cameraInput.files = transfer.files;
+                    cameraInput.dispatchEvent(new Event('change'));
+
+                    modal.hide();
+                }, 'image/jpeg', 0.9);
+            });
+
+            // Never leave the camera light on.
+            modalEl.addEventListener('hidden.bs.modal', stopStream);
+        })();
     </script>
 @endpush
