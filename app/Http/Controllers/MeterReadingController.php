@@ -145,7 +145,8 @@ class MeterReadingController extends Controller
         $data['source'] = MeterReading::SOURCE_MANUAL;
 
         if ($photo = $this->photoFile($request)) {
-            $data['photo'] = app(ImageService::class)->storeAsWebp($photo, 'meter_readings');
+            $data['photo'] = app(ImageService::class)
+                ->storeAsWebp($photo, $this->photoFolder($data['reading_date']));
         }
 
         $data['created_by'] = auth()->id();
@@ -423,7 +424,8 @@ class MeterReadingController extends Controller
             if ($meterReading->photo) {
                 Storage::disk('public')->delete($meterReading->photo);
             }
-            $data['photo'] = app(ImageService::class)->storeAsWebp($photo, 'meter_readings');
+            $data['photo'] = app(ImageService::class)
+                ->storeAsWebp($photo, $this->photoFolder($data['reading_date']));
         }
 
         $data['updated_by'] = auth()->id();
@@ -478,6 +480,15 @@ class MeterReadingController extends Controller
     protected function photoFile(Request $request): ?UploadedFile
     {
         return $request->file('photo_camera') ?? $request->file('photo');
+    }
+
+    /**
+     * Photos are filed under the reading's own month — meter_readings/2026-01 —
+     * so a month's shots stay together and old ones are easy to archive.
+     */
+    protected function photoFolder(string $readingDate): string
+    {
+        return 'meter_readings/'.Carbon::parse($readingDate)->format('Y-m');
     }
 
     /**
