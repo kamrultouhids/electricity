@@ -69,6 +69,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/bills/generate/{meterReading}', [BillController::class, 'preview'])->name('bills.preview');
         Route::post('/bills/generate/{meterReading}', [BillController::class, 'store'])->name('bills.store');
     });
+    Route::middleware('can:revise-bills')->group(function () {
+        Route::get('/bills/{bill}/revise', [BillController::class, 'revise'])->name('bills.revise');
+        Route::put('/bills/{bill}/revise', [BillController::class, 'storeRevision'])->name('bills.revise.store');
+    });
     Route::middleware('can:view-bills')->group(function () {
         Route::get('/bills', [BillController::class, 'index'])->name('bills.index');
         Route::get('/bills/print-all', [BillController::class, 'printAll'])->name('bills.print-all');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Bill;
 use App\Models\MeterReading;
 use App\Models\Sheet;
+use App\Services\BillCalculator;
 use App\Services\BillGenerator;
 use Illuminate\Http\Request;
 
@@ -273,7 +274,7 @@ class BillController extends Controller
      */
     public function show(Bill $bill)
     {
-        $bill->load(['customer.sheet', 'meterReading', 'createdBy', 'updatedBy']);
+        $bill->load(['customer.sheet', 'meterReading', 'createdBy', 'updatedBy', 'revisions.changedBy']);
 
         $previousBills = $bill->historyRows();
 
@@ -286,6 +287,62 @@ class BillController extends Controller
             : null;
 
         return view('bills.show', compact('bill', 'previousBills', 'previousReading'));
+    }
+
+    /**
+     * Show the revise form for a bill — correct the current reading and see
+     * what it does to the charges before saving.
+     */
+    public function revise(Bill $bill, BillCalculator $calculator)
+    {
+        $bill->load(['customer.sheet', 'meterReading', 'revisions.changedBy']);
+
+        if ($reason = $bill->revisionBlockedReason()) {
+            return redirect()->route('bills.show', $bill)->with('error', $reason);
+        }
+
+        return view('bills.revise', [
+            'bill' => $bill,
+            // Feeds the live preview so it floors exactly like the server does.
+            'minimumCharge' => $calculator->minimumCharge($bill->customer->connection_type),
+        ]);
+    }
+
+    /**
+     * Apply the corrected reading to the bill.
+     */
+    public function storeRevision(Request $request, Bill $bill, BillGenerator $generator)
+    {
+        $bill->load(['customer', 'meterReading']);
+
+        if ($reason = $bill->revisionBlockedReason()) {
+            return redirect()->route('bills.show', $bill)->with('error', $reason);
+        }
+
+        $data = $request->validate([
+            'current_reading' => 'required|numeric|min:0',
+            'reason'          => 'required|string|max:255',
+        ]);
+
+        $previous = (float) $bill->meterReading->previous_reading;
+        $current = round((float) $data['current_reading'], 2);
+
+        if ($current < $previous) {
+            return back()->withInput()->withErrors([
+                'current_reading' => "Current reading must be greater than or equal to the previous reading ({$previous}).",
+            ]);
+        }
+
+        if ($current === (float) $bill->meterReading->current_reading) {
+            return back()->withInput()->withErrors([
+                'current_reading' => 'That is the reading already on the bill — nothing to revise.',
+            ]);
+        }
+
+        $generator->revise($bill, $current, $data['reason'], auth()->id());
+
+        return redirect()->route('bills.show', $bill)
+            ->with('success', 'Bill revised from the corrected reading. Reprint it for the customer.');
     }
 
     /**

@@ -31,6 +31,7 @@ class User extends Authenticatable
         'manage-customers'      => ['admin', 'manager', 'operator'],
         'access-meter-readings' => ['admin', 'manager', 'operator', 'reader'],
         'generate-bills'        => ['admin', 'manager', 'operator'],
+        'revise-bills'          => ['admin', 'manager'],
         'collect-payments'      => ['admin', 'manager', 'operator', 'collector'],
         'view-due-list'         => ['admin', 'manager', 'operator', 'collector'],
         'view-reports'          => ['admin', 'manager', 'operator'],

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bill;
 use App\Models\Customer;
 use App\Models\MeterReading;
 use App\Services\ImageService;
@@ -366,6 +367,18 @@ class MeterReadingController extends Controller
     public function edit(MeterReading $meterReading)
     {
         if (! $meterReading->isPending()) {
+            // Already billed — correcting it has to go through the bill, so the
+            // charges are recalculated and the change is logged.
+            if ($bill = Bill::where('meter_reading_id', $meterReading->id)->first()) {
+                if ($bill->isRevisable() && auth()->user()?->can('revise-bills')) {
+                    return redirect()->route('bills.revise', $bill)
+                        ->with('error', 'This reading is already billed — correct it here and the bill is recalculated.');
+                }
+
+                return redirect()->route('bills.show', $bill)
+                    ->with('error', $bill->revisionBlockedReason() ?? 'This reading is already billed and cannot be edited.');
+            }
+
             return redirect()->route('meter-readings.index')
                 ->with('error', 'Only pending readings can be edited.');
         }

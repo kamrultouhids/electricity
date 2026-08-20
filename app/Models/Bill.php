@@ -146,6 +146,65 @@ class Bill extends Model
         return $this->hasMany(PaymentAllocation::class);
     }
 
+    public function revisions(): HasMany
+    {
+        return $this->hasMany(BillRevision::class)->latest();
+    }
+
+    /**
+     * Whether this is the customer's newest bill. Only that one may be revised:
+     * a later bill would have frozen this bill's figures into its carried
+     * balance and its printed history.
+     */
+    public function isLatestForCustomer(): bool
+    {
+        return ! static::query()
+            ->where('customer_id', $this->customer_id)
+            ->where(function ($q) {
+                $q->whereDate('billing_month', '>', $this->billing_month)
+                    ->orWhere(function ($q) {
+                        $q->whereDate('billing_month', '=', $this->billing_month)
+                            ->where('id', '>', $this->id);
+                    });
+            })
+            ->exists();
+    }
+
+    /**
+     * Nothing collected against this bill yet — no payment, no discount.
+     */
+    public function isUntouchedByPayment(): bool
+    {
+        return (float) $this->paid_amount <= 0
+            && (float) $this->discount <= 0
+            && ! $this->allocations()->exists();
+    }
+
+    /**
+     * Why this bill cannot be revised, or null when it can be.
+     */
+    public function revisionBlockedReason(): ?string
+    {
+        if (! $this->meter_reading_id) {
+            return 'This bill has no meter reading attached to revise.';
+        }
+
+        if (! $this->isLatestForCustomer()) {
+            return 'Only the customer\'s latest bill can be revised.';
+        }
+
+        if (! $this->isUntouchedByPayment()) {
+            return 'A payment has already been collected against this bill.';
+        }
+
+        return null;
+    }
+
+    public function isRevisable(): bool
+    {
+        return $this->revisionBlockedReason() === null;
+    }
+
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
