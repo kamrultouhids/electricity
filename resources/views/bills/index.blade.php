@@ -11,14 +11,17 @@
             <span class="badge bg-primary px-1 py-0 small">{{ $bills->total() }}</span>
         </h5>
         <div class="d-flex gap-2">
-            @if ($bills->count())
+            {{-- Opening balances are skipped by the print run (they have no
+                 units or rate to print), so they are left out of the count. --}}
+            @php($printableCount = $bills->getCollection()->where('is_opening', false)->count())
+            @if ($printableCount)
                 {{-- Prints exactly the bills shown below — same filters, same
                      per-page — into a hidden frame, so we stay on this page. --}}
                 <button type="button" id="printAllBtn" class="btn btn-outline-secondary"
                         data-url="{{ route('bills.print-all', request()->only('search', 'sheet_id', 'status', 'month', 'per_page', 'page')) }}"
                         title="Print the bills shown on this page">
                     <i class="bi bi-printer me-1"></i>Print
-                    <span class="badge bg-light text-dark ms-1">{{ $bills->count() }}</span>
+                    <span class="badge bg-light text-dark ms-1">{{ $printableCount }}</span>
                 </button>
             @endif
             
