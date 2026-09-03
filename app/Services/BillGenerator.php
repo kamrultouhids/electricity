@@ -195,7 +195,7 @@ class BillGenerator
     protected function lateFeeBasis(float $previousOutstanding, ?Bill $previousBill): float
     {
         // return $previousBill?->is_opening ? 0.0 : $previousOutstanding;
-                return $previousOutstanding;
+       return $previousOutstanding;
 
     }
 
