@@ -322,18 +322,23 @@ class CustomerController extends Controller
     {
         $data = $this->validateCustomer($request, $customer->id);
 
-        $openingChanged = $this->openingChanged($customer, $data);
-
         // Once a bill has been raised on top of the opening balance or money has
         // been taken against it, those figures are history — a later bill froze
         // them into its carried balance and its printed copy. Correcting them
         // then has to be a new entry, not a rewrite of the opening.
-        if ($blocked = $opening->blockedReason($customer)) {
-            if ($openingChanged) {
-                return back()->withInput()->withErrors(['opening_due' => $blocked]);
-            }
+        //
+        // The form disables those inputs, and a disabled input submits nothing,
+        // so a locked customer always posts them blank. Drop them and carry on
+        // rather than reading the blanks as an edit — the rest of the form still
+        // has to save. Dropping them is also what keeps a hand-crafted request
+        // from rewriting a locked balance.
+        $locked = $opening->blockedReason($customer) !== null;
+
+        if ($locked) {
             unset($data['opening_reading'], $data['opening_due'], $data['opening_as_of']);
         }
+
+        $openingChanged = ! $locked && $this->openingChanged($customer, $data);
 
         if ($request->hasFile('photo')) {
             if ($customer->photo) {

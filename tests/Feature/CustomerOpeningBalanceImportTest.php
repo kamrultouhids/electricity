@@ -134,7 +134,7 @@ class CustomerOpeningBalanceImportTest extends TestCase
         $this->assertSame('100.00', $reading->consumed_units);
     }
 
-    public function test_the_opening_balance_cannot_be_edited_once_it_is_locked(): void
+    public function test_a_locked_opening_balance_ignores_submitted_changes(): void
     {
         $operator = $this->operator();
 
@@ -153,9 +153,46 @@ class CustomerOpeningBalanceImportTest extends TestCase
                 'opening_due'     => 99,
                 'opening_as_of'   => '2026-08-31',
             ]))
-            ->assertSessionHasErrors('opening_due');
+            ->assertRedirect(route('customers.index'));
 
-        $this->assertSame('1250.00', $customer->refresh()->opening_due);
+        $customer->refresh();
+        $this->assertSame('1250.00', $customer->opening_due);
+        $this->assertSame('4820.00', $customer->opening_reading);
+        $this->assertSame('750.00', $customer->openingBill->due_amount);
+    }
+
+    /**
+     * The form disables the opening inputs when they are locked, and a disabled
+     * input submits nothing — so a locked customer always posts them blank. That
+     * must not read as "the operator cleared the opening balance".
+     */
+    public function test_a_locked_customer_saves_when_the_opening_fields_are_absent(): void
+    {
+        $operator = $this->operator();
+
+        $this->actingAs($operator)->post(route('customers.store'), $this->formPayload([
+            'opening_reading' => 4820,
+            'opening_due'     => 1250,
+            'opening_as_of'   => '2026-08-31',
+        ]));
+
+        $customer = Customer::sole();
+        $customer->openingBill->update(['paid_amount' => 500, 'due_amount' => 750]);
+
+        // Exactly what the browser posts: no opening_* keys at all.
+        $this->actingAs($operator)
+            ->put(route('customers.update', $customer), $this->formPayload([
+                'name' => 'Renamed Customer',
+            ]))
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('customers.index'));
+
+        $customer->refresh();
+        $this->assertSame('Renamed Customer', $customer->name);
+        $this->assertSame('1250.00', $customer->opening_due);
+        $this->assertSame('4820.00', $customer->opening_reading);
+        $this->assertSame('2026-08-31', $customer->opening_as_of->toDateString());
+        $this->assertSame(1, Bill::where('customer_id', $customer->id)->count());
     }
 
     public function test_an_unrelated_edit_still_saves_while_the_opening_is_locked(): void
