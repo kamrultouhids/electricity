@@ -10,10 +10,13 @@ trait HasSource
 {
     public const SOURCE_MANUAL = 'manual';
     public const SOURCE_CSV = 'csv';
+    /** Derived from a customer's declared opening balance, not entered as a reading. */
+    public const SOURCE_OPENING = 'opening';
 
     public const SOURCES = [
-        self::SOURCE_MANUAL => 'Manual',
-        self::SOURCE_CSV    => 'CSV Import',
+        self::SOURCE_MANUAL  => 'Manual',
+        self::SOURCE_CSV     => 'CSV Import',
+        self::SOURCE_OPENING => 'Opening Balance',
     ];
 
     /**

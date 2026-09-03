@@ -93,6 +93,10 @@ class BillController extends Controller
     public function printAll(Request $request)
     {
         $bills = $this->filteredBills($request)
+            // An opening balance has no units, no rate and no reading — printed
+            // as a bill document it would be a blank sheet. It is shown on its
+            // own page instead, and carried into the next real bill regardless.
+            ->where('is_opening', false)
             ->with(['customer.sheet', 'meterReading', 'createdBy'])
             ->latest('billing_month')->latest('id')
             ->paginate($this->perPage($request))

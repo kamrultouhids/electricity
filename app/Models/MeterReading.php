@@ -43,6 +43,15 @@ class MeterReading extends Model
         self::STATUS_COMPLETED => 'Completed',
     ];
 
+    /**
+     * The opening row carries no consumption — it only anchors the meter so the
+     * first real reading bills the difference instead of the whole meter.
+     */
+    public function isOpening(): bool
+    {
+        return $this->source === self::SOURCE_OPENING;
+    }
+
     public function isPending(): bool
     {
         return $this->status === self::STATUS_PENDING;

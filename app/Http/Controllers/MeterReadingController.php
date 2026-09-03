@@ -368,6 +368,13 @@ class MeterReadingController extends Controller
      */
     public function edit(MeterReading $meterReading)
     {
+        if ($meterReading->isOpening()) {
+            // Not a reading anyone took — it mirrors the customer's declared
+            // opening balance, so it is corrected there or not at all.
+            return redirect()->route('customers.edit', $meterReading->customer_id)
+                ->with('error', 'This is an opening balance. Correct it on the customer instead.');
+        }
+
         if (! $meterReading->isPending()) {
             // Already billed — correcting it has to go through the bill, so the
             // charges are recalculated and the change is logged.
@@ -441,6 +448,12 @@ class MeterReadingController extends Controller
      */
     public function destroy(MeterReading $meterReading)
     {
+        if ($meterReading->isOpening()) {
+            // Deleting the anchor would leave the next bill charging the meter's
+            // whole lifetime instead of the month's units.
+            return back()->with('error', 'An opening balance reading cannot be deleted. Remove it on the customer instead.');
+        }
+
         $meterReading->delete();
 
         return redirect()->route('meter-readings.index')

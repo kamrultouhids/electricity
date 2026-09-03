@@ -11,9 +11,9 @@
             <span class="badge bg-primary px-1 py-0 small">{{ $readings->total() }}</span>
         </h5>
         <div class="d-flex gap-2">
-            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#importReadingsModal">
+            <!-- <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#importReadingsModal">
                 <i class="bi bi-upload me-1"></i>Import CSV
-            </button>
+            </button> -->
             <a href="{{ route('meter-readings.create') }}" class="btn btn-primary text-white"><i class="bi bi-plus-lg me-1"></i>Add Reading</a>
         </div>
     </div>

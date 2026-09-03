@@ -38,6 +38,40 @@
         <div class="alert alert-danger no-print">{{ session('error') }}</div>
     @endif
 
+    @if ($bill->is_opening)
+        {{-- A carry-forward entry, not a billed month: no units were consumed
+             under this system and no tariff applied to them. --}}
+        <div class="card list-card rounded-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">Opening Balance <span class="text-muted fw-normal">(পূর্বের বকেয়া)</span></h6>
+                <span class="badge bg-secondary">{{ $bill->statusLabel() }}</span>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Brought forward when {{ $customer->name }} was carried over from the
+                    previous system. It is not a bill for consumption &mdash; no units were
+                    read and no charges were applied. The amount rolls into the next
+                    bill's outstanding balance and can be collected against directly.
+                </p>
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">As of</dt>
+                    <dd class="col-sm-8">{{ $billMonth->format('F Y') }}</dd>
+
+                    <dt class="col-sm-4">Meter reading at handover</dt>
+                    <dd class="col-sm-8">{{ number_format((float) ($customer->opening_reading ?? 0), 2) }}</dd>
+
+                    <dt class="col-sm-4">Amount carried forward</dt>
+                    <dd class="col-sm-8">{{ number_format((float) $bill->total_amount, 2) }}</dd>
+
+                    <dt class="col-sm-4">Collected</dt>
+                    <dd class="col-sm-8">{{ number_format((float) $bill->paid_amount, 2) }}</dd>
+
+                    <dt class="col-sm-4">Still outstanding</dt>
+                    <dd class="col-sm-8 fw-semibold">{{ number_format((float) $bill->due_amount, 2) }}</dd>
+                </dl>
+            </div>
+        </div>
+    @else
     @include('bills._document', [
         'customer'            => $customer,
         'billMonth'          => $billMonth,
@@ -65,6 +99,7 @@
         'previousBills'      => $previousBills,
         'verifyUrl'          => route('portal.bills.show', $bill),
     ])
+    @endif
 
     {{-- Revision history — screen only, never on the printed bill. --}}
     @if ($bill->revisions->count())

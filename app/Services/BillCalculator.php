@@ -36,9 +36,14 @@ class BillCalculator
         $meterRent = (float) ($input['meter_rent'] ?? 0);
         $previous  = (float) ($input['previous_outstanding'] ?? 0);
         $paid      = (float) ($input['paid_amount'] ?? 0);
+        // The balance the penalty is charged on — normally the carried balance
+        // itself. A balance carried in from the old system is the exception:
+        // it was never overdue under this system's terms, so the first bill
+        // after an opening balance passes zero here and still carries the debt.
+        $lateFeeBasis = (float) ($input['late_fee_basis'] ?? $previous);
 
         $energyCharge = $this->energyCharge($type, $units, $rate);
-        $lateFee = $this->lateFee($type, $previous);
+        $lateFee = $this->lateFee($type, $lateFeeBasis);
         $duty = $this->electricityDuty($energyCharge, $lateFee, $dutyRate);
 
         $total = round($energyCharge + $line + $service + $demand + $duty + $fixed + $meterRent + $previous + $lateFee, 2);

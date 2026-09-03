@@ -35,6 +35,7 @@ class Bill extends Model
         'due_amount',
         'previous_bills_snapshot',
         'status',
+        'is_opening',
         'created_by',
         'updated_by',
     ];
@@ -59,6 +60,7 @@ class Bill extends Model
         'due_amount' => 'decimal:2',
         'previous_bills_snapshot' => 'array',
         'status' => 'integer',
+        'is_opening' => 'boolean',
     ];
 
     /**

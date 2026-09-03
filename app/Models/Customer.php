@@ -33,6 +33,9 @@ class Customer extends Authenticatable
         'meter_number',
         'connection_type',
         'connection_date',
+        'opening_reading',
+        'opening_due',
+        'opening_as_of',
         'status',
         'source',
         'created_by',
@@ -44,6 +47,9 @@ class Customer extends Authenticatable
         'age' => 'integer',
         'status' => 'integer',
         'connection_date' => 'date',
+        'opening_reading' => 'decimal:2',
+        'opening_due' => 'decimal:2',
+        'opening_as_of' => 'date',
     ];
 
     public function sheet(): BelongsTo
@@ -96,5 +102,31 @@ class Customer extends Authenticatable
     public function isActive(): bool
     {
         return $this->status === self::STATUS_ACTIVE;
+    }
+
+    /**
+     * Whether an opening balance was declared for this customer — i.e. they
+     * came from the old system with a meter history, a debt, or both.
+     * A zero due with a reading still counts: the meter has to start somewhere.
+     */
+    public function hasOpeningBalance(): bool
+    {
+        return $this->opening_as_of !== null;
+    }
+
+    /**
+     * The carry-forward bill that opens a migrated customer's ledger, if any.
+     */
+    public function openingBill(): HasOne
+    {
+        return $this->hasOne(Bill::class)->where('is_opening', true);
+    }
+
+    /**
+     * The reading the meter stood at when the customer was brought over.
+     */
+    public function openingReadingRow(): HasOne
+    {
+        return $this->hasOne(MeterReading::class)->where('source', MeterReading::SOURCE_OPENING);
     }
 }

@@ -37,12 +37,9 @@ class BillGenerator
         $dutyRate      = (float) ($tariff?->electricity_duty ?? 0);
 
         // Carry forward the latest prior bill's due (it already rolls up earlier months).
-        $previousOutstanding = (float) (Bill::query()
-            ->where('customer_id', $customer->id)
-            ->whereDate('billing_month', '<', $billingMonth)
-            ->orderByDesc('billing_month')
-            ->value('due_amount') ?? 0);
-
+        $previousBill = $this->previousBill($customer->id, $billingMonth);
+        $previousOutstanding = (float) ($previousBill?->due_amount ?? 0);
+// dd($previousOutstanding,$previousBill->toArray());
         $computed = $this->calculator->compute([
             'connection_type'      => $customer->connection_type,
             'units'                => $reading->consumed_units,
@@ -52,6 +49,7 @@ class BillGenerator
             'demand_charge'        => $demandCharge,
             'electricity_duty_rate' => $dutyRate,
             'previous_outstanding' => $previousOutstanding,
+            'late_fee_basis'       => $this->lateFeeBasis($previousOutstanding, $previousBill),
         ]);
 
         return [
@@ -103,8 +101,13 @@ class BillGenerator
             'fixed_charge'          => (float) $bill->fixed_charge,
             'meter_rent'            => (float) $bill->meter_rent,
             // Preserved, so compute() reproduces the same late fee it derived
-            // from it when the bill was issued.
+            // from it when the bill was issued — including the suppression when
+            // the balance was carried in from the old system.
             'previous_outstanding'  => (float) $bill->previous_outstanding,
+            'late_fee_basis'        => $this->lateFeeBasis(
+                (float) $bill->previous_outstanding,
+                $this->previousBill($bill->customer_id, $bill->billing_month->toDateString()),
+            ),
             'paid_amount'           => (float) $bill->paid_amount,
         ]);
 
@@ -164,6 +167,36 @@ class BillGenerator
 
             return $revision;
         });
+    }
+
+    /**
+     * The customer's most recent bill before the given month — the one whose
+     * due rolls forward into it.
+     */
+    protected function previousBill(int $customerId, string $billingMonth): ?Bill
+    {
+        return Bill::query()
+            ->where('customer_id', $customerId)
+            ->whereDate('billing_month', '<', $billingMonth)
+            ->orderByDesc('billing_month')
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    /**
+     * What the late fee is charged on.
+     *
+     * A debt carried in from the old system is not overdue under this system's
+     * terms — the customer was never issued a bill here and given a chance to
+     * pay it — so the first bill after an opening balance carries the balance
+     * without the penalty. From the month after that it is an ordinary unpaid
+     * balance and is penalised like any other.
+     */
+    protected function lateFeeBasis(float $previousOutstanding, ?Bill $previousBill): float
+    {
+        // return $previousBill?->is_opening ? 0.0 : $previousOutstanding;
+                return $previousOutstanding;
+
     }
 
     /**

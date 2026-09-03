@@ -183,6 +183,9 @@ class ReportController extends Controller
         $query = MeterReading::query()
             ->selectRaw('customer_id, COUNT(*) as readings_count, SUM(consumed_units) as total_units, MAX(reading_date) as last_reading')
             ->with('customer.sheet')
+            // An opening row anchors the meter, it isn't a visit — counting it
+            // would overstate how many times each meter was actually read.
+            ->where('source', '!=', MeterReading::SOURCE_OPENING)
             ->groupBy('customer_id');
 
         if ($request->filled('from_date')) {
@@ -249,10 +252,12 @@ class ReportController extends Controller
             // Only customers whose connection was active by the selected month.
             ->whereNotNull('connection_date')
             ->whereDate('connection_date', '<=', $periodEnd)
-            // ...and who have no reading in that month/year.
+            // ...and who have no reading in that month/year. An opening row
+            // doesn't count: a meter anchored in that month still wasn't read.
             ->whereDoesntHave('readings', function ($q) use ($year, $month) {
                 $q->whereYear('reading_date', $year)
-                    ->whereMonth('reading_date', $month);
+                    ->whereMonth('reading_date', $month)
+                    ->where('source', '!=', MeterReading::SOURCE_OPENING);
             });
 
         $this->applyCustomerFilters($query, $request);

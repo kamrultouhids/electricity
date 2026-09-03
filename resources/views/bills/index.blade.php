@@ -111,8 +111,13 @@
                                 @include('partials.customer_cell', ['customer' => $bill->customer])
                             </td>
                             <td>{{ $bill->customer->sheet->name ?? '—' }}</td>
-                            <td>{{ $bill->billing_month->format('M Y') }}</td>
-                            <td class="text-end">{{ number_format($bill->units, 2) }}</td>
+                            <td>
+                                {{ $bill->billing_month->format('M Y') }}
+                                @if ($bill->is_opening)
+                                    <span class="badge bg-secondary ms-1" title="Balance carried over from the previous system">Opening</span>
+                                @endif
+                            </td>
+                            <td class="text-end">{{ $bill->is_opening ? '—' : number_format($bill->units, 2) }}</td>
                             <td class="text-end">{{ number_format($bill->total_amount, 2) }}</td>
                             <td class="text-end">{{ number_format($bill->paid_amount, 2) }}</td>
                             <td class="text-end">{{ number_format($bill->due_amount, 2) }}</td>

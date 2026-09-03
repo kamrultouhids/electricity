@@ -58,6 +58,13 @@
                                     'Connection Type'           => $customer->connection_type ? ucfirst($customer->connection_type) : null,
                                     'Connection Date'           => $customer->connection_date ? $customer->connection_date->format('d M Y') : null,
                                 ];
+
+                                // Only shown for a customer carried over from the old system.
+                                if ($customer->hasOpeningBalance()) {
+                                    $rows['Opening Meter Reading'] = number_format((float) $customer->opening_reading, 2);
+                                    $rows['Opening Due']           = number_format((float) $customer->opening_due, 2);
+                                    $rows['Opening Balance As Of'] = $customer->opening_as_of->format('M Y');
+                                }
                             @endphp
                             @foreach ($rows as $label => $value)
                                 <tr>

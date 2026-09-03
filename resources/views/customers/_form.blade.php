@@ -144,12 +144,80 @@
     </div>
 </div>
 
+{{-- Opening balance — only for a customer carried over from the old system. --}}
+@php
+    $openingBlocked = $openingBlocked ?? null;
+    $hasOpening = old('opening_as_of', ($customer && $customer->opening_as_of) ? $customer->opening_as_of->format('Y-m-d') : '') !== '';
+@endphp
+
+<hr class="my-4">
+
+<div class="form-check mb-3">
+    <input type="checkbox" class="form-check-input" id="hasOpeningBalance"
+           @checked($hasOpening) @disabled($openingBlocked)>
+    <label class="form-check-label fw-semibold" for="hasOpeningBalance">
+        Existing customer — carry over their meter reading and outstanding due
+    </label>
+    <div class="form-text">
+        Use this for a customer who was already being billed before this system. Leave it
+        unticked for a brand new connection.
+    </div>
+</div>
+
+@if ($openingBlocked)
+    <div class="alert alert-warning py-2">
+        <strong>Opening balance locked.</strong> {{ $openingBlocked }}
+        These figures can no longer be edited here.
+    </div>
+@endif
+
+<div class="row g-3 {{ $hasOpening ? '' : 'd-none' }}" id="openingBalanceFields">
+    <div class="col-md-4">
+        <label class="form-label">Last Meter Reading <span class="text-danger">*</span></label>
+        <input type="number" step="0.01" min="0" name="opening_reading" class="form-control"
+               placeholder="Reading on the meter at handover"
+               @disabled($openingBlocked)
+               value="{{ old('opening_reading', $customer->opening_reading ?? '') }}">
+        <div class="form-text">The first bill charges the units above this — not the whole meter.</div>
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">Outstanding Due <span class="text-danger">*</span></label>
+        <input type="number" step="0.01" min="0" name="opening_due" class="form-control"
+               placeholder="0.00"
+               @disabled($openingBlocked)
+               value="{{ old('opening_due', $customer->opening_due ?? '') }}">
+        <div class="form-text">Enter 0 if they are paid up. No late fee is charged on this amount.</div>
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">As Of <span class="text-danger">*</span></label>
+        <input type="date" name="opening_as_of" class="form-control"
+               @disabled($openingBlocked)
+               value="{{ old('opening_as_of', ($customer && $customer->opening_as_of) ? $customer->opening_as_of->format('Y-m-d') : '') }}">
+        <div class="form-text">The last month the old system billed. Billing here starts after it.</div>
+    </div>
+</div>
+
 <div class="mt-4 text-end">
     <button type="submit" class="btn btn-primary text-white">{{ $customer ? 'Update' : 'Save' }}</button>
     <a href="{{ route('customers.index') }}" class="btn btn-outline-secondary">Cancel</a>
 </div>
 
 <script>
+    // Ticking the box reveals the opening fields; unticking clears them, so an
+    // unticked box always submits blanks and the balance is genuinely removed.
+    (function () {
+        const toggle = document.getElementById('hasOpeningBalance');
+        const fields = document.getElementById('openingBalanceFields');
+        if (!toggle || !fields) return;
+
+        toggle.addEventListener('change', function () {
+            fields.classList.toggle('d-none', !toggle.checked);
+            if (!toggle.checked) {
+                fields.querySelectorAll('input').forEach(input => input.value = '');
+            }
+        });
+    })();
+
     function previewPhoto(event) {
         const input = event.target;
         const preview = document.getElementById('photoPreview');
