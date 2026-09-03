@@ -39,7 +39,7 @@ class BillGenerator
         // Carry forward the latest prior bill's due (it already rolls up earlier months).
         $previousBill = $this->previousBill($customer->id, $billingMonth);
         $previousOutstanding = (float) ($previousBill?->due_amount ?? 0);
-// dd($previousOutstanding,$previousBill->toArray());
+
         $computed = $this->calculator->compute([
             'connection_type'      => $customer->connection_type,
             'units'                => $reading->consumed_units,
