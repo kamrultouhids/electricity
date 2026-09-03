@@ -26,7 +26,16 @@ class DatabaseSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
                 'email_verified_at' => now()
-            ]
+            ],
+             [
+                'name' => 'Admin',
+                'user_type' => UserTypeEnum::Admin->value,
+                'email' => 'admin@gmail.com',
+                'password' => Hash::make('Secret@123'),
+                'created_at' => now(),
+                'updated_at' => now(),
+                'email_verified_at' => now()
+            ],
         ]);
 
         $this->call([
