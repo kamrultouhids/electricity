@@ -1,0 +1,47 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd /Users/touhid/docs/electricity *)",
+      "Bash(php artisan *)",
+      "Bash(php -l app/Models/Payment.php)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(php -l app/Models/User.php)",
+      "Bash(php -l app/Http/Controllers/Portal/DashboardController.php)",
+      "Bash(php -r \"echo 'gd:'.\\(extension_loaded\\('gd'\\)?'y':'n'\\).' imagick:'.\\(extension_loaded\\('imagick'\\)?'y':'n'\\).PHP_EOL;\")",
+      "Bash(composer --version)",
+      "Bash(composer require *)",
+      "Bash(php -l app/Support/Qr.php)",
+      "Bash(php -l app/Http/Controllers/CustomerController.php)",
+      "Bash(php -l /Users/touhid/docs/electricity/app/Http/Controllers/CustomerController.php)",
+      "Bash(php -l app/Http/Controllers/MeterReadingController.php)",
+      "Bash(php -l app/Models/Concerns/HasSource.php)",
+      "Bash(php -l app/Http/Controllers/HomeController.php)",
+      "Bash(php -l app/Http/Controllers/TariffController.php)",
+      "Bash(php -l app/Models/TariffLog.php)",
+      "Bash(git commit *)",
+      "Bash(git --no-pager log --stat -1)",
+      "Bash(php -l app/Services/BillCalculator.php)",
+      "Bash(php -l app/Services/BillGenerator.php)",
+      "Bash(git --no-pager diff --stat)",
+      "Bash(git --no-pager diff app/Http/Controllers/CustomerController.php app/Http/Controllers/MeterReadingController.php app/Http/Controllers/PaymentController.php app/Http/Controllers/ReportController.php app/Http/Controllers/BillController.php)",
+      "Bash(git --no-pager log --oneline -3)",
+      "Bash(php -l app/Models/Bill.php)",
+      "Bash(php -l app/Http/Controllers/BillController.php)",
+      "Bash(git --no-pager diff app/Http/Controllers/BillController.php app/Http/Controllers/Portal/DashboardController.php)",
+      "Bash(git --no-pager log --oneline -2)",
+      "Bash(php -l app/Http/Controllers/PaymentController.php)",
+      "Bash(git --no-pager diff app/Http/Controllers/PaymentController.php)",
+      "Bash(git --no-pager diff resources/views/payments/create.blade.php)",
+      "Bash(wc -l resources/views/payments/create.blade.php && git show HEAD~0:resources/views/payments/create.blade.php 2>/dev/null | head -1; git diff --no-index /dev/null resources/views/payments/create.blade.php 2>/dev/null | head -5; echo \"--- compare to deleted version ---\"; git show 892f5db:resources/views/payments/create.blade.php > /private/tmp/claude-501/-Users-touhid-docs-electricity/e8f2866e-1dc1-42b9-8ea6-baa3ed168c5e/scratchpad/old_create.blade.php 2>/dev/null && diff /private/tmp/claude-501/-Users-touhid-docs-electricity/e8f2866e-1dc1-42b9-8ea6-baa3ed168c5e/scratchpad/old_create.blade.php resources/views/payments/create.blade.php && echo \"IDENTICAL to the version deleted in 7bc7125\")",
+      "Read(//dev/**)",
+      "Bash(git --no-pager diff app/Http/Controllers/BillController.php)",
+      "Bash(php -l app/Http/Controllers/ReportController.php)",
+      "Bash(git --no-pager diff resources/views/home.blade.php resources/views/layouts/app.blade.php resources/views/portal/layout.blade.php)"
+    ],
+    "additionalDirectories": [
+      "/Users/touhid/docs/electricity/app/Http/Controllers"
+    ]
+  }
+}
