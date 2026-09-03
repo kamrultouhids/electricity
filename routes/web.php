@@ -15,7 +15,9 @@ use App\Http\Controllers\UserController;
 Route::get('/register', function () {
    abort(404);
  });
-Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
+// The landing page is the login form, but the [login] name belongs to
+// /login below — two routes cannot share it or route:cache refuses to build.
+Route::get('/', [LoginController::class, 'showLoginForm']);
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
