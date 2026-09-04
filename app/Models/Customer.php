@@ -91,7 +91,7 @@ class Customer extends Authenticatable
     /**
      * Connection type options.
      */
-    public const CONNECTION_TYPES = ['residential', 'commercial', 'religious', 'others'];
+    public const CONNECTION_TYPES = ['residential', 'commercial', 'religious', 'Deep bill', 'Water plan', 'others'];
 
     /**
      * Status constants.
