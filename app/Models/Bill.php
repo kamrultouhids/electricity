@@ -17,6 +17,7 @@ class Bill extends Model
         'customer_id',
         'meter_reading_id',
         'billing_month',
+        'bill_last_date',
         'units',
         'per_unit_rate',
         'energy_charge',
@@ -42,6 +43,7 @@ class Bill extends Model
 
     protected $casts = [
         'billing_month' => 'date',
+        'bill_last_date' => 'date',
         'units' => 'decimal:2',
         'per_unit_rate' => 'decimal:2',
         'energy_charge' => 'decimal:2',
@@ -97,6 +99,25 @@ class Bill extends Model
     public function statusLabel(): string
     {
         return self::STATUS_LABELS[$this->status] ?? 'Unknown';
+    }
+
+    /**
+     * The deadline a bill falls back to when no date was entered for it: the
+     * 20th of the month after the month being billed.
+     */
+    public static function defaultLastDate(Carbon|string $billingMonth): Carbon
+    {
+        return Carbon::parse($billingMonth)->startOfMonth()->addMonth()->day(20);
+    }
+
+    /**
+     * The payment deadline to print (পরিশোধের শেষ তারিখ) — the one entered when
+     * the bill was generated, or the derived default for bills raised before
+     * the operator could enter one.
+     */
+    public function paymentLastDate(): Carbon
+    {
+        return $this->bill_last_date ?? self::defaultLastDate($this->billing_month);
     }
 
     /**

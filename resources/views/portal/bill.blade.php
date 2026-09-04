@@ -6,8 +6,8 @@
     $customer = $bill->customer;
     $billMonth = $bill->billing_month;
     $prepDate = $bill->created_at;
-    // Payable by the 20th of the month after the billing month.
-    $lastDate = $billMonth->copy()->addMonth()->day(20);
+    // The deadline entered when the bill was generated.
+    $lastDate = $bill->paymentLastDate();
     $mr = $bill->meterReading;
 @endphp
 

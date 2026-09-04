@@ -6,8 +6,9 @@
     $customer = $meterReading->customer;
     $billMonth = \Illuminate\Support\Carbon::parse($data['billing_month']);
     $prepDate = now();
-    // Payable by the 20th of the month after the billing month.
-    $lastDate = $billMonth->copy()->addMonth()->day(20);
+    // Suggested deadline; the operator confirms or changes it below before
+    // the bill is saved.
+    $lastDate = \App\Models\Bill::defaultLastDate($billMonth);
 @endphp
 
 @section('content')
@@ -53,8 +54,21 @@
 
     {{-- Confirm --}}
     <div class="mt-4 text-end no-print">
-        <form method="POST" action="{{ route('bills.store', $meterReading) }}" class="d-inline">
+        <form method="POST" action="{{ route('bills.store', $meterReading) }}"
+              class="d-inline-flex align-items-end gap-2">
             @csrf
+            {{-- Printed on the bill as পরিশোধের শেষ তারিখ and saved with it. --}}
+            <div class="text-start">
+                <label for="bill_last_date" class="form-label mb-1 small">
+                    Last payment date <span class="text-danger">*</span>
+                </label>
+                <input type="date" id="bill_last_date" name="bill_last_date" required
+                       class="form-control @error('bill_last_date') is-invalid @enderror"
+                       value="{{ old('bill_last_date', $lastDate->toDateString()) }}">
+                @error('bill_last_date')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
             <a href="{{ route('bills.pending') }}" class="btn btn-outline-secondary">Cancel</a>
             <button type="submit" class="btn btn-primary text-white"
                     onclick="return confirm('Generate this bill?');">

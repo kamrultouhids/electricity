@@ -169,6 +169,12 @@ class BillController extends Controller
      */
     public function generateAll(Request $request, BillGenerator $generator)
     {
+        // One deadline for the whole run — the operator enters it next to the
+        // Generate All button.
+        $data = $request->validate([
+            'bill_last_date' => 'required|date',
+        ]);
+
         $query = MeterReading::query()
             ->with('customer')
             ->where('status', MeterReading::STATUS_PENDING);
@@ -200,7 +206,9 @@ class BillController extends Controller
         $generated = 0;
         $skipped = 0;
         foreach ($readings as $reading) {
-            $generator->generateForReading($reading, auth()->id()) ? $generated++ : $skipped++;
+            $generator->generateForReading($reading, auth()->id(), $data['bill_last_date'])
+                ? $generated++
+                : $skipped++;
         }
 
         $message = "Generated {$generated} bill(s).".($skipped ? " Skipped {$skipped} (inactive or already billed)." : '');
@@ -255,14 +263,19 @@ class BillController extends Controller
     /**
      * Step 3 — generate (persist) the bill.
      */
-    public function store(MeterReading $meterReading, BillGenerator $generator)
+    public function store(Request $request, MeterReading $meterReading, BillGenerator $generator)
     {
         if ($older = $this->olderPendingReading($meterReading)) {
             return redirect()->route('bills.pending')
                 ->with('error', "Generate the oldest pending reading first — {$older->reading_date->format('M Y')}.");
         }
 
-        $bill = $generator->generateForReading($meterReading, auth()->id());
+        // The payment deadline printed on the bill, entered on the preview page.
+        $data = $request->validate([
+            'bill_last_date' => 'required|date',
+        ]);
+
+        $bill = $generator->generateForReading($meterReading, auth()->id(), $data['bill_last_date']);
 
         if (! $bill) {
             return redirect()->route('bills.pending')

@@ -19,9 +19,11 @@ class BillGenerator
     }
 
     /**
-     * Build the (unsaved) bill data for a reading — used for the preview and the save.
+     * Build the (unsaved) bill data for a reading — used for the preview and the
+     * save. $billLastDate is the payment deadline the operator entered; without
+     * one the bill falls back to the derived default.
      */
-    public function buildData(MeterReading $reading): array
+    public function buildData(MeterReading $reading, ?string $billLastDate = null): array
     {
         $customer = $reading->customer;
         $billingMonth = $this->billingMonthFor($reading);
@@ -56,6 +58,9 @@ class BillGenerator
             'customer_id'          => $customer->id,
             'meter_reading_id'     => $reading->id,
             'billing_month'        => $billingMonth,
+            'bill_last_date'       => $billLastDate
+                ? Carbon::parse($billLastDate)->toDateString()
+                : Bill::defaultLastDate($billingMonth)->toDateString(),
             'units'                => (float) $reading->consumed_units,
             'per_unit_rate'        => $rate,
             'energy_charge'        => $computed['energy_charge'],
@@ -250,7 +255,7 @@ class BillGenerator
      * Generate the bill for a single reading and mark the reading Completed.
      * Returns null when it is not billable (inactive customer / already billed).
      */
-    public function generateForReading(MeterReading $reading, ?int $userId = null): ?Bill
+    public function generateForReading(MeterReading $reading, ?int $userId = null, ?string $billLastDate = null): ?Bill
     {
         $customer = $reading->customer;
 
@@ -258,7 +263,7 @@ class BillGenerator
             return null;
         }
 
-        $bill = Bill::create($this->buildData($reading) + [
+        $bill = Bill::create($this->buildData($reading, $billLastDate) + [
             'created_by' => $userId,
             'updated_by' => $userId,
         ]);
@@ -276,7 +281,7 @@ class BillGenerator
      *
      * @return array{generated: int, skipped: int}
      */
-    public function generateForMonth(string $month, ?int $sheetId = null, ?int $userId = null): array
+    public function generateForMonth(string $month, ?int $sheetId = null, ?int $userId = null, ?string $billLastDate = null): array
     {
         $date = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
 
@@ -294,7 +299,7 @@ class BillGenerator
         $skipped = 0;
 
         foreach ($readings as $reading) {
-            $this->generateForReading($reading, $userId) ? $generated++ : $skipped++;
+            $this->generateForReading($reading, $userId, $billLastDate) ? $generated++ : $skipped++;
         }
 
         return ['generated' => $generated, 'skipped' => $skipped];

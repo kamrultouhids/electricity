@@ -13,11 +13,21 @@
         <div class="d-flex gap-2">
             @if ($readings->total() > 0)
                 <form method="POST" action="{{ route('bills.generate-all') }}"
+                      class="d-inline-flex align-items-end gap-2"
                       onsubmit="return confirm('Generate bills for all {{ $readings->total() }} pending reading(s) matching the current filters?');">
                     @csrf
                     <input type="hidden" name="search" value="{{ request('search') }}">
                     <input type="hidden" name="sheet_id" value="{{ request('sheet_id') }}">
                     <input type="hidden" name="month" value="{{ request('month') }}">
+                    {{-- Printed on every bill in this run as পরিশোধের শেষ তারিখ. --}}
+                    <div class="text-start">
+                        <label for="bill_last_date" class="form-label mb-1 small">
+                            Last payment date <span class="text-danger">*</span>
+                        </label>
+                        <input type="date" id="bill_last_date" name="bill_last_date" required
+                               class="form-control @error('bill_last_date') is-invalid @enderror"
+                               value="{{ old('bill_last_date', now()->day(20)->toDateString()) }}">
+                    </div>
                     <button type="submit" class="btn btn-primary text-white">
                         <i class="bi bi-lightning-charge-fill me-1"></i>Generate All
                     </button>

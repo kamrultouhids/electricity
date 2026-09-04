@@ -43,7 +43,7 @@
                 'customer'            => $bill->customer,
                 'billMonth'           => $billMonth,
                 'prepDate'            => $bill->created_at,
-                'lastDate'            => $billMonth->copy()->addMonth()->day(20),
+                'lastDate'            => $bill->paymentLastDate(),
                 'serialNo'            => $mr->id ?? $bill->id,
                 'accountNo'           => $bill->customer_id,
                 'preparerName'        => $bill->createdBy->name ?? '',
