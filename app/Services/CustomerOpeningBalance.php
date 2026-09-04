@@ -165,7 +165,7 @@ class CustomerOpeningBalance
             // Stamped one month back from the anchor date, the same way a real
             // reading bills for the month before it: an anchor as of 31 Aug
             // opens July, leaving August free for the first real bill.
-            'billing_month'           => Carbon::parse($asOf)->startOfMonth()->subMonth()->toDateString(),
+            'billing_month'           => Carbon::parse($asOf)->startOfMonth()->toDateString(),
             'units'                   => 0,
             'per_unit_rate'           => 0,
             'energy_charge'           => 0,
