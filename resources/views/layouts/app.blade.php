@@ -298,6 +298,7 @@
             });
         });
     </script>
+    @include('partials.submit_guard')
     @stack('scripts')
 </body>
 </html>

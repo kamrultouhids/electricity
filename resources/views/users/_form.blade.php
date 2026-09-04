@@ -41,18 +41,27 @@
         </select>
     </div>
 
-    @unless ($user)
-        <div class="col-md-4">
-            <label class="form-label">Password <span class="text-danger">*</span></label>
-            <input type="password" name="password" class="form-control" placeholder="Enter Password"
-                   required autocomplete="new-password">
-        </div>
-        <div class="col-md-4">
-            <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-            <input type="password" name="password_confirmation" class="form-control" placeholder="Confirm Password"
-                   required autocomplete="new-password">
-        </div>
-    @endunless
+    {{-- On edit the password is optional: filled in only when it is being
+         changed, left blank to keep the existing one. --}}
+    <div class="col-md-4">
+        <label class="form-label">
+            Password @unless ($user)<span class="text-danger">*</span>@endunless
+        </label>
+        <input type="password" name="password" class="form-control"
+               placeholder="{{ $user ? 'Leave blank to keep current' : 'Enter Password' }}"
+               @unless ($user) required @endunless autocomplete="new-password">
+        @if ($user)
+            <div class="form-text">Leave both fields blank to keep the current password. Minimum 8 characters.</div>
+        @endif
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">
+            Confirm Password @unless ($user)<span class="text-danger">*</span>@endunless
+        </label>
+        <input type="password" name="password_confirmation" class="form-control"
+               placeholder="{{ $user ? 'Repeat the new password' : 'Confirm Password' }}"
+               @unless ($user) required @endunless autocomplete="new-password">
+    </div>
 </div>
 
 <div class="mt-4 text-end">
