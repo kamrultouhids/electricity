@@ -173,11 +173,12 @@
             <li>নির্ধারিত তারিখের মধ্যে বিল পরিশোধ না করিলে সংযোগ বিচ্ছিন্ন করা হবে।</li>
         </ul>
         {{-- Where to call, and where to check the bill online. The portal URL
-             follows APP_URL, printed without the scheme to keep it short. --}}
+             is printed in full, scheme included, and follows APP_URL. --}}
         <div class="small bill-contact">
             <b>হটলাইন:</b> {{ $bn('01633380033') }}
             <span class="bill-contact-sep">|</span>
-            <b>অনলাইনে বিল দেখুন:</b> {{ preg_replace('#^https?://#', '', route('portal.login')) }}
+            <b>অনলাইনে বিল দেখুন:</b>
+            <a href="{{ route('portal.login') }}" target="_blank" rel="noopener">{{ route('portal.login') }}</a>
         </div>
         <div class="small">
             ১) বিদ্যুৎ সাশ্রয়ের মাধ্যমে বিদ্যুৎ বিল কমান | ২) বাতি/ফ্যান ব্যবহারে সচেতন হোন |<br>
@@ -245,6 +246,11 @@
     .bill-qr-cap { font-size: 8px; line-height: 1.1; margin-top: 1px; }
     .bill-block { border-top: 1px solid #000; }
     .bill-contact { margin: 2px 0 4px; }
+    /* Clickable on screen, plain black text on paper. */
+    .bill-contact a { color: inherit; text-decoration: underline; }
+    @media print {
+        .bill-contact a { color: #000; text-decoration: none; }
+    }
     .bill-contact-sep { padding: 0 4px; color: #555; }
     .bill-copy .kv { display: flex; font-size: 13px; padding: 1px 0; }
     .bill-copy .kv > span { min-width: 130px; }
