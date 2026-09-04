@@ -8,7 +8,7 @@
         // Long enough that no real request is still pending, short enough that
         // a button never stays dead if the page somehow does not navigate.
         var FAILSAFE_MS = 15000;
-        var BUSY_LABEL = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Please wait...';
+        var BUSY_LABEL = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Loading...';
 
         // A button with no type attribute submits its form, same as type="submit".
         function submitButtons(form) {
