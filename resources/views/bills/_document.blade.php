@@ -140,7 +140,9 @@
                         <td>বিদ্যুৎ শুল্ক{{ $electricityDutyRate > 0 ? ' ('.$bn(rtrim(rtrim(number_format($electricityDutyRate, 2), '0'), '.')).'%)' : '(%)' }}</td>
                         <td class="text-end">{{ $bn(number_format($electricityDuty, 2)) }}</td>
                     </tr>
-                    @php $discount = $discount ?? 0; @endphp
+                    <!-- @php $discount = $discount ?? 0; @endphp -->
+                    @php $discount =  0; @endphp
+
                     <tr class="fw-bold"><td>মোট বিল</td><td class="text-end">{{ $bn(number_format($totalAmount, 2)) }}</td></tr>
                     <tr><td>ছাড়(-)</td><td class="text-end">{{ $bn(number_format($discount, 2)) }}</td></tr>
                     <tr class="fw-bold table-light"><td>বিল</td><td class="text-end">৳ {{ $bn(number_format($totalAmount - $discount, 2)) }}</td></tr>

@@ -24,7 +24,7 @@ class BillGenerator
     public function buildData(MeterReading $reading): array
     {
         $customer = $reading->customer;
-        $billingMonth = Carbon::parse($reading->reading_date)->startOfMonth()->toDateString();
+        $billingMonth = $this->billingMonthFor($reading);
 
         // Snapshot the connection type's tariff onto the bill so later tariff
         // edits never change an already generated bill.
@@ -224,11 +224,21 @@ class BillGenerator
     }
 
     /**
+     * The month a reading bills for. A reading is taken at the start of a month
+     * to close out the month that just ended, so the bill is stamped one month
+     * back: a reading dated 05 Sep bills for August.
+     */
+    public function billingMonthFor(MeterReading $reading): string
+    {
+        return Carbon::parse($reading->reading_date)->startOfMonth()->subMonth()->toDateString();
+    }
+
+    /**
      * Whether the reading's customer already has a bill for that month.
      */
     public function alreadyBilled(MeterReading $reading): bool
     {
-        $billingMonth = Carbon::parse($reading->reading_date)->startOfMonth()->toDateString();
+        $billingMonth = $this->billingMonthFor($reading);
 
         return Bill::query()
             ->where('customer_id', $reading->customer_id)
