@@ -524,13 +524,19 @@ class MeterReadingController extends Controller
 
     protected function readingExists(int $customerId, string $readingDate, ?int $ignoreId = null): bool
     {
-         $date = \Illuminate\Support\Carbon::parse($readingDate)->subMonth();
-
-        return MeterReading::query()
+         $date = \Illuminate\Support\Carbon::parse($readingDate);
+        //  dd($date->year, $date->month, $date, $readingDate);
+// Carbon::parse($asOf)
+//             ->startOfMonth()
+//             ->addMonth()
+//             ->toDateString()
+        $data = MeterReading::query()
             ->where('customer_id', $customerId)
             ->whereYear('reading_date', $date->year)
             ->whereMonth('reading_date', $date->month)
             ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
             ->exists();
+
+            return $data;
     }
 }

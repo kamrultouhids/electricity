@@ -144,7 +144,10 @@ class CustomerOpeningBalance
             'previous_reading' => $reading,
             'current_reading'  => $reading,
             'consumed_units'   => 0,
-            'reading_date'     => $asOf,
+            'reading_date'     => Carbon::parse($asOf)
+            ->startOfMonth()
+            ->addMonth()
+            ->toDateString(),
             'status'           => MeterReading::STATUS_COMPLETED,
             'source'           => MeterReading::SOURCE_OPENING,
             'created_by'       => $userId,
