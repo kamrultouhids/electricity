@@ -1,7 +1,7 @@
 {{--
     Shared electricity-bill document.
     Expects: $customer, $billMonth, $prepDate, $lastDate (Carbon),
-             $serialNo, $accountNo, $preparerName,
+             $preparerName,
              $currentReading, $previousReading, $currentReadingDate, $previousReadingDate,
              $units, $energyCharge, $lineCharge, $serviceCharge, $demandCharge,
              $electricityDutyRate, $electricityDuty,
@@ -40,7 +40,7 @@
         <div class="org-bismillah">বিসমিল্লাহির রাহমানির রাহিম</div>
         <div class="org-slogan">&ldquo;বিদ্যুৎ জাতীয় সম্পদ অপচয় রোধে এগিয়ে আসুন, অবৈধ সংযোগ থেকে বিরত থাকুন&rdquo;</div>
         <div class="org-name">চট্টগ্রাম মহানগর ছিন্নমূল বস্তিবাসি সমন্বয় সংগ্রাম পরিষদ</div>
-        <div class="org-addr">জঙ্গল ছলিমপুর ছিন্নমূল পুনর্বাসন প্রকল্প, ডাকঘরঃ জাফরাবাদ, থানাঃ সিতাকুণ্ড, চট্টগ্রাম।</div>
+        <div class="org-addr">পরিচালনায়ঃ জঙ্গল সলিমপুর বিদ্যুৎ গ্রাহক ফোরাম, ডাকঘরঃ জাফরাবাদ, থানাঃ সিতাকুণ্ড, চট্টগ্রাম।</div>
         <div class="org-dept">বিদ্যুৎ বিতরন বিভাগ</div>
     </div>
 
@@ -53,15 +53,17 @@
     {{-- Top: customer info + bill dates --}}
     <div class="row g-0 bill-block">
         <div class="col-7 p-2 border-end">
-            <div class="kv"><span>ক্রমিক নং</span><b>{{ $serialNo ?? '—' }}</b></div>
             <div class="kv"><span>এরিয়া কোড/শাখা</span><b>{{ $customer->sheet->name ?? '—' }}</b></div>
-            <div class="kv boxed"><span>হিসাব নং/গ্রাহক নং</span><b>{{ $accountNo }}</b></div>
+            <div class="kv boxed"><span>হিসাব নং/গ্রাহক নং</span><b>{{ $customer->serial_no ?? '—' }}</b></div>
             <div class="kv boxed"><span>গ্রাহকের নাম</span><b>{{ $customer->name }}</b></div>
             <div class="kv boxed"><span>পিতা/স্বামীর নাম</span><b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
             <div class="kv boxed"><span>ঠিকানা</span><b>{{ $customer->address ?? '—' }}</b></div>
-            {{-- Meter number hidden for now, mobile number shown in its place. --}}
-            {{-- <div class="kv boxed"><span>মিটার নং</span><b>{{ $customer->meter_number ?? '—' }}</b></div> --}}
-            <div class="kv boxed"><span>মোবাইল নং</span><b>{{ $customer->mobile_number ?? '—' }}</b></div>
+            @if (filled($customer->meter_number))
+                <div class="kv boxed"><span>মিটার নং</span><b>{{ $customer->meter_number }}</b></div>
+            @endif
+            @if (filled($customer->mobile_number))
+                <div class="kv boxed"><span>মোবাইল নং</span><b>{{ $customer->mobile_number }}</b></div>
+            @endif
         </div>
         <div class="col-5 p-2">
             <div class="kv"><span>বিলের মাস</span><b>{{ $bnMonthYear($billMonth) }}</b></div>
@@ -193,15 +195,18 @@
     <div class="p-2 text-center fw-bold bill-block">অফিস কপি</div>
     <div class="row g-0 bill-block">
         <div class="col-6 p-2 border-end">
-            <div class="kv"><span>ক্রমিক নং</span><b>{{ $serialNo ?? '—' }}</b></div>
             <div class="kv"><span>গ্রাহকের নাম</span><b>{{ $customer->name }}</b></div>
             <div class="kv"><span>পিতা/স্বামীর নাম</span><b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
             <div class="kv"><span>ঠিকানা</span><b>{{ $customer->address ?? '—' }}</b></div>
+            @if (filled($customer->meter_number))
+                <div class="kv"><span>মিটার নং</span><b>{{ $customer->meter_number }}</b></div>
+            @endif
         </div>
         <div class="col-6 p-2">
-            {{-- <div class="kv"><span>মিটার নং</span><b>{{ $customer->meter_number ?? '—' }}</b></div> --}}
-            <div class="kv"><span>মোবাইল নং</span><b>{{ $customer->mobile_number ?? '—' }}</b></div>
-            <div class="kv"><span>হিসাব নং/গ্রাহক নং</span><b>{{ $accountNo }}</b></div>
+            @if (filled($customer->mobile_number))
+                <div class="kv"><span>মোবাইল নং</span><b>{{ $customer->mobile_number }}</b></div>
+            @endif
+            <div class="kv"><span>হিসাব নং/গ্রাহক নং</span><b>{{ $customer->serial_no ?? '—' }}</b></div>
             <div class="kv"><span>বিলের মাস</span><b>{{ $bnMonthYear($billMonth) }}</b></div>
             <div class="kv"><span>মোট বিল</span><b>৳ {{ $bn(number_format($totalAmount, 2)) }}</b></div>
         </div>

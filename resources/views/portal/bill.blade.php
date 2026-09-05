@@ -28,8 +28,6 @@
         'billMonth'          => $billMonth,
         'prepDate'           => $prepDate,
         'lastDate'           => $lastDate,
-        'serialNo'           => $mr->id ?? $bill->id,
-        'accountNo'          => $customer->id,
         'preparerName'       => $bill->createdBy->name ?? '',
         'currentReading'     => $mr->current_reading ?? 0,
         'previousReading'    => $mr->previous_reading ?? 0,

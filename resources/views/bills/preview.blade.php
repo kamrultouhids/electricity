@@ -30,8 +30,6 @@
         'billMonth'          => $billMonth,
         'prepDate'           => $prepDate,
         'lastDate'           => $lastDate,
-        'serialNo'           => $meterReading->id,
-        'accountNo'          => $customer->id,
         'preparerName'       => auth()->user()->name ?? '',
         'currentReading'     => $meterReading->current_reading,
         'previousReading'    => $meterReading->previous_reading,
