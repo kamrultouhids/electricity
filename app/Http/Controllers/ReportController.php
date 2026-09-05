@@ -184,9 +184,13 @@ class ReportController extends Controller
             );
         }
 
+        $perPage = $this->perPage($request);
+
         return view('reports.customer', [
-            'customers' => $query->paginate(20)->withQueryString(),
-            'sheets'    => Sheet::orderBy('id')->get(),
+            'customers'      => $query->paginate($perPage)->withQueryString(),
+            'sheets'         => Sheet::orderBy('id')->get(),
+            'perPage'        => $perPage,
+            'perPageOptions' => self::PER_PAGE_OPTIONS,
         ]);
     }
 

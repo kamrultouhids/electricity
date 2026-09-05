@@ -10,7 +10,7 @@
             Customer Report
             <span class="badge bg-primary px-1 py-0 small">{{ $customers->total() }}</span>
         </h5>
-        @include('reports._actions')
+        @include('reports._actions', ['printCount' => $customers->count()])
     </div>
 
     {{-- Filters --}}
@@ -21,7 +21,7 @@
                     <label class="form-label mb-1">Search</label>
                     <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Serial / Name / Mobile / Meter">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label mb-1">Sheet</label>
                     <select name="sheet_id" class="form-select">
                         <option value="">All</option>
@@ -46,6 +46,16 @@
                         <option value="without" @selected(request('outstanding') === 'without')>No Outstanding</option>
                     </select>
                 </div>
+                <div class="col-md-1">
+                    <label class="form-label mb-1">Per Page</label>
+                    {{-- Applies straight away; page resets so the range stays valid. --}}
+                    <select name="per_page" class="form-select" onchange="this.form.page.value = 1; this.form.submit();">
+                        @foreach ($perPageOptions as $option)
+                            <option value="{{ $option }}" @selected($perPage === $option)>{{ $option }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <input type="hidden" name="page" value="1">
 
                 <div class="col-md-2 d-flex gap-2">
                     <button type="submit" class="btn btn-primary text-white "><i class="bi bi-funnel me-1"></i>Filter</button>

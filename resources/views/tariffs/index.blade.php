@@ -30,7 +30,7 @@
                 @method('PUT')
 
                 <div class="table-responsive ">
-                    <table class="table table-hover align-middle mb-0">
+                    <table class="table table-hover align-middle mb-0 stack-sm">
                         <thead class="list-head">
                             <tr>
                                 <th>#</th>
@@ -45,9 +45,9 @@
                         <tbody>
                             @foreach ($tariffs as $tariff)
                                 <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ ucfirst($tariff->connection_type) }}</td>
-                                    <td>
+                                    <td class="stack-title">{{ $loop->iteration }}</td>
+                                    <td class="stack-title">{{ ucfirst($tariff->connection_type) }}</td>
+                                    <td data-label="Per Unit Rate">
                                         <div class="input-group">
                                             <span class="input-group-text">৳</span>
                                             <input type="number" step="0.01" min="0"
@@ -57,7 +57,7 @@
                                                    required>
                                         </div>
                                     </td>
-                                    <td>
+                                    <td data-label="Line Charge">
                                         <div class="input-group">
                                             <span class="input-group-text">৳</span>
                                             <input type="number" step="0.01" min="0"
@@ -66,7 +66,7 @@
                                                    value="{{ old('line_charges.'.$tariff->connection_type, $tariff->line_charge) }}">
                                         </div>
                                     </td>
-                                    <td>
+                                    <td data-label="Service Charge">
                                         <div class="input-group">
                                             <span class="input-group-text">৳</span>
                                             <input type="number" step="0.01" min="0"
@@ -75,7 +75,7 @@
                                                    value="{{ old('service_charges.'.$tariff->connection_type, $tariff->service_charge) }}">
                                         </div>
                                     </td>
-                                    <td>
+                                    <td data-label="Demand Charge">
                                         <div class="input-group">
                                             <span class="input-group-text">৳</span>
                                             <input type="number" step="0.01" min="0"
@@ -84,7 +84,7 @@
                                                    value="{{ old('demand_charges.'.$tariff->connection_type, $tariff->demand_charge) }}">
                                         </div>
                                     </td>
-                                    <td>
+                                    <td data-label="Electricity Duty">
                                         <div class="input-group">
                                             <input type="number" step="0.01" min="0" max="100"
                                                    name="duties[{{ $tariff->connection_type }}]"
@@ -99,7 +99,7 @@
                     </table>
                 </div>
 
-                <div class="mt-4 text-end">
+                <div class="mt-4 text-md-end d-grid d-md-block">
                     <button type="submit" class="btn btn-primary text-white">Save</button>
                 </div>
             </form>
@@ -139,7 +139,7 @@
             </form>
         </div>
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+            <table class="table table-hover align-middle mb-0 stack-sm">
                 <thead class="list-head">
                     <tr>
                         <th>#</th>
@@ -156,23 +156,23 @@
                 <tbody>
                     @forelse ($logs as $log)
                         @php
-                            // [old, new, isPercent] — the duty is a rate, the rest are amounts.
+                            // [label, old, new, isPercent] — the duty is a rate, the rest are amounts.
                             $changes = [
-                                [$log->old_rate, $log->new_rate, false],
-                                [$log->old_line_charge, $log->new_line_charge, false],
-                                [$log->old_service_charge, $log->new_service_charge, false],
-                                [$log->old_demand_charge, $log->new_demand_charge, false],
-                                [$log->old_electricity_duty, $log->new_electricity_duty, true],
+                                ['Per Unit Rate', $log->old_rate, $log->new_rate, false],
+                                ['Line Charge', $log->old_line_charge, $log->new_line_charge, false],
+                                ['Service Charge', $log->old_service_charge, $log->new_service_charge, false],
+                                ['Demand Charge', $log->old_demand_charge, $log->new_demand_charge, false],
+                                ['Electricity Duty', $log->old_electricity_duty, $log->new_electricity_duty, true],
                             ];
                             $money = fn ($v, $percent) => $percent
                                 ? number_format($v, 2).'%'
                                 : '৳ '.number_format($v, 2);
                         @endphp
                         <tr>
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ ucfirst($log->connection_type) }}</td>
-                            @foreach ($changes as [$oldValue, $newValue, $isPercent])
-                                <td class="text-nowrap">
+                            <td class="stack-title">{{ $loop->iteration }}</td>
+                            <td class="stack-title">{{ ucfirst($log->connection_type) }}</td>
+                            @foreach ($changes as [$label, $oldValue, $newValue, $isPercent])
+                                <td class="text-nowrap" data-label="{{ $label }}">
                                     @if ((float) $oldValue === (float) $newValue)
                                         <span class="text-muted">{{ $money($newValue, $isPercent) }}</span>
                                     @else
@@ -182,8 +182,8 @@
                                     @endif
                                 </td>
                             @endforeach
-                            <td>{{ $log->changedBy->name ?? '—' }}</td>
-                            <td>{{ $log->created_at->format('d M Y, h:i A') }}</td>
+                            <td data-label="Changed By">{{ $log->changedBy->name ?? '—' }}</td>
+                            <td data-label="Changed At">{{ $log->created_at->format('d M Y, h:i A') }}</td>
                         </tr>
                     @empty
                         <tr>
@@ -199,3 +199,51 @@
     </div>
 </div>
 @endsection
+
+@push('styles')
+<style>
+    /*
+     * Narrow screens: these tables are too wide to scroll through comfortably —
+     * the rates one is a form. Each row becomes its own card, with the column
+     * header carried down as a per-field label.
+     */
+    @media (max-width: 767.98px) {
+        .stack-sm thead { display: none; }
+        .stack-sm, .stack-sm tbody, .stack-sm tr, .stack-sm td { display: block; width: 100%; }
+
+        .stack-sm tr {
+            border: 1px solid var(--bs-border-color, #dee2e6);
+            border-radius: .75rem;
+            padding: .75rem 1rem;
+            margin-bottom: .75rem;
+        }
+        .stack-sm tr:last-child { margin-bottom: 0; }
+
+        .stack-sm td {
+            border: 0;
+            padding: .35rem 0;
+        }
+        .stack-sm td[data-label]::before {
+            content: attr(data-label);
+            display: block;
+            font-size: .78rem;
+            color: var(--bs-secondary-color, #6c757d);
+            margin-bottom: .15rem;
+        }
+
+        /* The row's identity (number + connection type) reads as its heading. */
+        .stack-sm td.stack-title {
+            display: inline-block;
+            width: auto;
+            font-weight: 600;
+            padding: 0 .35rem .35rem 0;
+        }
+        .stack-sm td.stack-title + td { clear: both; }
+
+        /* An empty-state row has nothing to stack. */
+        .stack-sm td[colspan] { text-align: center; }
+
+        .stack-sm .text-nowrap { white-space: normal; }
+    }
+</style>
+@endpush
