@@ -180,10 +180,10 @@
                 valueField: 'id',
                 labelField: 'text',
                 searchField: 'text',
-                placeholder: 'Search by name, mobile or serial no…',
-                // Results are already filtered server-side (incl. mobile/serial which
-                // aren't in the label) — keep every loaded option, don't re-filter.
-                score: function () { return function () { return 1; }; },
+                placeholder: 'Search by name or serial no',
+                // The label carries both searchable fields ("Name (serial no)"),
+                // so Tom Select's own filtering hides options left over from
+                // earlier queries instead of listing them alongside the matches.
                 load: function (query, callback) {
                     fetch('{{ route('customers.search') }}?q=' + encodeURIComponent(query))
                         .then(r => r.json())

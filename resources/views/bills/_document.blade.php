@@ -221,7 +221,7 @@
     .bill-org .org-slogan { font-size: 13px; font-weight: 700; }
     .bill-org .org-name { font-size: 17px; font-weight: 700; }
     .bill-org .org-addr { font-size: 12px; }
-    .bill-title { font-size: 20px; font-weight: 700; padding: 8px 0 0; }
+    .bill-title { font-size: 20px; font-weight: 700; padding: 0 0 2px; }
     .bill-cut {
         position: relative;
         height: 24px;
@@ -237,7 +237,7 @@
         font-size: 16px;
         line-height: 24px;
     }
-    .bill-copy-tag { position: absolute; right: 8px; top: 10px; font-size: 12px; }
+    .bill-copy-tag { position: absolute; right: 8px; top: 2px; font-size: 12px; }
     .bill-qr { position: absolute; left: 8px; top: 8px; width: 74px; text-align: center; z-index: 2; }
     .bill-qr img { width: 66px; height: 66px; display: block; margin: 0 auto; }
     .bill-qr-cap { font-size: 8px; line-height: 1.1; margin-top: 1px; }
@@ -275,7 +275,7 @@
         .bill-copy tr, .bill-copy .bill-block, .bill-copy table { page-break-inside: avoid; break-inside: avoid; }
         /* Slightly tighter type/padding so it never spills to a 2nd page */
         .bill-org .org-name { font-size: 15px; }
-        .bill-title { font-size: 18px; padding-top: 4px; }
+        .bill-title { font-size: 18px; padding-top: 0; }
         .bill-copy .kv { font-size: 12px; }
         .bill-table th, .bill-table td { padding: 2px 5px; font-size: 12px; }
     }

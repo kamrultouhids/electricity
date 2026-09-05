@@ -67,8 +67,6 @@ class CustomerController extends Controller
             ->when($term !== '', function ($q) use ($term) {
                 $q->where(function ($sub) use ($term) {
                     $sub->where('name', 'like', "%{$term}%")
-                        ->orWhere('mobile_number', 'like', "%{$term}%")
-                        ->orWhere('meter_number', 'like', "%{$term}%")
                         ->orWhere('serial_no', 'like', "%{$term}%");
                 });
             })
