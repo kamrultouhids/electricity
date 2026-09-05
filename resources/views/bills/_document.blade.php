@@ -250,8 +250,10 @@
     .bill-table { border-color: #000 !important; }
     .bill-table th, .bill-table td { border-color: #000 !important; }
     @media print {
-        @page { size: A4 portrait; margin: 8mm; }
+        /* Zero page margin so the browser drops its own header/footer. */
+        @page { size: A4 portrait; margin: 0; }
         html, body { height: auto; }
+        body { padding: 8mm !important; }
         .no-print { display: none !important; }
         .navbar, nav { display: none !important; }
         /* Strip app chrome/spacing so only the bill prints */

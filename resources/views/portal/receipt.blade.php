@@ -85,6 +85,10 @@
     .receipt-copy .kv > span::after { content: ' :'; }
     .receipt-table th, .receipt-table td { padding: 4px 8px; font-size: 13px; border-color: #000 !important; }
     @media print {
+        /* Zero page margin so the browser drops its own header/footer
+           (date, title, page URL). The paper margin moves onto the body. */
+        @page { size: A4 portrait; margin: 0; }
+        body { padding: 12mm !important; }
         .no-print { display: none !important; }
         .navbar, nav { display: none !important; }
     }

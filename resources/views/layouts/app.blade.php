@@ -195,7 +195,10 @@
         .list-card tbody td { font-size: 14px; }
 
         @media print {
-            body { background: #fff !important; }
+            /* Zero page margin so the browser drops its own header/footer
+               (date, title, page URL). The paper margin moves onto the body. */
+            @page { size: A4 portrait; margin: 0; }
+            body { background: #fff !important; padding: 12mm !important; }
             .no-print { display: none !important; }
             .navbar, nav { display: none !important; }
 

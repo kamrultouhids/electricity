@@ -119,8 +119,12 @@
 @push('styles')
 <style>
     @media print {
-        @page { size: A4 portrait; margin: 12mm; }
-        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        /* Zero page margin so the browser drops its own header/footer. */
+        @page { size: A4 portrait; margin: 0; }
+        body {
+            -webkit-print-color-adjust: exact; print-color-adjust: exact;
+            padding: 12mm !important;
+        }
         .navbar, nav, .no-print { display: none !important; }
         main.py-4 { padding: 0 !important; }
         .container { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
