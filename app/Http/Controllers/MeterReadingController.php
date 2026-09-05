@@ -28,6 +28,7 @@ class MeterReadingController extends Controller
                 $q->where('serial_no', 'like', "%{$search}%")
                     ->orWhere('name', 'like', "%{$search}%")
                     ->orWhere('mobile_number', 'like', "%{$search}%")
+                    ->orWhere('serial_no', 'like', "%{$search}%")
                     ->orWhere('meter_number', 'like', "%{$search}%");
             });
         }
@@ -154,7 +155,7 @@ class MeterReadingController extends Controller
 
         MeterReading::create($data);
 
-        return redirect()->route('meter-readings.index')
+        return redirect()->back()
             ->with('success', 'Meter reading added successfully!');
     }
 
@@ -439,7 +440,7 @@ class MeterReadingController extends Controller
 
         $meterReading->update($data);
 
-        return redirect()->route('meter-readings.index')
+        return redirect()->back()
             ->with('success', 'Meter reading updated successfully!');
     }
 

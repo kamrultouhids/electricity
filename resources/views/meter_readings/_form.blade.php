@@ -10,6 +10,23 @@
     </div>
 @endif
 
+@if (session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+    @if (session('import_errors'))
+        <div class="alert alert-warning">
+            <div class="fw-semibold mb-1">Some rows were skipped:</div>
+            <ul class="mb-0 small">
+                @foreach (session('import_errors') as $err)
+                    <li>{{ $err }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
 @php $meterReading = $meterReading ?? null; @endphp
 
 @php
@@ -26,7 +43,7 @@
         @if ($meterReading)
             {{-- Locked on edit: the previous/current chain must stay tied to one customer --}}
             <input type="text" class="form-control"
-                   value="{{ $meterReading->customer->name }} ({{ $meterReading->customer->meter_number }})" readonly>
+                   value="{{ $meterReading->customer->serial_no ? $meterReading->customer->name.' ('.$meterReading->customer->serial_no.')' : $meterReading->customer->name }}" readonly>
             <input type="hidden" name="customer_id" value="{{ $meterReading->customer_id }}">
         @else
             <select name="customer_id" id="customerSelect" class="form-select" required>
@@ -34,7 +51,7 @@
                 @if ($selectedCustomer)
                     <option value="{{ $selectedCustomer->id }}"
                             data-last="{{ $selectedCustomer->latestMeterReading->current_reading ?? 0 }}" selected>
-                        {{ $selectedCustomer->name }} ({{ $selectedCustomer->meter_number }})
+                        {{ $selectedCustomer->serial_no ? $selectedCustomer->name.' ('.$selectedCustomer->serial_no.')' : $selectedCustomer->name }}
                     </option>
                 @endif
             </select>
@@ -163,8 +180,8 @@
                 valueField: 'id',
                 labelField: 'text',
                 searchField: 'text',
-                placeholder: 'Search by name, mobile or meter no…',
-                // Results are already filtered server-side (incl. mobile/meter which
+                placeholder: 'Search by name, mobile or serial no…',
+                // Results are already filtered server-side (incl. mobile/serial which
                 // aren't in the label) — keep every loaded option, don't re-filter.
                 score: function () { return function () { return 1; }; },
                 load: function (query, callback) {
