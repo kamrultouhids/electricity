@@ -41,7 +41,6 @@
         <div class="org-slogan">&ldquo;বিদ্যুৎ জাতীয় সম্পদ অপচয় রোধে এগিয়ে আসুন, অবৈধ সংযোগ থেকে বিরত থাকুন&rdquo;</div>
         <div class="org-name">চট্টগ্রাম মহানগর ছিন্নমূল বস্তিবাসি সমন্বয় সংগ্রাম পরিষদ</div>
         <div class="org-addr">পরিচালনায়ঃ জঙ্গল সলিমপুর বিদ্যুৎ গ্রাহক ফোরাম, ডাকঘরঃ জাফরাবাদ, থানাঃ সিতাকুণ্ড, চট্টগ্রাম।</div>
-        <div class="org-dept">বিদ্যুৎ বিতরন বিভাগ</div>
     </div>
 
     {{-- Header --}}
@@ -58,9 +57,6 @@
             <div class="kv boxed"><span>গ্রাহকের নাম</span><b>{{ $customer->name }}</b></div>
             <div class="kv boxed"><span>পিতা/স্বামীর নাম</span><b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
             <div class="kv boxed"><span>ঠিকানা</span><b>{{ $customer->address ?? '—' }}</b></div>
-            @if (filled($customer->meter_number))
-                <div class="kv boxed"><span>মিটার নং</span><b>{{ $customer->meter_number }}</b></div>
-            @endif
             @if (filled($customer->mobile_number))
                 <div class="kv boxed"><span>মোবাইল নং</span><b>{{ $customer->mobile_number }}</b></div>
             @endif
@@ -198,9 +194,6 @@
             <div class="kv"><span>গ্রাহকের নাম</span><b>{{ $customer->name }}</b></div>
             <div class="kv"><span>পিতা/স্বামীর নাম</span><b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
             <div class="kv"><span>ঠিকানা</span><b>{{ $customer->address ?? '—' }}</b></div>
-            @if (filled($customer->meter_number))
-                <div class="kv"><span>মিটার নং</span><b>{{ $customer->meter_number }}</b></div>
-            @endif
         </div>
         <div class="col-6 p-2">
             @if (filled($customer->mobile_number))
@@ -228,7 +221,6 @@
     .bill-org .org-slogan { font-size: 13px; font-weight: 700; }
     .bill-org .org-name { font-size: 17px; font-weight: 700; }
     .bill-org .org-addr { font-size: 12px; }
-    .bill-org .org-dept { font-size: 13px; }
     .bill-title { font-size: 20px; font-weight: 700; padding: 8px 0 0; }
     .bill-cut {
         position: relative;
