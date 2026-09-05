@@ -10,6 +10,24 @@
     </div>
 @endif
 
+
+@if (session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+    @if (session('import_errors'))
+        <div class="alert alert-warning">
+            <div class="fw-semibold mb-1">Some rows were skipped:</div>
+            <ul class="mb-0 small">
+                @foreach (session('import_errors') as $err)
+                    <li>{{ $err }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
 @php $category = $category ?? null; @endphp
 
 <div class="row g-3">

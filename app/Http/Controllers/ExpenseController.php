@@ -57,7 +57,7 @@ class ExpenseController extends Controller
 
         Expense::create($data);
 
-        return redirect()->route('expenses.index')
+        return redirect()->back()
             ->with('success', 'Expense added successfully!');
     }
 
@@ -76,7 +76,7 @@ class ExpenseController extends Controller
 
         $expense->update($data);
 
-        return redirect()->route('expenses.index')
+        return redirect()->back()
             ->with('success', 'Expense updated successfully!');
     }
 

@@ -33,7 +33,6 @@
                     </button>
                 </form>
             @endif
-            <a href="{{ route('bills.index') }}" class="btn btn-outline-secondary"><i class="bi bi-receipt me-1"></i>Generated Bills</a>
         </div>
     </div>
 

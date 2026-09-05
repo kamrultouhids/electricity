@@ -27,7 +27,7 @@ class ExpenseCategoryController extends Controller
 
         ExpenseCategory::create($data);
 
-        return redirect()->route('expense-categories.index')
+        return redirect()->back()
             ->with('success', 'Expense category added successfully!');
     }
 
@@ -43,7 +43,7 @@ class ExpenseCategoryController extends Controller
 
         $expenseCategory->update($data);
 
-        return redirect()->route('expense-categories.index')
+        return redirect()->back()
             ->with('success', 'Expense category updated successfully!');
     }
 

@@ -10,7 +10,10 @@
             Expenses
             <span class="badge bg-primary px-1 py-0 small">{{ $expenses->total() }}</span>
         </h5>
-        <a href="{{ route('expenses.create') }}" class="btn btn-primary text-white"><i class="bi bi-plus-lg me-1"></i>Add Expense</a>
+        <div class="d-flex gap-2 no-print">
+            @include('reports._actions')
+            <a href="{{ route('expenses.create') }}" class="btn btn-primary text-white"><i class="bi bi-plus-lg me-1"></i>Add Expense</a>
+        </div>
     </div>
 
     @if (session('success'))
@@ -21,7 +24,7 @@
     @endif
 
     {{-- Filters --}}
-    <div class="card mb-3">
+    <div class="card mb-3 no-print">
         <div class="card-body">
             <form method="GET" action="{{ route('expenses.index') }}" class="row g-2 align-items-end">
                 <div class="col-md-3">
@@ -67,7 +70,7 @@
                         <th>Note</th>
                         <th>Added By</th>
                         <th class="text-end">Amount</th>
-                        <th class="text-end" width="200">Actions</th>
+                        <th class="text-end no-print" width="200">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -79,7 +82,7 @@
                             <td>{{ $expense->note ?? '—' }}</td>
                             <td>{{ $expense->createdBy->name ?? '—' }}</td>
                             <td class="text-end">{{ number_format($expense->amount, 2) }}</td>
-                            <td class="text-end" width="200">
+                            <td class="text-end no-print" width="200">
                                <a href="{{ route('expenses.edit', $expense) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil-square me-1"></i>Edit</a>
                                     <a href="{{ route('expenses.delete', $expense) }}" class="btn btn-sm btn-outline-danger"
                                        onclick="return confirm('Delete this expense?');"><i class="bi bi-trash me-1"></i>Delete</a>
@@ -96,7 +99,7 @@
                         <tr class="fw-bold table-light">
                             <td colspan="5" class="text-end">Total (filtered)</td>
                             <td class="text-end">{{ number_format($total, 2) }}</td>
-                            <td></td>
+                            <td class="no-print"></td>
                         </tr>
                     </tfoot>
                 @endif
@@ -104,7 +107,7 @@
         </div>
     </div>
 
-    <div class="mt-3 d-flex justify-content-center">
+    <div class="mt-3 d-flex justify-content-center no-print">
         {{ $expenses->links() }}
     </div>
 </div>
