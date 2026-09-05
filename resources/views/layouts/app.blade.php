@@ -54,6 +54,80 @@
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,0.85)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
         }
 
+        /* ===== Mobile menu (slide-in panel below md) ===== */
+        @media (max-width: 767.98px) {
+            .navbar .offcanvas {
+                background-color: var(--app-nav-bg);
+                width: min(86vw, 340px);
+                border-left: 0;
+            }
+            .navbar .offcanvas-header {
+                border-bottom: 1px solid rgba(255,255,255,.14);
+                padding: 1rem 1.25rem;
+            }
+            .navbar .offcanvas-title { color: #fff; font-weight: 700; }
+            .navbar .offcanvas-body { padding: .75rem 1rem 1.5rem; }
+
+            /* Roomier tap targets, and a clear press state on a dark panel. */
+            .navbar .offcanvas .nav-link {
+                padding: .7rem .75rem;
+                border-radius: .6rem;
+                font-size: 1rem;
+            }
+            .navbar .offcanvas .nav-link:hover,
+            .navbar .offcanvas .nav-link:focus,
+            .navbar .offcanvas .nav-link[aria-expanded="true"] {
+                background-color: rgba(255,255,255,.08);
+            }
+            .navbar .offcanvas .nav-link.active {
+                background-color: rgba(255,255,255,.16);
+            }
+            /* The caret sits at the far edge so the whole row reads as one control. */
+            .navbar .offcanvas .nav-link.dropdown-toggle {
+                display: flex;
+                align-items: center;
+            }
+            .navbar .offcanvas .nav-link.dropdown-toggle::after {
+                margin-left: auto;
+                transition: transform .18s ease;
+            }
+            .navbar .offcanvas .nav-link.dropdown-toggle[aria-expanded="true"]::after {
+                transform: rotate(180deg);
+            }
+
+            /* Submenu reads as a nested group, not a floating card. */
+            .navbar .offcanvas .dropdown-menu {
+                background-color: transparent;
+                border: 0;
+                box-shadow: none;
+                padding: .15rem 0 .35rem;
+                margin: 0 0 .25rem;
+                border-left: 2px solid rgba(255,255,255,.16);
+                margin-left: 1.15rem;
+            }
+            .navbar .offcanvas .dropdown-item {
+                color: rgba(255,255,255,.75);
+                padding: .6rem .85rem;
+                margin: .1rem .35rem;
+                border-radius: .5rem;
+                white-space: normal;
+            }
+            .navbar .offcanvas .dropdown-item:hover,
+            .navbar .offcanvas .dropdown-item:focus {
+                background-color: rgba(255,255,255,.08);
+                color: #fff;
+            }
+            .navbar .offcanvas .dropdown-item.active,
+            .navbar .offcanvas .dropdown-item:active {
+                background-color: rgba(255,255,255,.18);
+                color: #fff;
+            }
+            .navbar .offcanvas .dropdown-divider {
+                border-top-color: rgba(255,255,255,.16);
+                margin: .5rem .85rem;
+            }
+        }
+
         /* ===== Primary button ===== */
         .btn-primary {
             background-color: #3061B3 !important;
@@ -156,11 +230,17 @@
                 <a class="navbar-brand" href="{{ url('/') }}">
                     {{ config('app.name', 'Laravel') }}
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
+                {{-- Below md the menu is a slide-in panel; from md up it is the ordinary inline navbar. --}}
+                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <div class="offcanvas offcanvas-end offcanvas-md" tabindex="-1" id="navbarSupportedContent" aria-labelledby="navbarSupportedContentLabel">
+                    <div class="offcanvas-header d-md-none">
+                        <h5 class="offcanvas-title" id="navbarSupportedContentLabel">{{ config('app.name', 'Laravel') }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#navbarSupportedContent" aria-label="{{ __('Close') }}"></button>
+                    </div>
+                    <div class="offcanvas-body">
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav me-auto">
 
@@ -256,6 +336,7 @@
                             </li>
                         @endguest
                     </ul>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -294,6 +375,34 @@
                     input.type = show ? 'text' : 'password';
                     btn.innerHTML = show ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
                     btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+                });
+            });
+        });
+
+        // Mobile menu: open the panel already showing the section the current
+        // page lives in, so the user isn't hunting for it behind a tap.
+        document.addEventListener('DOMContentLoaded', function () {
+            var panel = document.getElementById('navbarSupportedContent');
+            if (! panel) return;
+
+            panel.addEventListener('show.bs.offcanvas', function () {
+                var current = panel.querySelector('.dropdown-item.active');
+                if (! current) return;
+
+                var menu = current.closest('.dropdown-menu');
+                var toggle = menu && menu.parentElement.querySelector('.dropdown-toggle');
+                if (! menu || ! toggle) return;
+
+                menu.classList.add('show');
+                toggle.classList.add('show');
+                toggle.setAttribute('aria-expanded', 'true');
+            });
+
+            // Leave the desktop navbar as it was — those menus float on hover/click.
+            panel.addEventListener('hidden.bs.offcanvas', function () {
+                panel.querySelectorAll('.dropdown-menu.show, .dropdown-toggle.show').forEach(function (el) {
+                    el.classList.remove('show');
+                    if (el.classList.contains('dropdown-toggle')) el.setAttribute('aria-expanded', 'false');
                 });
             });
         });
