@@ -13,6 +13,21 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReportController extends Controller
 {
+    /** Rows-per-page choices offered on the paginated reports. */
+    public const PER_PAGE_OPTIONS = [20, 50, 100, 200, 500, 1000];
+
+    /**
+     * Rows per page, restricted to the offered choices.
+     */
+    protected function perPage(Request $request): int
+    {
+        $perPage = (int) $request->input('per_page', self::PER_PAGE_OPTIONS[0]);
+
+        return in_array($perPage, self::PER_PAGE_OPTIONS, true)
+            ? $perPage
+            : self::PER_PAGE_OPTIONS[0];
+    }
+
     /**
      * Reports landing page.
      */
@@ -337,10 +352,14 @@ class ReportController extends Controller
             );
         }
 
+        $perPage = $this->perPage($request);
+
         return view('reports.outstanding', [
-            'bills'  => $query->paginate(20)->withQueryString(),
-            'sheets' => Sheet::orderBy('id')->get(),
-            'total'  => (float) (clone $query)->sum('bills.due_amount'),
+            'bills'          => $query->paginate($perPage)->withQueryString(),
+            'sheets'         => Sheet::orderBy('id')->get(),
+            'total'          => (float) (clone $query)->sum('bills.due_amount'),
+            'perPage'        => $perPage,
+            'perPageOptions' => self::PER_PAGE_OPTIONS,
         ]);
     }
 

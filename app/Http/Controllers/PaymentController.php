@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 class PaymentController extends Controller
 {
     /** Rows-per-page choices offered on the payments list. */
-    public const PER_PAGE_OPTIONS = [15, 25, 50, 100];
+    public const PER_PAGE_OPTIONS = [20, 50, 100, 200, 500, 1000];
 
     /**
      * Customers with outstanding due (based on their latest bill, which already
