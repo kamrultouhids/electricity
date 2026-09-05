@@ -17,6 +17,8 @@
         @page { size: A4 portrait; margin: 0; }
         body {
             -webkit-print-color-adjust: exact; print-color-adjust: exact;
+            box-sizing: border-box !important;
+            width: auto !important;
             padding: 12mm !important;
         }
         .navbar, nav, .no-print { display: none !important; }
@@ -37,6 +39,17 @@
             border: 1px solid #444 !important;
             padding: 4px 6px !important;
         }
+        /* A wide report (Customer Report carries ten columns) must fold to fit
+           the page instead of running past the right margin. Long headings may
+           wrap mid-word; the money columns stay on one line. */
+        table.table { max-width: 100% !important; }
+        table.table th, table.table td {
+            white-space: normal !important;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+        table.table td.text-end { white-space: nowrap !important; }
+
         table.table thead { display: table-header-group; }
         table.table tfoot { display: table-footer-group; }
         table.table tr, table.table td, table.table th { page-break-inside: avoid; }

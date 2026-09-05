@@ -123,6 +123,8 @@
         @page { size: A4 portrait; margin: 0; }
         body {
             -webkit-print-color-adjust: exact; print-color-adjust: exact;
+            box-sizing: border-box !important;
+            width: auto !important;
             padding: 12mm !important;
         }
         .navbar, nav, .no-print { display: none !important; }

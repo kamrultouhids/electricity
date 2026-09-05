@@ -253,7 +253,7 @@
         /* Zero page margin so the browser drops its own header/footer. */
         @page { size: A4 portrait; margin: 0; }
         html, body { height: auto; }
-        body { padding: 8mm !important; }
+        body { box-sizing: border-box !important; width: auto !important; padding: 8mm !important; }
         .no-print { display: none !important; }
         .navbar, nav { display: none !important; }
         /* Strip app chrome/spacing so only the bill prints */
