@@ -27,8 +27,8 @@
     @endif
 
     <div class="alert alert-warning">
-        Correcting the reading rewrites this bill's units and charges. The tariff rates, carried balance
-        and previous-months history stay exactly as issued.
+        Correcting the readings or the carried balance rewrites this bill's units, late fee and charges.
+        The tariff rates and previous-months history stay exactly as issued.
     </div>
 
     <form method="POST" action="{{ route('bills.revise.store', $bill) }}">
@@ -58,15 +58,24 @@
                                 <div>{{ $reading->reading_date->format('d M Y') }}</div>
                             </div>
                             <div class="col-6">
-                                <label class="form-label mb-1">Previous Reading</label>
-                                <input type="text" class="form-control" value="{{ number_format($previous, 2) }}" disabled>
-                                <small class="text-muted">Fixed — carried from the last reading.</small>
+                                <label class="form-label mb-1">Previous Reading <span class="text-danger">*</span></label>
+                                <input type="number" step="0.01" min="0" name="previous_reading" id="previous_reading"
+                                       class="form-control" required
+                                       value="{{ old('previous_reading', $previous) }}">
+                                <small class="text-muted">Carried from the last reading — correct it if it was wrong.</small>
                             </div>
                             <div class="col-6">
                                 <label class="form-label mb-1">Current Reading <span class="text-danger">*</span></label>
-                                <input type="number" step="0.01" min="{{ $previous }}" name="current_reading" id="current_reading"
+                                <input type="number" step="0.01" min="0" name="current_reading" id="current_reading"
                                        class="form-control" required autofocus
                                        value="{{ old('current_reading', $reading->current_reading) }}">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label mb-1">Previous Outstanding <span class="text-danger">*</span></label>
+                                <input type="number" step="0.01" min="0" name="previous_outstanding" id="previous_outstanding"
+                                       class="form-control" required
+                                       value="{{ old('previous_outstanding', $bill->previous_outstanding) }}">
+                                <small class="text-muted">The late fee is recalculated from this.</small>
                             </div>
                             <div class="col-12">
                                 <label class="form-label mb-1">Reason <span class="text-danger">*</span></label>
@@ -119,17 +128,13 @@
                                     </tr>
                                     <tr>
                                         <td>Previous Outstanding</td>
-                                        <td class="text-end text-muted" colspan="2">
-                                            {{ number_format($bill->previous_outstanding, 2) }}
-                                            <span class="badge bg-light text-muted border ms-1">unchanged</span>
-                                        </td>
+                                        <td class="text-end text-muted">{{ number_format($bill->previous_outstanding, 2) }}</td>
+                                        <td class="text-end fw-semibold" id="new_outstanding">—</td>
                                     </tr>
                                     <tr>
-                                        <td>Late Fee</td>
-                                        <td class="text-end text-muted" colspan="2">
-                                            {{ number_format($bill->late_fee, 2) }}
-                                            <span class="badge bg-light text-muted border ms-1">unchanged</span>
-                                        </td>
+                                        <td>Late Fee <small class="text-muted">on the outstanding</small></td>
+                                        <td class="text-end text-muted">{{ number_format($bill->late_fee, 2) }}</td>
+                                        <td class="text-end fw-semibold" id="new_late_fee">—</td>
                                     </tr>
                                     <tr class="fw-bold table-light">
                                         <td>Total</td>
@@ -162,8 +167,11 @@
                     <thead class="list-head">
                         <tr>
                             <th>#</th>
+                            <th>Prev. Reading</th>
                             <th>Reading</th>
                             <th>Units</th>
+                            <th>Outstanding</th>
+                            <th>Late Fee</th>
                             <th>Total</th>
                             <th>Reason</th>
                             <th>Revised By</th>
@@ -174,8 +182,11 @@
                         @foreach ($bill->revisions as $revision)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
+                                <td class="text-nowrap">{{ number_format($revision->old_previous_reading, 2) }} <i class="bi bi-arrow-right mx-1"></i> {{ number_format($revision->new_previous_reading, 2) }}</td>
                                 <td class="text-nowrap">{{ number_format($revision->old_current_reading, 2) }} <i class="bi bi-arrow-right mx-1"></i> {{ number_format($revision->new_current_reading, 2) }}</td>
                                 <td class="text-nowrap">{{ number_format($revision->old_units, 2) }} <i class="bi bi-arrow-right mx-1"></i> {{ number_format($revision->new_units, 2) }}</td>
+                                <td class="text-nowrap">{{ number_format($revision->old_previous_outstanding, 2) }} <i class="bi bi-arrow-right mx-1"></i> {{ number_format($revision->new_previous_outstanding, 2) }}</td>
+                                <td class="text-nowrap">{{ number_format($revision->old_late_fee, 2) }} <i class="bi bi-arrow-right mx-1"></i> {{ number_format($revision->new_late_fee, 2) }}</td>
                                 <td class="text-nowrap">{{ number_format($revision->old_total_amount, 2) }} <i class="bi bi-arrow-right mx-1"></i> {{ number_format($revision->new_total_amount, 2) }}</td>
                                 <td>{{ $revision->reason }}</td>
                                 <td>{{ $revision->changedBy->name ?? '—' }}</td>
@@ -193,37 +204,54 @@
 @push('scripts')
 <script>
     // Mirrors BillCalculator: energy charge floors at the connection minimum,
-    // duty is a percentage of it, and the rest of the bill is untouched.
-    const previous   = {{ (float) $previous }};
+    // duty is a percentage of it, the late fee is charged on the outstanding,
+    // and the rest of the bill is untouched.
     const rate       = {{ (float) $bill->per_unit_rate }};
     const minCharge  = {{ (float) $minimumCharge }};
     const dutyRate   = {{ (float) $bill->electricity_duty_rate }};
-    const fixedParts = {{ (float) $bill->line_charge + (float) $bill->service_charge + (float) $bill->demand_charge + (float) $bill->fixed_charge + (float) $bill->meter_rent + (float) $bill->previous_outstanding + (float) $bill->late_fee }};
+    const fixedParts = {{ (float) $bill->line_charge + (float) $bill->service_charge + (float) $bill->demand_charge + (float) $bill->fixed_charge + (float) $bill->meter_rent }};
+    const flatLimit  = {{ \App\Services\BillCalculator::OUTSTANDING_FLAT_LIMIT }};
+    const flatFee    = {{ \App\Services\BillCalculator::OUTSTANDING_FLAT_FEE }};
+    const percentFee = {{ \App\Services\BillCalculator::OUTSTANDING_PERCENT }};
 
-    const input = document.getElementById('current_reading');
+    const previousInput    = document.getElementById('previous_reading');
+    const currentInput     = document.getElementById('current_reading');
+    const outstandingInput = document.getElementById('previous_outstanding');
     const money = (v) => v.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-    function recalc() {
-        const current = parseFloat(input.value);
-        const targets = ['new_units', 'new_energy', 'new_duty', 'new_total'];
+    // BillCalculator::lateFee — flat up to the limit, a percentage above it.
+    function lateFeeOn(outstanding) {
+        if (outstanding <= 0) return 0;
+        if (outstanding <= flatLimit) return flatFee;
+        return Math.round(outstanding * percentFee * 100) / 100;
+    }
 
-        if (isNaN(current) || current < previous) {
+    function recalc() {
+        const previous    = parseFloat(previousInput.value);
+        const current     = parseFloat(currentInput.value);
+        const outstanding = parseFloat(outstandingInput.value);
+        const targets = ['new_units', 'new_energy', 'new_duty', 'new_outstanding', 'new_late_fee', 'new_total'];
+
+        if (isNaN(previous) || isNaN(current) || isNaN(outstanding) || current < previous || outstanding < 0) {
             targets.forEach(id => document.getElementById(id).textContent = '—');
             return;
         }
 
-        const units  = Math.round((current - previous) * 100) / 100;
-        const energy = Math.round(Math.max(minCharge, Math.max(0, units) * rate) * 100) / 100;
-        const duty   = dutyRate > 0 ? Math.round(energy * dutyRate) / 100 : 0;
-        const total  = Math.round((energy + duty + fixedParts) * 100) / 100;
+        const units   = Math.round((current - previous) * 100) / 100;
+        const energy  = Math.round(Math.max(minCharge, Math.max(0, units) * rate) * 100) / 100;
+        const duty    = dutyRate > 0 ? Math.round(energy * dutyRate) / 100 : 0;
+        const lateFee = lateFeeOn(outstanding);
+        const total   = Math.round((energy + duty + fixedParts + outstanding + lateFee) * 100) / 100;
 
-        document.getElementById('new_units').textContent  = money(units);
-        document.getElementById('new_energy').textContent = money(energy);
-        document.getElementById('new_duty').textContent   = money(duty);
-        document.getElementById('new_total').textContent  = money(total);
+        document.getElementById('new_units').textContent       = money(units);
+        document.getElementById('new_energy').textContent      = money(energy);
+        document.getElementById('new_duty').textContent        = money(duty);
+        document.getElementById('new_outstanding').textContent = money(outstanding);
+        document.getElementById('new_late_fee').textContent    = money(lateFee);
+        document.getElementById('new_total').textContent       = money(total);
     }
 
-    input.addEventListener('input', recalc);
+    [previousInput, currentInput, outstandingInput].forEach(el => el.addEventListener('input', recalc));
     recalc();
 </script>
 @endpush

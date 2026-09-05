@@ -82,18 +82,19 @@ class BillGenerator
     }
 
     /**
-     * Recalculate a bill from a corrected current reading.
+     * Recalculate a bill from corrected readings and a corrected carried balance.
      *
-     * The bill's own tariff snapshot, carried balance and frozen history are
-     * kept — only what the reading drives is recomputed, so a units correction
-     * can never smuggle in a later tariff change or re-derive a carried balance
-     * that has since been settled.
+     * The bill's own tariff snapshot and frozen history are kept — only what the
+     * readings and the carried balance drive is recomputed, so a correction can
+     * never smuggle in a later tariff change. The late fee is re-derived from
+     * the corrected balance, since the penalty is charged on it.
      *
-     * @return array{units: float, energy_charge: float, electricity_duty: float, total_amount: float, due_amount: float, status: int}
+     * @return array{units: float, energy_charge: float, electricity_duty: float, late_fee: float, total_amount: float, due_amount: float, status: int}
      */
-    public function reviseData(Bill $bill, float $currentReading, float $previousReading): array
+    public function reviseData(Bill $bill, float $currentReading, float $previousReading, ?float $previousOutstanding = null): array
     {
         $units = round($currentReading - $previousReading, 2);
+        $previousOutstanding = round($previousOutstanding ?? (float) $bill->previous_outstanding, 2);
 
         $computed = $this->calculator->compute([
             'connection_type'       => $bill->customer->connection_type,
@@ -105,69 +106,87 @@ class BillGenerator
             'electricity_duty_rate' => (float) $bill->electricity_duty_rate,
             'fixed_charge'          => (float) $bill->fixed_charge,
             'meter_rent'            => (float) $bill->meter_rent,
-            // Preserved, so compute() reproduces the same late fee it derived
-            // from it when the bill was issued — including the suppression when
-            // the balance was carried in from the old system.
-            'previous_outstanding'  => (float) $bill->previous_outstanding,
+            // The carried balance as corrected here — the late fee is charged
+            // on it, so both move together.
+            'previous_outstanding'  => $previousOutstanding,
             'late_fee_basis'        => $this->lateFeeBasis(
-                (float) $bill->previous_outstanding,
+                $previousOutstanding,
                 $this->previousBill($bill->customer_id, $bill->billing_month->toDateString()),
             ),
             'paid_amount'           => (float) $bill->paid_amount,
         ]);
 
         return [
-            'units'            => $units,
-            'energy_charge'    => $computed['energy_charge'],
-            'electricity_duty' => $computed['electricity_duty'],
-            'late_fee'         => $computed['late_fee'],
-            'total_amount'     => $computed['total_amount'],
-            'due_amount'       => $computed['due_amount'],
-            'status'           => $computed['status'],
+            'units'                => $units,
+            'previous_outstanding' => $previousOutstanding,
+            'energy_charge'        => $computed['energy_charge'],
+            'electricity_duty'     => $computed['electricity_duty'],
+            'late_fee'             => $computed['late_fee'],
+            'total_amount'         => $computed['total_amount'],
+            'due_amount'           => $computed['due_amount'],
+            'status'               => $computed['status'],
         ];
     }
 
     /**
-     * Apply a corrected reading to its bill and log the revision.
+     * Apply corrected readings and a corrected carried balance to a bill and
+     * log the revision. Passing null for either previous value keeps what the
+     * bill already carries.
      */
-    public function revise(Bill $bill, float $currentReading, string $reason, ?int $userId = null): BillRevision
-    {
-        return DB::transaction(function () use ($bill, $currentReading, $reason, $userId) {
+    public function revise(
+        Bill $bill,
+        float $currentReading,
+        string $reason,
+        ?int $userId = null,
+        ?float $previousReading = null,
+        ?float $previousOutstanding = null,
+    ): BillRevision {
+        return DB::transaction(function () use ($bill, $currentReading, $reason, $userId, $previousReading, $previousOutstanding) {
             $bill = Bill::query()->with('customer', 'meterReading')->lockForUpdate()->findOrFail($bill->id);
             $reading = $bill->meterReading;
 
-            $revised = $this->reviseData($bill, $currentReading, (float) $reading->previous_reading);
+            $newPrevious = round($previousReading ?? (float) $reading->previous_reading, 2);
+
+            $revised = $this->reviseData($bill, $currentReading, $newPrevious, $previousOutstanding);
 
             $revision = BillRevision::create([
-                'bill_id'             => $bill->id,
-                'meter_reading_id'    => $reading->id,
-                'old_current_reading' => (float) $reading->current_reading,
-                'new_current_reading' => $currentReading,
-                'old_units'           => (float) $bill->units,
-                'new_units'           => $revised['units'],
-                'old_total_amount'    => (float) $bill->total_amount,
-                'new_total_amount'    => $revised['total_amount'],
-                'old_due_amount'      => (float) $bill->due_amount,
-                'new_due_amount'      => $revised['due_amount'],
-                'reason'              => $reason,
-                'changed_by'          => $userId,
+                'bill_id'                  => $bill->id,
+                'meter_reading_id'         => $reading->id,
+                'old_previous_reading'     => (float) $reading->previous_reading,
+                'new_previous_reading'     => $newPrevious,
+                'old_current_reading'      => (float) $reading->current_reading,
+                'new_current_reading'      => $currentReading,
+                'old_units'                => (float) $bill->units,
+                'new_units'                => $revised['units'],
+                'old_previous_outstanding' => (float) $bill->previous_outstanding,
+                'new_previous_outstanding' => $revised['previous_outstanding'],
+                'old_late_fee'             => (float) $bill->late_fee,
+                'new_late_fee'             => $revised['late_fee'],
+                'old_total_amount'         => (float) $bill->total_amount,
+                'new_total_amount'         => $revised['total_amount'],
+                'old_due_amount'           => (float) $bill->due_amount,
+                'new_due_amount'           => $revised['due_amount'],
+                'reason'                   => $reason,
+                'changed_by'               => $userId,
             ]);
 
             $reading->update([
-                'current_reading' => $currentReading,
-                'consumed_units'  => $revised['units'],
-                'updated_by'      => $userId,
+                'previous_reading' => $newPrevious,
+                'current_reading'  => $currentReading,
+                'consumed_units'   => $revised['units'],
+                'updated_by'       => $userId,
             ]);
 
             $bill->update([
-                'units'            => $revised['units'],
-                'energy_charge'    => $revised['energy_charge'],
-                'electricity_duty' => $revised['electricity_duty'],
-                'late_fee'         => $revised['late_fee'],
-                'total_amount'     => $revised['total_amount'],
-                'due_amount'       => $revised['due_amount'],
-                'status'           => $revised['status'],
-                'updated_by'       => $userId,
+                'units'                => $revised['units'],
+                'energy_charge'        => $revised['energy_charge'],
+                'electricity_duty'     => $revised['electricity_duty'],
+                'previous_outstanding' => $revised['previous_outstanding'],
+                'late_fee'             => $revised['late_fee'],
+                'total_amount'         => $revised['total_amount'],
+                'due_amount'           => $revised['due_amount'],
+                'status'               => $revised['status'],
+                'updated_by'           => $userId,
             ]);
 
             return $revision;

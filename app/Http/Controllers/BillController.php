@@ -337,12 +337,15 @@ class BillController extends Controller
         }
 
         $data = $request->validate([
-            'current_reading' => 'required|numeric|min:0',
-            'reason'          => 'required|string|max:255',
+            'previous_reading'     => 'required|numeric|min:0',
+            'current_reading'      => 'required|numeric|min:0',
+            'previous_outstanding' => 'required|numeric|min:0',
+            'reason'               => 'required|string|max:255',
         ]);
 
-        $previous = (float) $bill->meterReading->previous_reading;
+        $previous = round((float) $data['previous_reading'], 2);
         $current = round((float) $data['current_reading'], 2);
+        $outstanding = round((float) $data['previous_outstanding'], 2);
 
         if ($current < $previous) {
             return back()->withInput()->withErrors([
@@ -350,13 +353,17 @@ class BillController extends Controller
             ]);
         }
 
-        if ($current === (float) $bill->meterReading->current_reading) {
+        $unchanged = $previous === (float) $bill->meterReading->previous_reading
+            && $current === (float) $bill->meterReading->current_reading
+            && $outstanding === (float) $bill->previous_outstanding;
+
+        if ($unchanged) {
             return back()->withInput()->withErrors([
-                'current_reading' => 'That is the reading already on the bill — nothing to revise.',
+                'current_reading' => 'These are the figures already on the bill — nothing to revise.',
             ]);
         }
 
-        $generator->revise($bill, $current, $data['reason'], auth()->id());
+        $generator->revise($bill, $current, $data['reason'], auth()->id(), $previous, $outstanding);
 
         return redirect()->route('bills.show', $bill)
             ->with('success', 'Bill revised from the corrected reading. Reprint it for the customer.');
