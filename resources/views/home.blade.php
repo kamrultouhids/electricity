@@ -9,9 +9,25 @@
         <div class="alert alert-success">{{ session('status') }}</div>
     @endif
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    @php
+        // Rendered server-side: the greeting must follow the app's Asia/Dhaka
+        // clock, not whatever timezone the viewer's device happens to be set to.
+        $now = \Illuminate\Support\Carbon::now();
+    @endphp
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
         <div>
+            <div class="greet-line">{{ \App\Support\Bn::greeting($now) }}</div>
             <h4 class="mb-0 fw-semibold">Dashboard</h4>
+        </div>
+        <div class="clock-chip" role="status" aria-live="off">
+            <i class="bi bi-clock"></i>
+            <div>
+                <div class="clock-time" id="dashClock"
+                     data-epoch="{{ $now->getTimestampMs() }}"
+                     data-offset="{{ $now->utcOffset() }}">{{ \App\Support\Bn::time($now) }}</div>
+                <div class="clock-date">{{ \App\Support\Bn::fullDate($now) }}</div>
+            </div>
         </div>
     </div>
 
@@ -308,10 +324,89 @@
 
     .min-w-0 { min-width: 0; }
     .chart-box { position: relative; height: 300px; }
+
+    /* ===== Greeting + clock ===== */
+    .greet-line {
+        font-size: .95rem;
+        font-weight: 600;
+        color: #3061B3;
+        margin-bottom: .1rem;
+    }
+    .clock-chip {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        background: #fff;
+        border: 1px solid #eef0f4;
+        box-shadow: 0 1px 3px rgba(16,24,40,.05);
+        border-radius: .85rem;
+        padding: .5rem .9rem;
+    }
+    .clock-chip > i {
+        font-size: 1.05rem;
+        color: #3061B3;
+    }
+    .clock-time {
+        font-weight: 700;
+        line-height: 1.2;
+        /* Digits keep their column as the seconds tick, so nothing jitters. */
+        font-variant-numeric: tabular-nums;
+    }
+    .clock-date {
+        font-size: .78rem;
+        color: #6b7280;
+        line-height: 1.2;
+    }
+    @media (max-width: 575.98px) {
+        .clock-chip { width: 100%; }
+    }
 </style>
 @endpush
 
 @push('scripts')
+<script>
+    // The server rendered the correct time; this only advances it so the chip
+    // doesn't go stale on a page left open. The starting hour comes with it, so
+    // the day-part label stays right even if the device's clock is wrong.
+    (function () {
+        const el = document.getElementById('dashClock');
+        if (! el) return;
+
+        const digits = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+        const bn = (v) => String(v).replace(/[0-9]/g, (d) => digits[d]);
+
+        // Mirrors App\Support\Bn::DAY_PARTS — the night band wraps past midnight.
+        const parts = [
+            [4, 5, 'ভোর'], [6, 11, 'সকাল'], [12, 15, 'দুপুর'],
+            [16, 17, 'বিকাল'], [18, 19, 'সন্ধ্যা'], [20, 3, 'রাত'],
+        ];
+        const partFor = (hour) => {
+            for (const [from, to, label] of parts) {
+                const inBand = from <= to ? (hour >= from && hour <= to) : (hour >= from || hour <= to);
+                if (inBand) return label;
+            }
+            return 'দিন';
+        };
+
+        // Tick the server's clock, not the device's: start from the epoch the
+        // server rendered, add the elapsed time since load, then shift by the
+        // app timezone's offset and read the result in UTC. A device set to the
+        // wrong timezone — or the wrong time — never affects what is shown.
+        const startedAt = Date.now();
+        const serverEpoch = parseInt(el.dataset.epoch, 10);
+        const offsetMs = parseInt(el.dataset.offset, 10) * 60000;
+
+        const pad = (n) => String(n).padStart(2, '0');
+
+        setInterval(function () {
+            const at = new Date(serverEpoch + (Date.now() - startedAt) + offsetMs);
+            const h24 = at.getUTCHours();
+            const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+            el.textContent = partFor(h24) + ' '
+                + bn(pad(h12) + ':' + pad(at.getUTCMinutes()) + ':' + pad(at.getUTCSeconds()));
+        }, 1000);
+    })();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script>
     (function () {

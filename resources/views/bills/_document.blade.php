@@ -15,17 +15,11 @@
     $electricityDutyRate = $electricityDutyRate ?? 0;
     $electricityDuty = $electricityDuty ?? 0;
 
-    // Convert western digits to Bengali numerals for bill figures.
-    $bn = fn ($v) => strtr((string) $v, ['0' => '০', '1' => '১', '2' => '২', '3' => '৩', '4' => '৪', '5' => '৫', '6' => '৬', '7' => '৭', '8' => '৮', '9' => '৯']);
-
-    // Bengali Gregorian month names, keyed by month number (1-12).
-    $bnMonths = [1 => 'জানুয়ারি', 2 => 'ফেব্রুয়ারি', 3 => 'মার্চ', 4 => 'এপ্রিল', 5 => 'মে', 6 => 'জুন', 7 => 'জুলাই', 8 => 'আগস্ট', 9 => 'সেপ্টেম্বর', 10 => 'অক্টোবর', 11 => 'নভেম্বর', 12 => 'ডিসেম্বর'];
-
-    // Render a Carbon date as "মাস - বছর" in Bengali.
-    $bnMonthYear = fn ($d) => $d ? $bnMonths[$d->month] . ' - ' . $bn($d->format('Y')) : '—';
-
-    // Render a Carbon date as "দিন-মাস-বছর" in Bengali.
-    $bnDate = fn ($d) => $d ? $bn($d->format('d')) . '-' . $bnMonths[$d->month] . '-' . $bn($d->format('Y')) : '—';
+    // Bengali numerals and dates — shared with the dashboard, see App\Support\Bn.
+    $bn = fn ($v) => \App\Support\Bn::digits($v);
+    $bnMonths = \App\Support\Bn::MONTHS;
+    $bnMonthYear = fn ($d) => \App\Support\Bn::monthYear($d);
+    $bnDate = fn ($d) => \App\Support\Bn::date($d);
 @endphp
 <div class="bill-copy">
     @isset($verifyUrl)
