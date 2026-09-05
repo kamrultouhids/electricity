@@ -96,6 +96,14 @@
     <div class="col-md-4">
         <label class="form-label">Address <span class="text-danger">*</span></label>
         <textarea name="address" rows="2" class="form-control" required placeholder="Enter Address">{{ old('address', $customer->address ?? '') }}</textarea>
+        {{-- Quick picks for the সমাজ the address belongs to. Clicking one fills it
+             into the box; the rest of the address is still typed by hand. --}}
+        <div class="d-flex flex-wrap gap-1 mt-2" id="somajTags">
+            @foreach (['১ নং সমাজ', '২ নং সমাজ', '৩ নং সমাজ', '৪ নং সমাজ', '৫ নং সমাজ', '৬ নং সমাজ', '৭ নং সমাজ', '৮ নং সমাজ', '৯ নং সমাজ', '১০ নং সমাজ'] as $somaj)
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2"
+                        data-tag="{{ $somaj }}">{{ $somaj }}</button>
+            @endforeach
+        </div>
     </div>
 
     <div class="col-md-4">
@@ -234,6 +242,45 @@
                 fields.querySelectorAll('input').forEach(input => input.value = '');
             }
         });
+    })();
+
+    // Address সমাজ chips: a click drops the chosen সমাজ into the address box.
+    // If one is already there it is swapped, so picking twice never stacks up,
+    // and anything else the user typed is left untouched.
+    (function () {
+        const address = document.querySelector('textarea[name="address"]');
+        const tags = document.getElementById('somajTags');
+        if (!address || !tags) return;
+
+        const pattern = /[\u09E6-\u09EF]+\s*নং\s*সমাজ/;
+
+        function markActive() {
+            const current = address.value.match(pattern);
+            tags.querySelectorAll('button[data-tag]').forEach(btn => {
+                const on = current && btn.dataset.tag === current[0];
+                btn.classList.toggle('btn-primary', !!on);
+                btn.classList.toggle('text-white', !!on);
+                btn.classList.toggle('btn-outline-secondary', !on);
+            });
+        }
+
+        tags.addEventListener('click', function (event) {
+            const btn = event.target.closest('button[data-tag]');
+            if (!btn) return;
+
+            const tag = btn.dataset.tag;
+            const value = address.value.trim();
+            address.value = pattern.test(value)
+                ? value.replace(pattern, tag)
+                : (value ? tag + ', ' + value : tag);
+
+            markActive();
+            address.focus();
+            address.setSelectionRange(address.value.length, address.value.length);
+        });
+
+        address.addEventListener('input', markActive);
+        markActive();
     })();
 
     function previewPhoto(event) {
