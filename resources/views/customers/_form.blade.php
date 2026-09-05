@@ -10,6 +10,24 @@
     </div>
 @endif
 
+
+@if (session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+    @if (session('import_errors'))
+        <div class="alert alert-warning">
+            <div class="fw-semibold mb-1">Some rows were skipped:</div>
+            <ul class="mb-0 small">
+                @foreach (session('import_errors') as $err)
+                    <li>{{ $err }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+    
 @php $customer = $customer ?? null; @endphp
 
 <div class="row g-3">
@@ -60,8 +78,8 @@
     </div>
 
     <div class="col-md-4">
-        <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
-        <input type="text" name="mobile_number" class="form-control" required placeholder="Enter Mobile Number"
+        <label class="form-label">Mobile Number</label>
+        <input type="text" name="mobile_number" class="form-control" placeholder="Enter Mobile Number"
                value="{{ old('mobile_number', $customer->mobile_number ?? '') }}">
     </div>
     <div class="col-md-4">
@@ -115,8 +133,8 @@
 
     {{-- Connection --}}
     <div class="col-md-4">
-        <label class="form-label">Meter Number <span class="text-danger">*</span></label>
-        <input type="text" name="meter_number" class="form-control" required placeholder="Enter Meter Number"
+        <label class="form-label">Meter Number</label>
+        <input type="text" name="meter_number" class="form-control" placeholder="Enter Meter Number"
                value="{{ old('meter_number', $customer->meter_number ?? '') }}">
     </div>
     <div class="col-md-4">

@@ -78,7 +78,8 @@ class CustomerController extends Controller
             ->get()
             ->map(fn (Customer $c) => [
                 'id'   => $c->id,
-                'text' => $c->name.' ('.$c->meter_number.')',
+                // Meter number is optional, so only bracket it when there is one.
+                'text' => $c->serial_no ? $c->name.' ('.$c->serial_no.')' : $c->name,
                 'last' => (float) ($c->latestMeterReading->current_reading ?? 0),
             ]);
 
@@ -117,7 +118,7 @@ class CustomerController extends Controller
         // their ledger with what they already owe.
         $opening->materialize($customer, auth()->id());
 
-        return redirect()->route('customers.index')
+        return redirect()->back()
             ->with('success', 'Customer added successfully!');
     }
 
@@ -355,7 +356,7 @@ class CustomerController extends Controller
             $opening->adjust($customer->refresh(), auth()->id());
         }
 
-        return redirect()->route('customers.index')
+        return redirect()->back()
             ->with('success', 'Customer updated successfully!');
     }
 
@@ -425,7 +426,7 @@ class CustomerController extends Controller
             'name'                      => 'required|string',
             'father_or_husband_name'    => 'nullable|string',
             'mother_name'               => 'nullable|string',
-            'mobile_number'             => 'required|string|max:20',
+            'mobile_number'             => 'nullable|string|max:20',
             'address'                   => 'required|string',
             'educational_qualification' => 'nullable|string',
             'age'                       => 'nullable|integer|min:0|max:150',
@@ -435,7 +436,7 @@ class CustomerController extends Controller
             'guardian_name'             => 'nullable|string',
             'guardian_relationship'     => 'nullable|string',
             'guardian_address'          => 'nullable|string',
-            'meter_number'              => 'required|string',
+            'meter_number'              => 'nullable|string',
             'connection_type'           => 'required|in:' . implode(',', Customer::CONNECTION_TYPES),
             'connection_date'           => 'required|date',
             // Opening balances — all or nothing, and only for a customer who

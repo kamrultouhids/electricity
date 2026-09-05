@@ -120,7 +120,7 @@
                             <td>{{ $customer->serial_no ?? '—' }}</td>
                             <td>{{ $customer->name }}</td>
                             <td>{{ $customer->mobile_number }}</td>
-                            <td>{{ $customer->meter_number ?? '—' }}</td>
+                            <td>{{ $customer->meter_number ?? '' }}</td>
                             <td>{{ $customer->connection_type ? ucfirst($customer->connection_type) : '—' }}</td>
                             <td>{{ $customer->connection_date ? $customer->connection_date->format('d M Y') : '—' }}</td>
                             <td>
