@@ -435,6 +435,7 @@ class ReportController extends Controller
     protected function collectors()
     {
         return \App\Models\User::query()
+        ->where('email', '!=', 'superadmin@gmail.com')
             ->orderBy('name')
             ->get();
     }

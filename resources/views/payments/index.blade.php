@@ -10,6 +10,7 @@
             Payments
             <span class="badge bg-primary px-1 py-0 small">{{ $payments->total() }}</span>
         </h5>
+        @include('reports._actions')
     </div>
 
     @if (session('success'))
@@ -20,20 +21,29 @@
     @endif
 
     {{-- Filters --}}
-    <div class="card mb-3">
+    <div class="card mb-3 no-print">
         <div class="card-body">
             <form method="GET" action="{{ route('payments.index') }}" class="row g-2 align-items-end">
                 <div class="col-md-3">
                     <label class="form-label mb-1">Search</label>
                     <input type="text" name="search" value="{{ request('search') }}" class="form-control"
-                           placeholder="Serial No, Name, Mobile or Meter No">
+                           placeholder="Serial, Name, Mobile, Meter No">
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-1">
                     <label class="form-label mb-1">Method</label>
                     <select name="method" class="form-select">
                         <option value="">All</option>
                         @foreach ($methods as $value => $label)
                             <option value="{{ $value }}" @selected(request('method') === $value)>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label mb-1">Collector</label>
+                    <select name="collector_id" class="form-select">
+                        <option value="">All</option>
+                        @foreach ($collectors as $collector)
+                            <option value="{{ $collector->id }}" @selected(request('collector_id') == $collector->id)>{{ $collector->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -45,7 +55,7 @@
                     <label class="form-label mb-1">To Date</label>
                     <input type="date" name="to_date" value="{{ request('to_date') }}" class="form-control">
                 </div>
-                <div class="col-md-3 d-flex gap-2">
+                <div class="col-2 col-md-auto d-flex gap-2">
                     <button type="submit" class="btn btn-primary text-white "><i class="bi bi-funnel me-1"></i>Filter</button>
                     <a href="{{ route('payments.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-counterclockwise"></i></a>
                 </div>
@@ -66,7 +76,7 @@
                         <th>Method</th>
                         <th>Collector</th>
                         <th>Date</th>
-                        <th class="text-end" width="150">Receipt</th>
+                        <th class="text-end no-print" width="150">Receipt</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -81,7 +91,7 @@
                             <td>{{ $payment->methodLabel() }}</td>
                             <td>{{ $payment->collector->name ?? '—' }}</td>
                             <td>{{ $payment->payment_date->format('d M Y') }}</td>
-                            <td class="text-end">
+                            <td class="text-end no-print">
                                 <a href="{{ route('payments.receipt', $payment) }}" class="btn btn-outline-primary"><i class="bi bi-receipt me-1"></i>Receipt</a>
                             </td>
                         </tr>
@@ -95,7 +105,7 @@
         </div>
     </div>
 
-    <div class="mt-3 d-flex justify-content-center">
+    <div class="mt-3 d-flex justify-content-center no-print">
         {{ $payments->links() }}
     </div>
 </div>

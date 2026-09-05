@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Payment;
 use App\Models\PaymentAllocation;
 use App\Models\Sheet;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -77,6 +78,10 @@ class PaymentController extends Controller
             $query->where('method', $request->input('method'));
         }
 
+        if ($request->filled('collector_id')) {
+            $query->where('collector_id', (int) $request->input('collector_id'));
+        }
+
         if ($request->filled('from_date')) {
             $query->whereDate('payment_date', '>=', $request->input('from_date'));
         }
@@ -89,8 +94,9 @@ class PaymentController extends Controller
             ->paginate(15)->withQueryString();
 
         return view('payments.index', [
-            'payments' => $payments,
-            'methods'  => Payment::METHODS,
+            'payments'   => $payments,
+            'methods'    => Payment::METHODS,
+            'collectors' => User::where('email', '!=', 'superadmin@gmail.com')->orderBy('name')->get(),
         ]);
     }
 
