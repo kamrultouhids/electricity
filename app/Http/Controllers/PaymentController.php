@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
+    /** Rows-per-page choices offered on the payments list. */
+    public const PER_PAGE_OPTIONS = [15, 25, 50, 100];
+
     /**
      * Customers with outstanding due (based on their latest bill, which already
      * carries forward all previous months' due).
@@ -90,13 +93,20 @@ class PaymentController extends Controller
             $query->whereDate('payment_date', '<=', $request->input('to_date'));
         }
 
+        // Rows per page, limited to the options offered in the filter bar.
+        $perPage = (int) $request->input('per_page', 15);
+        if (! in_array($perPage, self::PER_PAGE_OPTIONS, true)) {
+            $perPage = 15;
+        }
+
         $payments = $query->latest('payment_date')->latest('id')
-            ->paginate(15)->withQueryString();
+            ->paginate($perPage)->withQueryString();
 
         return view('payments.index', [
-            'payments'   => $payments,
-            'methods'    => Payment::METHODS,
-            'collectors' => User::where('email', '!=', 'superadmin@gmail.com')->orderBy('name')->get(),
+            'payments'       => $payments,
+            'methods'        => Payment::METHODS,
+            'collectors'     => User::where('email', '!=', 'superadmin@gmail.com')->orderBy('name')->get(),
+            'perPageOptions' => self::PER_PAGE_OPTIONS,
         ]);
     }
 

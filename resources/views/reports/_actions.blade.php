@@ -2,6 +2,9 @@
 <div class="d-flex gap-2 no-print">
     <button type="button" onclick="window.print()" class="btn btn-outline-secondary">
         <i class="bi bi-printer me-1"></i>Print
+        @isset($printCount)
+            <span class="badge bg-light text-dark ms-1">{{ $printCount }}</span>
+        @endisset
     </button>
 </div>
 

@@ -10,7 +10,7 @@
             Payments
             <span class="badge bg-primary px-1 py-0 small">{{ $payments->total() }}</span>
         </h5>
-        @include('reports._actions')
+        @include('reports._actions', ['printCount' => $payments->count()])
     </div>
 
     @if (session('success'))
@@ -38,7 +38,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-1">
                     <label class="form-label mb-1">Collector</label>
                     <select name="collector_id" class="form-select">
                         <option value="">All</option>
@@ -54,6 +54,14 @@
                 <div class="col-md-2">
                     <label class="form-label mb-1">To Date</label>
                     <input type="date" name="to_date" value="{{ request('to_date') }}" class="form-control">
+                </div>
+                <div class="col-md-1">
+                    <label class="form-label mb-1">Per Page</label>
+                    <select name="per_page" class="form-select" onchange="this.form.submit()">
+                        @foreach ($perPageOptions as $option)
+                            <option value="{{ $option }}" @selected($payments->perPage() == $option)>{{ $option }}</option>
+                        @endforeach
+                    </select>
                 </div>
                 <div class="col-2 col-md-auto d-flex gap-2">
                     <button type="submit" class="btn btn-primary text-white "><i class="bi bi-funnel me-1"></i>Filter</button>
