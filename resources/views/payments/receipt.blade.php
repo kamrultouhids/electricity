@@ -94,6 +94,8 @@
     .receipt-copy .kv > span::after { content: ' :'; }
     .receipt-table th, .receipt-table td { padding: 4px 8px; font-size: 13px; border-color: #000 !important; }
     @media print {
+        @page { size: 182mm 257mm; margin: 0; }
+        body { box-sizing: border-box !important; width: auto !important; padding: 12mm !important; }
         .no-print { display: none !important; }
         .navbar, nav { display: none !important; }
     }

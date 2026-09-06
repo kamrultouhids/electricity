@@ -14,7 +14,7 @@
     @media print {
         /* Zero page margin so the browser drops its own header/footer
            (date, title, page URL). The paper margin moves onto the body. */
-        @page { size: A4 portrait; margin: 0; }
+        @page { size: 182mm 257mm; margin: 0; }
         body {
             -webkit-print-color-adjust: exact; print-color-adjust: exact;
             box-sizing: border-box !important;
