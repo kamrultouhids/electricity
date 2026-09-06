@@ -94,7 +94,7 @@
                         <th>Reading Date</th>
                         <th>Reader Name</th>
                         <th>Status</th>
-                        <th>Source</th>
+                        <!-- <th>Source</th> -->
                         <th>Flag</th>
                         <th class="text-end" width="150">Actions</th>
                     </tr>
@@ -132,12 +132,12 @@
                                     <span class="badge bg-warning text-dark">Pending</span>
                                 @endif
                             </td>
-                            <td>
+                            <!-- <td>
                                 @if ($reading->isImported())
                                     <span class="badge bg-info text-dark"><i class="bi bi-filetype-csv me-1"></i>CSV Import</span>
                                 @else
                                     <span class="badge bg-light text-dark border"><i class="bi bi-pencil me-1"></i>Manual</span>
-                                @endif
+                                @endif -->
                             </td>
                             <td>
                                 @if ($reading->is_flagged)

@@ -12,9 +12,9 @@
         </h5>
         @can('manage-customers')
             <div class="d-flex gap-2">
-                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#importCsvModal">
+                <!-- <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#importCsvModal">
                     <i class="bi bi-upload me-1"></i>Import CSV
-                </button>
+                </button> -->
                 <a href="{{ route('customers.create') }}" class="btn btn-primary text-white"><i class="bi bi-plus-lg me-1"></i>Add Customer</a>
             </div>
         @endcan
@@ -100,7 +100,7 @@
                         <th>Connection Type</th>
                         <th>Connection Date</th>
                         <th>Connection Status</th>
-                        <th>Source</th>
+                        <!-- <th>Source</th> -->
                         <th class="text-end" width="150">Actions</th>
                     </tr>
                 </thead>
@@ -130,12 +130,12 @@
                                     <span class="badge bg-secondary">Inactive</span>
                                 @endif
                             </td>
-                            <td>
+                            <!-- <td>
                                 @if ($customer->isImported())
                                     <span class="badge bg-info text-dark"><i class="bi bi-filetype-csv me-1"></i>CSV Import</span>
                                 @else
                                     <span class="badge bg-light text-dark border"><i class="bi bi-pencil me-1"></i>Manual</span>
-                                @endif
+                                @endif -->
                             </td>
                             <td class="text-end">
                                 <div class="btn-group btn-group-sm">
