@@ -54,7 +54,9 @@
             <div class="kv"><span>এরিয়া কোড/শাখা</span><b>{{ $customer->sheet->name ?? '—' }}</b></div>
             <div class="kv boxed"><span>হিসাব নং/গ্রাহক নং</span><b>{{ $customer->serial_no ?? '—' }}</b></div>
             <div class="kv boxed"><span>গ্রাহকের নাম</span><b>{{ $customer->name }}</b></div>
-            <div class="kv boxed"><span>পিতা/স্বামীর নাম</span><b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
+            @if (filled($customer->father_or_husband_name))
+                <div class="kv boxed"><span>পিতা/স্বামীর নাম</span><b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
+            @endif
             <div class="kv boxed"><span>ঠিকানা</span><b>{{ $customer->address ?? '—' }}</b></div>
             @if (filled($customer->mobile_number))
                 <div class="kv boxed"><span>মোবাইল নং</span><b>{{ $customer->mobile_number }}</b></div>
@@ -188,7 +190,9 @@
         <div class="row g-0">
             <div class="col-6 p-2 border-end border-dark">
                 <div class="d-flex mb-1"><span class="me-1">গ্রাহকের নাম:</span><b>{{ $customer->name }}</b></div>
-                <div class="d-flex mb-1"><span class="me-1">পিতা/স্বামীর নাম:</span><b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
+                @if (filled($customer->father_or_husband_name))
+                    <div class="d-flex mb-1"><span class="me-1">পিতা/স্বামীর নাম:</span><b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
+                @endif
                 <div class="d-flex"><span class="me-1">ঠিকানা:</span><b>{{ $customer->address ?? '—' }}</b></div>
             </div>
             <div class="col-3 p-2 border-end border-dark">
