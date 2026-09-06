@@ -45,7 +45,12 @@
 
     {{-- Top: customer info + bill dates --}}
     <div class="row g-0 bill-block">
-        <div class="col-7 p-2 border-end">
+        <div class="col-5 p-2 border-black-right">
+            <div class="kv"><span>বিলের মাস</span><b>{{ $bnMonthYear($billMonth) }}</b></div>
+            <div class="kv"><span>বিল প্রস্তুতের তারিখ</span><b>{{ $bnDate($prepDate) }}</b></div>
+            <div class="kv"><span>পরিশোধের শেষ তারিখ</span><b>{{ $bnDate($lastDate) }}</b></div>
+        </div>
+        <div class="col-7 p-2 ">
             <div class="kv"><span>এরিয়া কোড/শাখা</span><b>{{ $customer->sheet->name ?? '—' }}</b></div>
             <div class="kv boxed"><span>হিসাব নং/গ্রাহক নং</span><b>{{ $customer->serial_no ?? '—' }}</b></div>
             <div class="kv boxed"><span>গ্রাহকের নাম</span><b>{{ $customer->name }}</b></div>
@@ -55,11 +60,7 @@
                 <div class="kv boxed"><span>মোবাইল নং</span><b>{{ $customer->mobile_number }}</b></div>
             @endif
         </div>
-        <div class="col-5 p-2">
-            <div class="kv"><span>বিলের মাস</span><b>{{ $bnMonthYear($billMonth) }}</b></div>
-            <div class="kv"><span>বিল প্রস্তুতের তারিখ</span><b>{{ $bnDate($prepDate) }}</b></div>
-            <div class="kv"><span>পরিশোধের শেষ তারিখ</span><b>{{ $bnDate($lastDate) }}</b></div>
-        </div>
+
     </div>
 
     {{-- Previous bills history --}}
@@ -139,7 +140,7 @@
 
                     <tr class="fw-bold"><td>মোট বিল</td><td class="text-end">{{ $bn(number_format($totalAmount, 2)) }}</td></tr>
                     <tr><td>ছাড়(-)</td><td class="text-end">{{ $bn(number_format($discount, 2)) }}</td></tr>
-                    <tr class="fw-bold table-light"><td>বিল</td><td class="text-end">৳ {{ $bn(number_format($totalAmount - $discount, 2)) }}</td></tr>
+                    <tr class="fw-bold "><td>বিল</td><td class="text-end">৳ {{ $bn(number_format($totalAmount - $discount, 2)) }}</td></tr>
                 </tbody>
             </table>
         </div>
@@ -226,7 +227,7 @@
     }
     .bill-org { line-height: 1.35; }
     .bill-org .org-bismillah { font-size: 12px; }
-    .bill-org .org-slogan { font-size: 13px; font-weight: 700; }
+    .bill-org .org-slogan { font-size: 12px; font-weight: 700; }
     .bill-org .org-name { font-size: 12px; }
     .bill-org .org-addr { font-size: 12px; font-weight: 700; }
     .bill-title { font-size: 20px; font-weight: 700; padding: 0 0 2px; }
@@ -265,6 +266,7 @@
         font-weight: 600;
         white-space: nowrap;
     }
+    .border-black-right { border-right: var(--bs-border-width) var(--bs-border-style) #000 !important;}
     .bill-signature { font-size: 11px; }
     .bill-office-copy { font-size: 13px; }
     .bill-contact { margin: 2px 0 4px; }
@@ -275,7 +277,7 @@
     }
     .bill-contact-sep { padding: 0 4px; color: #555; }
     .bill-copy .kv { display: flex; font-size: 13px; padding: 1px 0; }
-    .bill-copy .kv > span { min-width: 130px; }
+/*     .bill-copy .kv > span { min-width: 130px; } */
     .bill-copy .kv > span::after { content: ' :'; }
     .bill-table th, .bill-table td { padding: 3px 6px; font-size: 13px; }
     .bill-table { border-color: #000 !important; }
@@ -300,16 +302,18 @@
             break-inside: avoid;
             padding: 0;
         }
+
         .bill-copy > .text-center:first-child,
         .bill-copy > .bill-org {
-            padding-left: 3mm;
+            padding-left: 17mm;
             padding-right: 3mm;
-            padding-top: 2mm;
+            padding-top: 0;
         }
         .bill-copy > .text-center.position-relative {
             padding-left: 3mm;
             padding-right: 3mm;
-            padding-bottom: 1mm;
+            padding-bottom: 0;
+            padding-top: 0;
         }
         .bill-copy tr, .bill-copy .bill-block, .bill-copy table { page-break-inside: avoid; break-inside: avoid; }
         /* Optimized spacing for B5 paper - compact */
@@ -339,6 +343,8 @@
         ul.small li { margin-bottom: 0.2mm; line-height: 1.35; }
         .small.bill-contact { font-size: 9.5px; margin: 1.2mm 0 2mm; }
         .bill-contact + .small { font-size: 9.5px; line-height: 1.35; }
+    .border-black-right { border-right: var(--bs-border-width) var(--bs-border-style) #000 !important;}
+
     }
 </style>
 @endpush
