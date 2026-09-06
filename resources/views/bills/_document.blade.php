@@ -92,9 +92,9 @@
     </table>
 
     {{-- Meter reading + charge breakdown --}}
-    <div class="row g-0 bill-block">
+    <div class="row g-0 ">
         {{-- Meter reading --}}
-        <div class="col-5 border-end">
+        <div class="col-5 ">
             <table class="table table-bordered bill-table mb-0 h-100">
                 <thead>
                     <tr class="text-center"><th colspan="2">মিটার রিডিং</th></tr>
@@ -303,11 +303,10 @@
             padding: 0;
         }
 
-        .bill-copy > .text-center:first-child,
         .bill-copy > .bill-org {
             padding-left: 17mm;
             padding-right: 3mm;
-            padding-top: 0;
+            padding-top: 2mm;
         }
         .bill-copy > .text-center.position-relative {
             padding-left: 3mm;
@@ -319,20 +318,19 @@
         /* Optimized spacing for B5 paper - compact */
         .bill-org { line-height: 1.25; }
         .bill-org .org-bismillah { font-size: 10px; }
-        .bill-org .org-slogan { font-size: 11px; }
-        .bill-org .org-name { font-size: 13px; line-height: 1.18; }
+        .bill-org .org-slogan { font-size: 10px; }
+        .bill-org .org-name { font-size: 10px; line-height: 1.18; }
         .bill-org .org-addr { font-size: 10px; line-height: 1.3; }
         .bill-title { font-size: 16px; padding-top: 0; margin-bottom: 1px; }
         .bill-copy-tag { font-size: 10px; }
         .bill-copy .kv { font-size: 10px; padding: 0.3px 0; line-height: 1.45; }
         .bill-copy .kv > span { min-width: 120px; }
         .bill-table th, .bill-table td { padding: 1.5px 3.5px; font-size: 10px; line-height: 1.3; }
-        .bill-block { padding: 1.2mm 0; border-top-width: 0.5px; }
         .bill-block.p-2 { padding: 1.2mm !important; }
         .row.g-0.bill-block .col-5.p-2, .row.g-0.bill-block .col-6.p-2, .row.g-0.bill-block .col-7.p-2 { padding: 1.2mm !important; }
         .bill-disclaimer-vertical { width: 32px; padding: 6px 0; border-right-width: 0.5px; }
         .bill-disclaimer-text { font-size: 9px; }
-        .bill-signature { font-size: 9px; }
+        .bill-signature { font-size: 9px;  }
         .bill-office-copy { font-size: 10px; }
         .bill-cut { height: 13px; margin: 3.5px 0; border-top-width: 1px; }
         .bill-cut span { font-size: 12px; line-height: 13px; top: -6.5px; }
@@ -343,9 +341,12 @@
         ul.small li { margin-bottom: 0.2mm; line-height: 1.35; }
         .small.bill-contact { font-size: 9.5px; margin: 1.2mm 0 2mm; }
         .bill-contact + .small { font-size: 9.5px; line-height: 1.35; }
-    .border-black-right { border-right: var(--bs-border-width) var(--bs-border-style) #000 !important;}
-
-    }
+.border-black-right {
+        border-top: 0 !important;
+        border-bottom: 0 !important;
+        border-left: 0 !important;
+        border-right: 1px solid #000 !important;
+    }    }
 </style>
 @endpush
 @endonce
