@@ -69,7 +69,7 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label mb-1">Connection Status</label>
+                    <label class="form-label mb-1"> Status</label>
                     <select name="status" class="form-select">
                         <option value="">All</option>
                         <option value="1" @selected(request('status') === '1')>Active</option>
@@ -99,7 +99,7 @@
                         <th>Meter No</th>
                         <th>Connection Type</th>
                         <th>Connection Date</th>
-                        <th>Connection Status</th>
+                        <th> Status</th>
                         <!-- <th>Source</th> -->
                         <th class="text-end" width="150">Actions</th>
                     </tr>
