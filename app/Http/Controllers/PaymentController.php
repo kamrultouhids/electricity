@@ -66,7 +66,7 @@ class PaymentController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Payment::query()->with(['customer', 'collector']);
+        $query = Payment::query()->withTrashed()->with(['customer', 'collector', 'updatedBy']);
 
         if ($search = $request->input('search')) {
             $query->whereHas('customer', function ($q) use ($search) {
@@ -246,7 +246,7 @@ class PaymentController extends Controller
 
             // The latest bill's due already carried forward all previous months,
             // so the same money settles those earlier bills as well.
-            $this->settleEarlierBills($customer, $bill, round($amount + $discount, 2));
+            $this->settleEarlierBills($payment, $customer, $bill, round($amount + $discount, 2));
 
             return $payment;
         });
@@ -264,11 +264,165 @@ class PaymentController extends Controller
     /**
      * Printable payment receipt.
      */
-    public function receipt(Payment $payment)
+    public function receipt($id)
     {
-        $payment->load(['customer.sheet', 'collector', 'allocations.bill']);
+        $payment = Payment::withTrashed()->with(['customer.sheet', 'collector', 'allocations.bill'])->findOrFail($id);
 
         return view('payments.receipt', compact('payment'));
+    }
+
+    /**
+     * Cancel a payment and reverse all bill calculations.
+     */
+    public function cancel($id)
+    {
+        $payment = Payment::findOrFail($id);
+
+        // Only allow cancelling completed payments
+        if ($payment->status !== Payment::STATUS_COMPLETED) {
+            return back()->with('error', 'Only completed payments can be cancelled.');
+        }
+
+        DB::transaction(function () use ($payment) {
+            // Load all payment allocations - these track exactly which bills were affected
+            $allocations = PaymentAllocation::where('payment_id', $payment->id)
+                ->with('bill')
+                ->get();
+
+            $amount = (float) $payment->amount;
+            $discount = (float) $payment->discount;
+            $totalSettled = round($amount + $discount, 2);
+
+            // Check if this is a legacy payment (no allocations or only 1 allocation for latest bill)
+            if ($allocations->count() <= 1) {
+                // Legacy payment - need to reconstruct the allocation logic
+                $this->reverseLegacyPayment($payment, $totalSettled, $discount);
+            } else {
+                // New payment with complete allocations - use stored data
+                $discountApplied = false;
+
+                // Reverse each allocation (newest to oldest)
+                foreach ($allocations->sortByDesc('bill_id') as $allocation) {
+                    $bill = $allocation->bill;
+                    if (! $bill) {
+                        continue;
+                    }
+
+                    $appliedAmount = (float) $allocation->amount;
+
+                    // Subtract the allocated amount from paid_amount
+                    $newPaid = round((float) $bill->paid_amount - $appliedAmount, 2);
+
+                    // Only reverse discount from the first (latest) bill
+                    $newDiscount = (float) $bill->discount;
+                    if (! $discountApplied && $discount > 0) {
+                        $newDiscount = round($newDiscount - $discount, 2);
+                        $discountApplied = true;
+                    }
+
+                    // Recalculate due amount
+                    $newDue = round((float) $bill->total_amount - $newPaid - $newDiscount, 2);
+
+                    // Determine correct status based on payment state
+                    if ($newDue <= 0) {
+                        $newStatus = Bill::STATUS_PAID;
+                    } elseif ($newPaid > 0 || $newDiscount > 0) {
+                        $newStatus = Bill::STATUS_PARTIAL;
+                    } else {
+                        $newStatus = Bill::STATUS_UNPAID;
+                    }
+
+                    $bill->update([
+                        'paid_amount' => max(0, $newPaid),
+                        'discount'    => max(0, $newDiscount),
+                        'due_amount'  => $newDue,
+                        'status'      => $newStatus,
+                        'updated_by'  => auth()->id(),
+                    ]);
+                }
+            }
+
+            // Mark payment as cancelled
+            $payment->update([
+                'status'     => Payment::STATUS_CANCELLED,
+                'updated_by' => auth()->id(),
+            ]);
+
+            // Soft delete the payment for audit trail
+            $payment->delete();
+        });
+
+        return redirect()->route('payments.index')
+            ->with('success', 'Payment cancelled successfully. All bill amounts have been reversed.');
+    }
+
+    /**
+     * Reverse a legacy payment (made before complete allocation tracking was implemented).
+     * Reconstructs the payment flow: latest bill first, then earlier bills oldest-first.
+     */
+    protected function reverseLegacyPayment(Payment $payment, float $totalSettled, float $discount): void
+    {
+        $customer = $payment->customer;
+
+        // Find the bill that received this payment (we need to figure out which was the "latest" at payment time)
+        // Look for bills that have paid_amount or discount and match the payment date approximately
+        $affectedBills = Bill::query()
+            ->where('customer_id', $customer->id)
+            ->where(function ($q) {
+                $q->where('paid_amount', '>', 0)
+                    ->orWhere('discount', '>', 0);
+            })
+            ->orderBy('billing_month')
+            ->orderBy('id')
+            ->get();
+
+        // Reverse the payment from bills oldest-first (same order it was applied)
+        $remaining = $totalSettled;
+        $discountApplied = false;
+
+        foreach ($affectedBills as $bill) {
+            if ($remaining < 0.01) {
+                break;
+            }
+
+            $currentPaid = (float) $bill->paid_amount;
+            $currentDiscount = (float) $bill->discount;
+
+            // Don't reverse more than what this bill has paid
+            $amountToReverse = min($remaining, $currentPaid);
+
+            $newPaid = round($currentPaid - $amountToReverse, 2);
+
+            // Only reverse discount from one bill (the one that actually has it)
+            $newDiscount = $currentDiscount;
+            if (! $discountApplied && $discount > 0 && $currentDiscount >= $discount) {
+                $newDiscount = round($currentDiscount - $discount, 2);
+                $discountApplied = true;
+                $remaining = round($remaining - $amountToReverse - $discount, 2);
+            } else {
+                $remaining = round($remaining - $amountToReverse, 2);
+            }
+
+            // Recalculate due
+            $newDue = round((float) $bill->total_amount - $newPaid - $newDiscount, 2);
+
+            // Determine correct status
+            if ($newDue <= 0) {
+                $newStatus = Bill::STATUS_PAID;
+            } elseif ($newPaid > 0 || $newDiscount > 0) {
+                $newStatus = Bill::STATUS_PARTIAL;
+            } else {
+                $newStatus = Bill::STATUS_UNPAID;
+            }
+
+            $bill->update([
+                'paid_amount' => max(0, $newPaid),
+                'discount'    => max(0, $newDiscount),
+                'due_amount'  => $newDue,
+                'status'      => $newStatus,
+                'updated_by'  => auth()->id(),
+            ]);
+        }
     }
 
     /**
@@ -276,8 +430,11 @@ class PaymentController extends Controller
      * first, capped at each bill's own due. A bill is only marked Paid when the
      * amount actually covers it — anything less leaves it Partial with the
      * remainder still showing as due.
+     *
+     * Also creates PaymentAllocation records for each affected bill to enable
+     * proper reversal during cancellation.
      */
-    protected function settleEarlierBills(Customer $customer, Bill $currentBill, float $settled): void
+    protected function settleEarlierBills(Payment $payment, Customer $customer, Bill $currentBill, float $settled): void
     {
         $earlierBills = Bill::query()
             ->where('customer_id', $customer->id)
@@ -302,6 +459,13 @@ class PaymentController extends Controller
                 'due_amount'  => $newDue,
                 'status'      => $newDue <= 0 ? Bill::STATUS_PAID : Bill::STATUS_PARTIAL,
                 'updated_by'  => auth()->id(),
+            ]);
+
+            // Store allocation record for this earlier bill so we can reverse it on cancellation
+            PaymentAllocation::create([
+                'payment_id' => $payment->id,
+                'bill_id'    => $earlier->id,
+                'amount'     => $applied,
             ]);
 
             $remaining = round($remaining - $applied, 2);

@@ -29,6 +29,7 @@ class Payment extends Model
         'discount' => 'decimal:2',
         'payment_date' => 'date',
         'status' => 'integer',
+        'deleted_at' => 'datetime',
     ];
 
     /**
@@ -88,5 +89,10 @@ class Payment extends Model
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updatedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 }

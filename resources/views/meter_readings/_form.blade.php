@@ -58,6 +58,13 @@
         @endif
     </div>
 
+ <div class="col-md-4">
+        <label class="form-label">Current Units <span class="text-danger">*</span></label>
+        <input type="number" step="0.01" min="0" name="current_reading" id="currentReading"
+               class="form-control" required placeholder="Enter Current Units"
+               value="{{ old('current_reading', $meterReading->current_reading ?? '') }}">
+    </div>
+
     <div class="col-md-4">
         <label class="form-label">Previous Units <span class="text-danger">*</span></label>
         <input type="number" step="0.01" min="0" name="previous_reading" id="previousReading"
@@ -66,12 +73,7 @@
         <small class="text-muted">Auto-filled from the last units — editable.</small>
     </div>
 
-    <div class="col-md-4">
-        <label class="form-label">Current Units <span class="text-danger">*</span></label>
-        <input type="number" step="0.01" min="0" name="current_reading" id="currentReading"
-               class="form-control" required placeholder="Enter Current Units"
-               value="{{ old('current_reading', $meterReading->current_reading ?? '') }}">
-    </div>
+
 
     <div class="col-md-4">
         <label class="form-label">Consumed Units</label>

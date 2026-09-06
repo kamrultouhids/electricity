@@ -84,12 +84,13 @@
                         <th>Method</th>
                         <th>Collector</th>
                         <th>Date</th>
-                        <th class="text-end no-print" width="150">Receipt</th>
+                        <th>Status</th>
+                        <th class="text-end no-print" width="200">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($payments as $payment)
-                        <tr>
+                        <tr @if($payment->status === 2) class="table-secondary text-decoration-line-through" @endif>
                             <td>{{ $loop->iteration }}</td>
                             <td>
                                 @include('partials.customer_cell', ['customer' => $payment->customer])
@@ -99,13 +100,41 @@
                             <td>{{ $payment->methodLabel() }}</td>
                             <td>{{ $payment->collector->name ?? '—' }}</td>
                             <td>{{ $payment->payment_date->format('d M Y') }}</td>
+                            <td>
+                                @if($payment->status === 1)
+                                    <span class="badge bg-success">Completed</span>
+                                @elseif($payment->status === 2)
+                                    <div>
+                                        <span class="badge bg-danger">Cancelled</span>
+                                        <div class="small text-muted mt-1">
+                                            By: {{ $payment->updatedBy->name ?? 'Unknown' }}<br>
+                                            {{ $payment->deleted_at ? $payment->deleted_at->format('d M Y, h:i A') : '—' }}
+                                        </div>
+                                    </div>
+                                @endif
+                            </td>
                             <td class="text-end no-print">
-                                <a href="{{ route('payments.receipt', $payment) }}" class="btn btn-outline-primary"><i class="bi bi-receipt me-1"></i>Receipt</a>
+                                <div class="d-flex gap-1 justify-content-end">
+                                    <a href="{{ route('payments.receipt', $payment) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                        <i class="bi bi-receipt me-1"></i>Receipt
+                                    </a>
+                                    @can('collect-payments')
+                                        @if($payment->status === 1)
+                                            <form method="POST" action="{{ route('payments.cancel', $payment) }}"
+                                                  onsubmit="return confirm('Are you sure you want to cancel this payment? This will reverse all bill calculations.');">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-x-circle me-1"></i>Cancel
+                                                </button>
+                                            </form>
+                                        @endif
+                                    @endcan
+                                </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center text-muted py-4">No payments found.</td>
+                            <td colspan="9" class="text-center text-muted py-4">No payments found.</td>
                         </tr>
                     @endforelse
                 </tbody>

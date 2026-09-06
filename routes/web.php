@@ -92,6 +92,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
         Route::get('/payments/{payment}/receipt', [PaymentController::class, 'receipt'])->name('payments.receipt');
     });
+    Route::middleware('can:collect-payments')->group(function () {
+        Route::post('/payments/{payment}/cancel', [PaymentController::class, 'cancel'])->name('payments.cancel');
+    });
 
     // Expense Management (admin & manager only)
     Route::middleware('can:manage-expenses')->group(function () {

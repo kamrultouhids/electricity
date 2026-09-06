@@ -24,7 +24,7 @@
                     <span class="badge bg-light text-dark ms-1">{{ $printableCount }}</span>
                 </button>
             @endif
-            
+
         </div>
     </div>
 
@@ -101,6 +101,7 @@
                         <th class="text-end">Units</th>
                         <th class="text-end">Total</th>
                         <th class="text-end">Paid</th>
+                        <th class="text-end">Discount</th>
                         <th class="text-end">Due</th>
                         <th>Status</th>
                         <th class="text-end" width="130">Actions</th>
@@ -123,6 +124,7 @@
                             <td class="text-end">{{ $bill->is_opening ? '—' : number_format($bill->units, 2) }}</td>
                             <td class="text-end">{{ number_format($bill->total_amount, 2) }}</td>
                             <td class="text-end">{{ number_format($bill->paid_amount, 2) }}</td>
+                            <td class="text-end">{{ number_format($bill->discount, 2) }}</td>
                             <td class="text-end">{{ number_format($bill->due_amount, 2) }}</td>
                             <td>
                                 @if ($bill->isPaid())

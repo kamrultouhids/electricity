@@ -20,6 +20,11 @@
         <div class="text-center">
             <div class="receipt-title">পেমেন্ট রসিদ / Payment Receipt</div>
             <div class="small text-muted">Receipt No: {{ $payment->receiptNo() }}</div>
+            @if($payment->status === 2)
+                <div class="alert alert-danger mt-2 mb-0">
+                    <strong>CANCELLED</strong> - This payment has been cancelled
+                </div>
+            @endif
         </div>
 
         <div class="row g-0 receipt-block">
