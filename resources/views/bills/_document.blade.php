@@ -182,33 +182,34 @@
     <div class="bill-cut"><span>&#9986;</span></div>
 
     {{-- Office copy --}}
-    <div class="p-2 text-center fw-bold bill-block">অফিস কপি</div>
-    <div class="row g-0 bill-block">
-        <div class="col-5 p-2 border-end">
-            <div class="kv"><span>গ্রাহকের নাম</span><b>{{ $customer->name }}</b></div>
-            <div class="kv"><span>পিতা/স্বামীর নাম</span><b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
-            <div class="kv"><span>ঠিকানা</span><b>{{ $customer->address ?? '—' }}</b></div>
+    <div class="bill-office-copy border border-dark">
+        <div class="p-2 text-center fw-bold border-bottom border-dark">অফিস কপি</div>
+        <div class="row g-0">
+            <div class="col-5 p-2 border-end border-dark">
+                <div class="d-flex mb-1"><span class="me-1">গ্রাহকের নাম:</span><b>{{ $customer->name }}</b></div>
+                <div class="d-flex mb-1"><span class="me-1">পিতা/স্বামীর নাম:</span><b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
+                <div class="d-flex"><span class="me-1">ঠিকানা:</span><b>{{ $customer->address ?? '—' }}</b></div>
+            </div>
+            <div class="col-4 p-2 border-end border-dark">
+                @if (filled($customer->mobile_number))
+                    <div class="d-flex mb-1"><span class="me-1">মোবাইল নং:</span><b>{{ $customer->mobile_number }}</b></div>
+                @endif
+                <div class="d-flex"><span class="me-1">বিলের মাস:</span><b>{{ $bnMonthYear($billMonth) }}</b></div>
+            </div>
+            <div class="col-3 p-2">
+                <div class="d-flex mb-1"><span class="me-1">হিসাব নং/গ্রাহক নং:</span><b>{{ $customer->serial_no ?? '—' }}</b></div>
+                <div class="d-flex"><span class="me-1">মোট বিল:</span><b>৳ {{ $bn(number_format($totalAmount, 2)) }}</b></div>
+            </div>
         </div>
-        <div class="col-5 p-2 border-end">
-            @if (filled($customer->mobile_number))
-                <div class="kv"><span>মোবাইল নং</span><b>{{ $customer->mobile_number }}</b></div>
-            @endif
-            <div class="kv"><span>হিসাব নং/গ্রাহক নং</span><b>{{ $customer->serial_no ?? '—' }}</b></div>
-            <div class="kv"><span>বিলের মাস</span><b>{{ $bnMonthYear($billMonth) }}</b></div>
-        </div>
-        <div class="col-2 p-2">
-            <div><b>মোট বিল :</b></div>
-            <div class="mt-1"><b>৳ {{ $bn(number_format($totalAmount, 2)) }}</b></div>
-        </div>
-    </div>
 
-    {{-- Signature section --}}
-    <div class="row g-0 mt-3 px-2 pt-2 pb-4 border-top bill-signature">
-        <div class="col-6">
-            গ্রাহকের স্বাক্ষর
-        </div>
-        <div class="col-6 text-end">
-            আদায়কারীর স্বাক্ষর ও তারিখ
+        {{-- Signature section --}}
+        <div class="row g-0 px-2 pt-2 pb-4 border-top border-dark bill-signature">
+            <div class="col-6">
+                গ্রাহকের স্বাক্ষর
+            </div>
+            <div class="col-6 text-end">
+                আদায়কারীর স্বাক্ষর ও তারিখ
+            </div>
         </div>
     </div>
 </div>
@@ -265,6 +266,7 @@
         white-space: nowrap;
     }
     .bill-signature { font-size: 11px; }
+    .bill-office-copy { font-size: 13px; }
     .bill-contact { margin: 2px 0 4px; }
     /* Clickable on screen, plain black text on paper. */
     .bill-contact a { color: inherit; text-decoration: underline; }
@@ -327,6 +329,7 @@
         .bill-disclaimer-vertical { width: 32px; padding: 6px 0; border-right-width: 0.5px; }
         .bill-disclaimer-text { font-size: 9px; }
         .bill-signature { font-size: 9px; }
+        .bill-office-copy { font-size: 10px; }
         .bill-cut { height: 13px; margin: 3.5px 0; border-top-width: 1px; }
         .bill-cut span { font-size: 12px; line-height: 13px; top: -6.5px; }
         .bill-qr { width: 62px; left: 6.5px; top: 6.5px; }
