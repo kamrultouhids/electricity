@@ -186,12 +186,12 @@
     <div class="bill-office-copy border border-dark">
         <div class="p-2 text-center fw-bold border-bottom border-dark">অফিস কপি</div>
         <div class="row g-0">
-            <div class="col-5 p-2 border-end border-dark">
+            <div class="col-6 p-2 border-end border-dark">
                 <div class="d-flex mb-1"><span class="me-1">গ্রাহকের নাম:</span><b>{{ $customer->name }}</b></div>
                 <div class="d-flex mb-1"><span class="me-1">পিতা/স্বামীর নাম:</span><b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
                 <div class="d-flex"><span class="me-1">ঠিকানা:</span><b>{{ $customer->address ?? '—' }}</b></div>
             </div>
-            <div class="col-4 p-2 border-end border-dark">
+            <div class="col-3 p-2 border-end border-dark">
                 @if (filled($customer->mobile_number))
                     <div class="d-flex mb-1"><span class="me-1">মোবাইল নং:</span><b>{{ $customer->mobile_number }}</b></div>
                 @endif
@@ -324,7 +324,7 @@
         .bill-title { font-size: 16px; padding-top: 0; margin-bottom: 1px; }
         .bill-copy-tag { font-size: 10px; }
         .bill-copy .kv { font-size: 10px; padding: 0.3px 0; line-height: 1.45; }
-        .bill-copy .kv > span { min-width: 120px; }
+/*         .bill-copy .kv > span { min-width: 120px; } */
         .bill-table th, .bill-table td { padding: 1.5px 3.5px; font-size: 10px; line-height: 1.3; }
         .bill-block.p-2 { padding: 1.2mm !important; }
         .row.g-0.bill-block .col-5.p-2, .row.g-0.bill-block .col-6.p-2, .row.g-0.bill-block .col-7.p-2 { padding: 1.2mm !important; }
