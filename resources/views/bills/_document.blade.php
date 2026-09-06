@@ -281,29 +281,29 @@
             padding-bottom: 1mm;
         }
         .bill-copy tr, .bill-copy .bill-block, .bill-copy table { page-break-inside: avoid; break-inside: avoid; }
-        /* Optimized spacing for B5 paper - very compact */
-        .bill-org { line-height: 1.2; }
+        /* Optimized spacing for B5 paper - balanced */
+        .bill-org { line-height: 1.25; }
         .bill-org .org-bismillah { font-size: 11px; }
         .bill-org .org-slogan { font-size: 12px; }
-        .bill-org .org-name { font-size: 14px; line-height: 1.15; }
+        .bill-org .org-name { font-size: 14px; line-height: 1.18; }
         .bill-org .org-addr { font-size: 11px; }
-        .bill-title { font-size: 16px; padding-top: 0; margin-bottom: 1px; }
+        .bill-title { font-size: 17px; padding-top: 0; margin-bottom: 1px; }
         .bill-copy-tag { font-size: 11px; }
-        .bill-copy .kv { font-size: 11px; padding: 0px; line-height: 1.4; }
-        .bill-copy .kv > span { min-width: 115px; }
-        .bill-table th, .bill-table td { padding: 1px 3px; font-size: 11px; line-height: 1.25; }
-        .bill-block { padding: 1mm 0; border-top-width: 0.5px; }
-        .bill-block.p-2 { padding: 1mm !important; }
-        .row.g-0.bill-block .col-5.p-2, .row.g-0.bill-block .col-6.p-2, .row.g-0.bill-block .col-7.p-2 { padding: 1mm !important; }
-        .bill-cut { height: 12px; margin: 3px 0; border-top-width: 1px; }
-        .bill-cut span { font-size: 13px; line-height: 12px; top: -6px; }
-        .bill-qr { width: 60px; left: 6px; top: 6px; }
-        .bill-qr img { width: 54px; height: 54px; }
-        .bill-qr-cap { font-size: 7px; }
-        ul.small { font-size: 10px; margin-bottom: 0.5mm !important; padding-left: 15px; }
-        ul.small li { margin-bottom: 0; line-height: 1.3; }
-        .small.bill-contact { font-size: 10px; margin: 1mm 0 2mm; }
-        .bill-contact + .small { font-size: 10px; line-height: 1.3; }
+        .bill-copy .kv { font-size: 11px; padding: 0.3px 0; line-height: 1.45; }
+        .bill-copy .kv > span { min-width: 120px; }
+        .bill-table th, .bill-table td { padding: 1.5px 3.5px; font-size: 11px; line-height: 1.3; }
+        .bill-block { padding: 1.2mm 0; border-top-width: 0.5px; }
+        .bill-block.p-2 { padding: 1.2mm !important; }
+        .row.g-0.bill-block .col-5.p-2, .row.g-0.bill-block .col-6.p-2, .row.g-0.bill-block .col-7.p-2 { padding: 1.2mm !important; }
+        .bill-cut { height: 13px; margin: 3.5px 0; border-top-width: 1px; }
+        .bill-cut span { font-size: 13px; line-height: 13px; top: -6.5px; }
+        .bill-qr { width: 62px; left: 6.5px; top: 6.5px; }
+        .bill-qr img { width: 56px; height: 56px; }
+        .bill-qr-cap { font-size: 7.5px; }
+        ul.small { font-size: 10.5px; margin-bottom: 0.7mm !important; padding-left: 15px; }
+        ul.small li { margin-bottom: 0.2mm; line-height: 1.35; }
+        .small.bill-contact { font-size: 10.5px; margin: 1.2mm 0 2mm; }
+        .bill-contact + .small { font-size: 10.5px; line-height: 1.35; }
     }
 </style>
 @endpush
