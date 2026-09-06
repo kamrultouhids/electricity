@@ -159,21 +159,21 @@
     {{-- Instructions --}}
     <div class="p-2 bill-block">
         <div class="fw-bold">নির্দেশনা</div>
-        <ul class="mb-1 small">
+        <ul class="mb-1 small fw-bold">
             <li>উপরোক্ত বিলের টাকা নির্দিষ্ট তারিখের মধ্যে কর্তৃপক্ষের বরাবরে পরিশোধ করিতে হইবে।</li>
             <li>সাইড লাইন ব্যবহার করা যাবে না। ৯৯৯ টাকার ঊর্ধ্বে বকেয়া বিলের উপর ১০% জরিমানা যোগ করা হবে।</li>
             <li>নির্ধারিত তারিখের মধ্যে বিল পরিশোধ না করিলে সংযোগ বিচ্ছিন্ন করা হবে।</li>
         </ul>
         {{-- Where to call, and where to check the bill online. The portal URL
              is printed in full, scheme included, and follows APP_URL. --}}
-        <div class="small bill-contact">
-            <b>হটলাইন:</b> {{ $bn('01633380033') }}
+        <div class="small bill-contact fw-bold">
+            হটলাইন: {{ $bn('01633380033') }}
             <span class="bill-contact-sep">|</span>
-            <b>অনলাইনে বিল দেখুন:</b>
+            অনলাইনে বিল দেখুন:
             <a href="{{ route('portal.login') }}" target="_blank" rel="noopener">{{ route('portal.login') }}</a>
         </div>
-        <div class="small">
-            ১) বিদ্যুৎ সাশ্রয়ের মাধ্যমে বিদ্যুৎ বিল কমান | ২) বাতি/ফ্যান ব্যবহারে সচেতন হোন |<br>
+        <div class="small fw-bold" style="margin-top: -1px;">
+            ১) বিদ্যুৎ সাশ্রয়ের মাধ্যমে বিদ্যুৎ বিল কমান | <br>২) বাতি/ফ্যান ব্যবহারে সচেতন হোন |<br>
             ৩) বিদ্যুৎ সাশ্রয়ী বাতি (CFL/T5 টিউব লাইট) ব্যবহার করুন |
         </div>
     </div>
