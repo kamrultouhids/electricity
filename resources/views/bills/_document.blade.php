@@ -251,15 +251,15 @@
     .bill-table th, .bill-table td { border-color: #000 !important; }
     @media print {
         /* Zero page margin so the browser drops its own header/footer. */
-        @page { size: A4 portrait; margin: 0; }
+        @page { size: 182mm 257mm; margin: 0; }
         html, body { height: auto; }
-        body { box-sizing: border-box !important; width: auto !important; padding: 8mm !important; }
+        body { box-sizing: border-box !important; width: auto !important; padding: 4mm !important; }
         .no-print { display: none !important; }
         .navbar, nav { display: none !important; }
         /* Strip app chrome/spacing so only the bill prints */
         #app > main.py-4, main.py-4 { padding: 0 !important; }
         .container, .container-fluid { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
-        /* Fit the whole bill (both copies) on a single A4 page */
+        /* Fit the whole bill (both copies) on a single B5 page */
         .bill-copy {
             border: 1px solid #000;
             max-width: 100%;
@@ -267,13 +267,43 @@
             margin: 0 auto;
             page-break-inside: avoid;
             break-inside: avoid;
+            padding: 0;
+        }
+        .bill-copy > .text-center:first-child,
+        .bill-copy > .bill-org {
+            padding-left: 3mm;
+            padding-right: 3mm;
+            padding-top: 2mm;
+        }
+        .bill-copy > .text-center.position-relative {
+            padding-left: 3mm;
+            padding-right: 3mm;
+            padding-bottom: 1mm;
         }
         .bill-copy tr, .bill-copy .bill-block, .bill-copy table { page-break-inside: avoid; break-inside: avoid; }
-        /* Slightly tighter type/padding so it never spills to a 2nd page */
-        .bill-org .org-name { font-size: 15px; }
-        .bill-title { font-size: 18px; padding-top: 0; }
-        .bill-copy .kv { font-size: 12px; }
-        .bill-table th, .bill-table td { padding: 2px 5px; font-size: 12px; }
+        /* Optimized spacing for B5 paper - very compact */
+        .bill-org { line-height: 1.2; }
+        .bill-org .org-bismillah { font-size: 10px; }
+        .bill-org .org-slogan { font-size: 11px; }
+        .bill-org .org-name { font-size: 13px; line-height: 1.15; }
+        .bill-org .org-addr { font-size: 10px; }
+        .bill-title { font-size: 15px; padding-top: 0; margin-bottom: 1px; }
+        .bill-copy-tag { font-size: 10px; }
+        .bill-copy .kv { font-size: 10px; padding: 0px; line-height: 1.4; }
+        .bill-copy .kv > span { min-width: 115px; }
+        .bill-table th, .bill-table td { padding: 1px 3px; font-size: 10px; line-height: 1.25; }
+        .bill-block { padding: 1mm 0; border-top-width: 0.5px; }
+        .bill-block.p-2 { padding: 1mm !important; }
+        .row.g-0.bill-block .col-5.p-2, .row.g-0.bill-block .col-6.p-2, .row.g-0.bill-block .col-7.p-2 { padding: 1mm !important; }
+        .bill-cut { height: 12px; margin: 3px 0; border-top-width: 1px; }
+        .bill-cut span { font-size: 12px; line-height: 12px; top: -6px; }
+        .bill-qr { width: 60px; left: 6px; top: 6px; }
+        .bill-qr img { width: 54px; height: 54px; }
+        .bill-qr-cap { font-size: 7px; }
+        ul.small { font-size: 9px; margin-bottom: 0.5mm !important; padding-left: 15px; }
+        ul.small li { margin-bottom: 0; line-height: 1.3; }
+        .small.bill-contact { font-size: 9px; margin: 1mm 0 2mm; }
+        .bill-contact + .small { font-size: 9px; line-height: 1.3; }
     }
 </style>
 @endpush
