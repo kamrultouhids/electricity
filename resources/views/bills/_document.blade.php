@@ -94,7 +94,7 @@
     </table>
 
     {{-- Meter reading + charge breakdown --}}
-    <div class="row g-0 ">
+    <div class="row g-0 bill-mid">
         {{-- Meter reading --}}
         <div class="col-5 ">
             <table class="table table-bordered bill-table mb-0 h-100">
@@ -105,15 +105,15 @@
                 <tbody>
                     <tr>
                         <td>বর্তমান<br><small>{{ $bnMonthYear($currentReadingDate) }}</small></td>
-                        <td class="text-end align-middle">{{ $bn(number_format($currentReading, 0)) }}</td>
+                        <td class="text-center align-middle">{{ $bn(number_format($currentReading, 0)) }}</td>
                     </tr>
                     <tr>
                         <td>পূর্ববতী<br><small>{{ $bnMonthYear($previousReadingDate) }}</small></td>
-                        <td class="text-end align-middle">{{ $bn(number_format($previousReading, 0)) }}</td>
+                        <td class="text-center align-middle">{{ $bn(number_format($previousReading, 0)) }}</td>
                     </tr>
                     <tr>
                         <td>ব্যবহৃত ইউনিট</td>
-                        <td class="text-end align-middle">{{ $bn(number_format($units, 0)) }}</td>
+                        <td class="text-center align-middle">{{ $bn(number_format($units, 0)) }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -148,9 +148,9 @@
         </div>
     </div>
 
-    {{-- Preparer --}}
-    <div class="row g-0 bill-block">
-        <div class="col-6 p-2 border-end">
+    {{-- Preparer — no border-top: the tables above already draw that line --}}
+    <div class="row g-0 bill-block border-top-0">
+        <div class="col-6 p-2 ">
             <div>{{ $preparerName }}</div>
             <small class="text-muted">বিল প্রস্তুতকারী</small>
         </div>
@@ -185,7 +185,8 @@
     <div class="bill-cut"><span>&#9986;</span></div>
 
     {{-- Office copy --}}
-    <div class="bill-office-copy border border-dark">
+    {{-- Sides/bottom come from the outer .bill-copy frame; only the top line is ours --}}
+    <div class="bill-office-copy border-top border-dark">
         <div class="p-2 text-center fw-bold border-bottom border-dark">অফিস কপি</div>
         <div class="row g-0">
             <div class="col-7 p-2 border-end border-dark">
@@ -287,6 +288,17 @@
     .bill-table th, .bill-table td { padding: 3px 6px; font-size: 13px; }
     .bill-table { border-color: #000 !important; }
     .bill-table th, .bill-table td { border-color: #000 !important; }
+    /* Single-weight rules everywhere: tables drop their outermost vertical
+       borders (the .bill-copy frame already draws them)... */
+    .bill-table > :not(caption) > * > :first-child { border-left: 0 !important; }
+    .bill-table > :not(caption) > * > :last-child { border-right: 0 !important; }
+    /* ...the divider between the meter and charges tables is drawn once,
+       by the column wrapper (spans the full row height too)... */
+    .bill-mid > .col-5 { border-right: 1px solid #000; }
+    /* ...and the line under the previous-bills table belongs to that table
+       alone, so the tables below start with no top border. */
+    .bill-mid .bill-table thead tr:first-child,
+    .bill-mid .bill-table thead tr:first-child > th { border-top: 0 !important; }
     .min-space {
         min-width: 80px;
     }
@@ -377,7 +389,7 @@
         }
     .min-space {
             min-width: 80px;
-        }
+        }poi
         .min-space-right {
                 min-width: 110px;
         }
