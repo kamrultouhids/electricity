@@ -34,7 +34,7 @@
         <div class="org-bismillah">বিসমিল্লাহির রাহমানির রাহিম</div>
         <div class="org-slogan">&ldquo;বিদ্যুৎ জাতীয় সম্পদ অপচয় রোধে এগিয়ে আসুন, অবৈধ সংযোগ থেকে বিরত থাকুন&rdquo;</div>
         <div class="org-name">চট্টগ্রাম মহানগর ছিন্নমূল বস্তিবাসি সমন্বয় সংগ্রাম পরিষদ</div>
-        <div class="org-addr">পরিচালনায়ঃ জঙ্গল সলিমপুর বিদ্যুৎ গ্রাহক ফোরা <br>ডাকঘরঃ জাফরাবাদ, থানাঃ সিতাকুণ্ড, চট্টগ্রাম </div>
+        <div class="org-addr">পরিচালনায়ঃ জঙ্গল সলিমপুর বিদ্যুৎ গ্রাহক ফোরাম <br>ডাকঘরঃ জাফরাবাদ, থানাঃ সীতাকুণ্ড, চট্টগ্রাম </div>
     </div>
 
     {{-- Header --}}
@@ -46,7 +46,7 @@
     {{-- Top: customer info + bill dates --}}
     <div class="row g-0 bill-block">
         <div class="col-5 p-2 border-black-right">
-            <div class="kv"><span>বিলের মাস</span><b>{{ $bnMonthYear($billMonth) }}</b></div>
+            <div class="kv"><span>বিলের মাস</span> <b> {{ $bnMonthYear($billMonth) }}</b></div>
             <div class="kv"><span>বিল প্রস্তুতের তারিখ</span><b>{{ $bnDate($prepDate) }}</b></div>
             <div class="kv"><span>পরিশোধের শেষ তারিখ</span><b>{{ $bnDate($lastDate) }}</b></div>
         </div>
@@ -188,20 +188,19 @@
     <div class="bill-office-copy border border-dark">
         <div class="p-2 text-center fw-bold border-bottom border-dark">অফিস কপি</div>
         <div class="row g-0">
-            <div class="col-6 p-2 border-end border-dark">
+            <div class="col-8 p-2 border-end border-dark">
                 <div class="d-flex mb-1"><span class="me-1">গ্রাহকের নাম:</span><b>{{ $customer->name }}</b></div>
                 @if (filled($customer->father_or_husband_name))
                     <div class="d-flex mb-1"><span class="me-1">পিতা/স্বামীর নাম:</span><b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
                 @endif
                 <div class="d-flex"><span class="me-1">ঠিকানা:</span><b>{{ $customer->address ?? '—' }}</b></div>
-            </div>
-            <div class="col-3 p-2 border-end border-dark">
                 @if (filled($customer->mobile_number))
                     <div class="d-flex mb-1"><span class="me-1">মোবাইল নং:</span><b>{{ $customer->mobile_number }}</b></div>
                 @endif
                 <div class="d-flex"><span class="me-1">বিলের মাস:</span><b>{{ $bnMonthYear($billMonth) }}</b></div>
             </div>
-            <div class="col-3 p-2">
+
+            <div class="col-4 p-2">
                 <div class="d-flex mb-1"><span class="me-1">হিসাব নং/গ্রাহক নং:</span><b>{{ $customer->serial_no ?? '—' }}</b></div>
                 <div class="d-flex"><span class="me-1">মোট বিল:</span><b>৳ {{ $bn(number_format($totalAmount, 2)) }}</b></div>
             </div>
@@ -234,7 +233,7 @@
     .bill-org .org-slogan { font-size: 12px; font-weight: 700; }
     .bill-org .org-name { font-size: 12px; }
     .bill-org .org-addr { font-size: 12px; font-weight: 700; }
-    .bill-title { font-size: 20px; font-weight: 700; padding: 0 0 2px; }
+    .bill-title { font-size: 20px; font-weight: 700; padding: 8px 8px; }
     .bill-cut {
         position: relative;
         height: 24px;
@@ -272,7 +271,7 @@
     }
     .border-black-right { border-right: var(--bs-border-width) var(--bs-border-style) #000 !important;}
     .bill-signature { font-size: 11px; }
-    .bill-office-copy { font-size: 13px; }
+    .bill-office-copy { font-size: 14px; }
     .bill-contact { margin: 2px 0 4px; }
     /* Clickable on screen, plain black text on paper. */
     .bill-contact a { color: inherit; text-decoration: underline; }
@@ -281,8 +280,8 @@
     }
     .bill-contact-sep { padding: 0 4px; color: #555; }
     .bill-copy .kv { display: flex; font-size: 13px; padding: 1px 0; }
-/*     .bill-copy .kv > span { min-width: 130px; } */
-    .bill-copy .kv > span::after { content: ' :'; }
+    .bill-copy .kv > span { min-width: 120px;    margin-right: 2px; }
+    .bill-copy .kv > span::after { content: ' :'; float: right; }
     .bill-table th, .bill-table td { padding: 3px 6px; font-size: 13px; }
     .bill-table { border-color: #000 !important; }
     .bill-table th, .bill-table td { border-color: #000 !important; }
@@ -325,17 +324,17 @@
         .bill-org .org-slogan { font-size: 10px; }
         .bill-org .org-name { font-size: 10px; line-height: 1.18; }
         .bill-org .org-addr { font-size: 10px; line-height: 1.3; }
-        .bill-title { font-size: 16px; padding-top: 0; margin-bottom: 1px; }
+        .bill-title { font-size: 20px; font-weight: 700; padding: 8px 8px; }
         .bill-copy-tag { font-size: 10px; }
-        .bill-copy .kv { font-size: 10px; padding: 0.3px 0; line-height: 1.45; }
-/*         .bill-copy .kv > span { min-width: 120px; } */
+        .bill-copy .kv { font-size: 13px; padding: 0.3px 0; line-height: 1.45; }
+        .bill-copy .kv > span { min-width: 120px; margin-right: 2px;}
         .bill-table th, .bill-table td { padding: 1.5px 3.5px; font-size: 10px; line-height: 1.3; }
         .bill-block.p-2 { padding: 1.2mm !important; }
         .row.g-0.bill-block .col-5.p-2, .row.g-0.bill-block .col-6.p-2, .row.g-0.bill-block .col-7.p-2 { padding: 1.2mm !important; }
         .bill-disclaimer-vertical { width: 32px; padding: 6px 0; border-right-width: 0.5px; }
         .bill-disclaimer-text { font-size: 9px; }
         .bill-signature { font-size: 9px;  }
-        .bill-office-copy { font-size: 10px; }
+        .bill-office-copy { font-size: 14px; }
         .bill-cut { height: 13px; margin: 3.5px 0; border-top-width: 1px; }
         .bill-cut span { font-size: 12px; line-height: 13px; top: -6.5px; }
         .bill-qr { width: 62px; left: 6.5px; top: 6.5px; }
