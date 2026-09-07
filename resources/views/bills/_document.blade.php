@@ -188,21 +188,21 @@
     <div class="bill-office-copy border border-dark">
         <div class="p-2 text-center fw-bold border-bottom border-dark">অফিস কপি</div>
         <div class="row g-0">
-            <div class="col-8 p-2 border-end border-dark">
-                <div class="d-flex mb-1"><span class="me-1">গ্রাহকের নাম:</span><b>{{ $customer->name }}</b></div>
+            <div class="col-7 p-2 border-end border-dark">
+                <div class="d-flex mb-1"><span class="me-1 min-space">গ্রাহকের নাম</span>:<b>{{ $customer->name }}</b></div>
                 @if (filled($customer->father_or_husband_name))
-                    <div class="d-flex mb-1"><span class="me-1">পিতা/স্বামীর নাম:</span><b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
+                    <div class="d-flex mb-1"><span class="me-1 min-space">পিতা/স্বামীর নাম</span>:<b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
                 @endif
-                <div class="d-flex"><span class="me-1">ঠিকানা:</span><b>{{ $customer->address ?? '—' }}</b></div>
+                <div class="d-flex"><span class="me-1 min-space">ঠিকানা</span>:<b>{{ $customer->address ?? '—' }}</b></div>
                 @if (filled($customer->mobile_number))
-                    <div class="d-flex mb-1"><span class="me-1">মোবাইল নং:</span><b>{{ $customer->mobile_number }}</b></div>
+                    <div class="d-flex mb-1"><span class="me-1 min-space">মোবাইল নং</span>:<b>{{ $customer->mobile_number }}</b></div>
                 @endif
-                <div class="d-flex"><span class="me-1">বিলের মাস:</span><b>{{ $bnMonthYear($billMonth) }}</b></div>
+                <div class="d-flex"><span class="me-1 min-space">বিলের মাস</span>:<b>{{ $bnMonthYear($billMonth) }}</b></div>
             </div>
 
-            <div class="col-4 p-2">
-                <div class="d-flex mb-1"><span class="me-1">হিসাব নং/গ্রাহক নং:</span><b>{{ $customer->serial_no ?? '—' }}</b></div>
-                <div class="d-flex"><span class="me-1">মোট বিল:</span><b>৳ {{ $bn(number_format($totalAmount, 2)) }}</b></div>
+            <div class="col-5 p-2 font-office-copy">
+                <div class="d-flex mb-1"><span class="me-1 min-space-right">হিসাব নং/গ্রাহক নং</span>:<b>{{ $customer->serial_no ?? '—' }}</b></div>
+                <div class="d-flex"><span class="me-1 min-space-right">মোট বিল</span>:<b>৳ {{ $bn(number_format($totalAmount, 2)) }}</b></div>
             </div>
         </div>
 
@@ -222,11 +222,13 @@
 @push('styles')
 <style>
     .bill-copy {
-        max-width: 800px;
+        max-width: 182mm;
+        width: 182mm;
         margin: 0 auto;
         border: 1px solid #000;
         background: #fff;
         position: relative;
+        box-sizing: border-box;
     }
     .bill-org { line-height: 1.35; }
     .bill-org .org-bismillah { font-size: 12px; }
@@ -285,11 +287,21 @@
     .bill-table th, .bill-table td { padding: 3px 6px; font-size: 13px; }
     .bill-table { border-color: #000 !important; }
     .bill-table th, .bill-table td { border-color: #000 !important; }
+    .min-space {
+        min-width: 80px;
+    }
+    .min-space-right {
+            min-width: 110px;
+    }
+    .font-office-copy{
+        font-size: 15px !important;
+        font-weight: 700;
+    }
     @media print {
         /* Zero page margin so the browser drops its own header/footer. */
         @page { size: 182mm 257mm; margin: 0; }
         html, body { height: auto; }
-        body { box-sizing: border-box !important; width: auto !important; padding: 4mm !important; }
+        body { box-sizing: border-box !important; width: auto !important; padding: 2mm 4mm !important; }
         .no-print { display: none !important; }
         .navbar, nav { display: none !important; }
         /* Strip app chrome/spacing so only the bill prints */
@@ -322,7 +334,7 @@
         .bill-org { line-height: 1.25; }
         .bill-org .org-bismillah { font-size: 10px; }
         .bill-org .org-slogan { font-size: 10px; }
-        .bill-org .org-name { font-size: 10px; line-height: 1.18; }
+        .bill-org .org-name { font-size: 11px; line-height: 1.2; }
         .bill-org .org-addr { font-size: 10px; line-height: 1.3; }
         .bill-title { font-size: 20px; font-weight: 700; padding: 8px 8px; }
         .bill-copy-tag { font-size: 10px; }
@@ -333,7 +345,7 @@
         .row.g-0.bill-block .col-5.p-2, .row.g-0.bill-block .col-6.p-2, .row.g-0.bill-block .col-7.p-2 { padding: 1.2mm !important; }
         .bill-disclaimer-vertical { width: 32px; padding: 6px 0; border-right-width: 0.5px; }
         .bill-disclaimer-text { font-size: 9px; }
-        .bill-signature { font-size: 9px;  }
+        .bill-signature { font-size: 9px; padding-bottom: 6mm !important; }
         .bill-office-copy { font-size: 14px; }
         .bill-cut { height: 13px; margin: 3.5px 0; border-top-width: 1px; }
         .bill-cut span { font-size: 12px; line-height: 13px; top: -6.5px; }
@@ -344,12 +356,24 @@
         ul.small li { margin-bottom: 0.2mm; line-height: 1.35; }
         .small.bill-contact { font-size: 9.5px; margin: 1.2mm 0 2mm; }
         .bill-contact + .small { font-size: 9.5px; line-height: 1.35; }
-.border-black-right {
-        border-top: 0 !important;
-        border-bottom: 0 !important;
-        border-left: 0 !important;
-        border-right: 1px solid #000 !important;
-    }    }
+       .border-black-right {
+            border-top: 0 !important;
+            border-bottom: 0 !important;
+            border-left: 0 !important;
+            border-right: 1px solid #000 !important;
+        }
+    .min-space {
+            min-width: 80px;
+        }
+        .min-space-right {
+                min-width: 110px;
+        }
+        .font-office-copy{
+            font-size: 15px;
+           font-weight: 700;
+        }
+
+    }
 </style>
 @endpush
 @endonce
