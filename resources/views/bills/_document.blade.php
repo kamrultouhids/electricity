@@ -324,8 +324,12 @@
             flex-direction: column;
         }
         .bill-copy > * { flex-shrink: 0; }
-        /* Push the cut separator and everything after it to the page bottom */
-        .bill-copy > .bill-cut { margin-top: auto; }
+        /* Leftover page space is absorbed by the customer copy's meter
+           reading + charges tables (their rows stretch evenly), so there is
+           no visible void: the cut line stays snug after the instructions
+           and a compact office copy ends at the page bottom. */
+        .bill-copy > .row.g-0:not(.bill-block) { flex-grow: 1; }
+        .bill-copy > .row.g-0:not(.bill-block) .bill-table { height: 100%; }
 
         .bill-copy > .bill-org {
             padding-left: 17mm;
