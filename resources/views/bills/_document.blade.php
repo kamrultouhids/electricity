@@ -15,6 +15,12 @@
     $electricityDutyRate = $electricityDutyRate ?? 0;
     $electricityDuty = $electricityDuty ?? 0;
 
+    if ($previousReadingDate) {
+        $previousReadingDate = $previousReadingDate->copy()->subMonth();
+    } else {
+        $previousReadingDate = $billMonth?->copy()->subMonth();
+    }
+
     // Bengali numerals and dates — shared with the dashboard, see App\Support\Bn.
     $bn = fn ($v) => \App\Support\Bn::digits($v);
     $bnMonths = \App\Support\Bn::MONTHS;
@@ -45,14 +51,14 @@
 
     {{-- Top: customer info + bill dates --}}
     <div class="row g-0 bill-block">
-        <div class="col-5 p-2 border-black-right">
+        <div class="col-6 p-2 border-black-right">
             <div class="kv"><span>বিলের মাস</span> <b> {{ $bnMonthYear($billMonth) }}</b></div>
             <div class="kv"><span>বিল প্রস্তুতের তারিখ</span><b>{{ $bnDate($prepDate) }}</b></div>
             <div class="kv"><span>পরিশোধের শেষ তারিখ</span><b>{{ $bnDate($lastDate) }}</b></div>
         </div>
-        <div class="col-7 p-2 ">
+        <div class="col-6 p-2 ">
             <div class="kv"><span>এরিয়া কোড/শাখা</span><b>{{ $customer->sheet->name ?? '—' }}</b></div>
-            <div class="kv boxed"><span>হিসাব নং/গ্রাহক নং</span><b>{{ $customer->serial_no ?? '—' }}</b></div>
+            <div class="kv boxed"><span>হিসাব/গ্রাহক নং</span><b>{{ $customer->serial_no ?? '—' }}</b></div>
             <div class="kv boxed"><span>গ্রাহকের নাম</span><b>{{ $customer->name }}</b></div>
             @if (filled($customer->father_or_husband_name))
                 <div class="kv boxed"><span>পিতা/স্বামীর নাম</span><b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
@@ -81,11 +87,11 @@
             @forelse ($previousBills as $pb)
                 <tr class="text-end">
                     <td class="text-center">{{ $bnMonthYear($pb->billing_month) }}</td>
-                    <td>{{ $bn(number_format($pb->units, 1)) }}</td>
-                    <td>{{ $bn(number_format($pb->total_amount, 1)) }}</td>
-                    <td>{{ $bn(number_format($pb->paid_amount, 1)) }}</td>
-                    <td>{{ $bn(number_format($pb->discount, 1)) }}</td>
-                    <td>{{ $bn(number_format($pb->due_amount, 1)) }}</td>
+                    <td>{{ $bn(number_format($pb->units, 0)) }}</td>
+                    <td>{{ $bn(number_format($pb->total_amount, 0)) }}</td>
+                    <td>{{ $bn(number_format($pb->paid_amount, 0)) }}</td>
+                    <td>{{ $bn(number_format($pb->discount, 0)) }}</td>
+                    <td>{{ $bn(number_format($pb->due_amount, 0)) }}</td>
                 </tr>
             @empty
                 <tr><td colspan="6" class="text-center text-muted">কোন আগের বিল নেই</td></tr>
@@ -126,23 +132,23 @@
                     <tr><th>বিবরণ</th><th class="text-end" width="120">টাকা</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td>ব্যবহৃত ইউনিট মূল্য</td><td class="text-end">{{ $bn(number_format($energyCharge, 2)) }}</td></tr>
-                    <tr><td>লাইন চার্জ</td><td class="text-end">{{ $bn(number_format($lineCharge, 2)) }}</td></tr>
-                    <tr><td>সার্ভিস চার্জ</td><td class="text-end">{{ $bn(number_format($serviceCharge, 2)) }}</td></tr>
-                    <tr><td>ডিমান্ড চার্জ</td><td class="text-end">{{ $bn(number_format($demandCharge, 2)) }}</td></tr>
-                    <tr><td>বকেয়া বিল</td><td class="text-end">{{ $bn(number_format($previousOutstanding, 2)) }}</td></tr>
-                    <tr><td>বকেয়া বিলের জরিমানা</td><td class="text-end">{{ $bn(number_format($lateFee, 2)) }}</td></tr>
-                    <tr><td>অতিরিক্ত চার্জ</td><td class="text-end">{{ $bn(number_format($fixedCharge, 2)) }}</td></tr>
+                    <tr><td>ব্যবহৃত ইউনিট মূল্য</td><td class="text-end">{{ $bn(number_format($energyCharge, 0)) }}</td></tr>
+                    <tr><td>লাইন চার্জ</td><td class="text-end">{{ $bn(number_format($lineCharge, 0)) }}</td></tr>
+                    <tr><td>সার্ভিস চার্জ</td><td class="text-end">{{ $bn(number_format($serviceCharge, 0)) }}</td></tr>
+                    <tr><td>ডিমান্ড চার্জ</td><td class="text-end">{{ $bn(number_format($demandCharge, 0)) }}</td></tr>
+                    <tr><td>বকেয়া বিল</td><td class="text-end">{{ $bn(number_format($previousOutstanding, 0)) }}</td></tr>
+                    <tr><td>বকেয়া বিলের জরিমানা</td><td class="text-end">{{ $bn(number_format($lateFee, 0)) }}</td></tr>
+                    <tr><td>অতিরিক্ত চার্জ</td><td class="text-end">{{ $bn(number_format($fixedCharge, 0)) }}</td></tr>
                     <tr>
                         <td>বিদ্যুৎ শুল্ক{{ $electricityDutyRate > 0 ? ' ('.$bn(rtrim(rtrim(number_format($electricityDutyRate, 2), '0'), '.')).'%)' : '(%)' }}</td>
-                        <td class="text-end">{{ $bn(number_format($electricityDuty, 2)) }}</td>
+                        <td class="text-end">{{ $bn(number_format($electricityDuty, 0)) }}</td>
                     </tr>
                     <!-- @php $discount = $discount ?? 0; @endphp -->
                     @php $discount =  0; @endphp
 
-                    <tr class="fw-bold"><td>মোট বিল</td><td class="text-end">{{ $bn(number_format($totalAmount, 2)) }}</td></tr>
-                    <tr><td>ছাড়(-)</td><td class="text-end">{{ $bn(number_format($discount, 2)) }}</td></tr>
-                    <tr class="fw-bold "><td>বিল</td><td class="text-end">৳ {{ $bn(number_format($totalAmount - $discount, 2)) }}</td></tr>
+                    <tr class="fw-bold"><td>মোট বিল</td><td class="text-end">{{ $bn(number_format($totalAmount, 0)) }}</td></tr>
+                    <tr><td>ছাড়(-)</td><td class="text-end">{{ $bn(number_format($discount, 0)) }}</td></tr>
+                    <tr class="fw-bold "><td>বিল</td><td class="text-end">{{ $bn(number_format($totalAmount - $discount, 0)) }}৳</td></tr>
                 </tbody>
             </table>
         </div>
@@ -170,7 +176,7 @@
         {{-- Where to call, and where to check the bill online. The portal URL
              is printed in full, scheme included, and follows APP_URL. --}}
         <div class="small bill-contact fw-bold">
-            হটলাইন: {{ $bn('01633380033') }}
+            হটলাইন: <b>{{ $bn('01633380033') }}</b>
             <span class="bill-contact-sep">|</span>
             অনলাইনে বিল দেখুন:
             <a href="{{ route('portal.login') }}" target="_blank" rel="noopener">{{ route('portal.login') }}</a>
@@ -202,8 +208,8 @@
             </div>
 
             <div class="col-5 p-2 font-office-copy">
-                <div class="d-flex mb-1"><span class="me-1 min-space-right">হিসাব নং/গ্রাহক নং</span>:<b>{{ $customer->serial_no ?? '—' }}</b></div>
-                <div class="d-flex"><span class="me-1 min-space-right">মোট বিল</span>:<b>৳ {{ $bn(number_format($totalAmount, 2)) }}</b></div>
+                <div class="d-flex mb-1"><span class="me-1 min-space-right">হিসাব/গ্রাহক নং</span>: <b>{{ $customer->serial_no ?? '—' }}</b></div>
+                <div class="d-flex"><span class="me-1 min-space-right">মোট বিল</span>: <b>{{ $bn(number_format($totalAmount, 0)) }}৳</b></div>
             </div>
         </div>
 
@@ -285,6 +291,10 @@
     .bill-copy .kv { display: flex; font-size: 13px; padding: 1px 0; }
     .bill-copy .kv > span { min-width: 120px;    margin-right: 2px; }
     .bill-copy .kv > span::after { content: ' :'; float: right; }
+    /* Labels never wrap; date values (left column) stay on one line too.
+       Long values on the right (name/address) may still wrap normally. */
+    .bill-copy .kv > span { white-space: nowrap; flex-shrink: 0; }
+    .border-black-right .kv > b { white-space: nowrap; }
     .bill-table th, .bill-table td { padding: 3px 6px; font-size: 13px; }
     .bill-table { border-color: #000 !important; }
     .bill-table th, .bill-table td { border-color: #000 !important; }
@@ -363,8 +373,10 @@
         .bill-org .org-addr { font-size: 10px; line-height: 1.3; }
         .bill-title { font-size: 20px; font-weight: 700; padding: 8px 8px; }
         .bill-copy-tag { font-size: 10px; }
-        .bill-copy .kv { font-size: 13px; padding: 0.3px 0; line-height: 1.45; }
-        .bill-copy .kv > span { min-width: 120px; margin-right: 2px;}
+        /* Slightly smaller than screen: real printers render a hair narrower
+           than the preview, which used to wrap the labels and dates. */
+        .bill-copy .kv { font-size: 12px; padding: 0.3px 0; line-height: 1.45; }
+        .bill-copy .kv > span { min-width: 110px; margin-right: 2px;}
         .bill-table th, .bill-table td { padding: 1.5px 3.5px; font-size: 10px; line-height: 1.3; }
         .bill-block.p-2 { padding: 1.2mm !important; }
         .row.g-0.bill-block .col-5.p-2, .row.g-0.bill-block .col-6.p-2, .row.g-0.bill-block .col-7.p-2 { padding: 1.2mm !important; }
