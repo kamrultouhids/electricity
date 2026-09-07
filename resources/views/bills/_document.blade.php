@@ -389,7 +389,7 @@
         }
     .min-space {
             min-width: 80px;
-        }poi
+        }
         .min-space-right {
                 min-width: 110px;
         }
