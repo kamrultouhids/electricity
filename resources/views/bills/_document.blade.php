@@ -307,7 +307,10 @@
         /* Strip app chrome/spacing so only the bill prints */
         #app > main.py-4, main.py-4 { padding: 0 !important; }
         .container, .container-fluid { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
-        /* Fit the whole bill (both copies) on a single B5 page */
+        /* Fit the whole bill (both copies) on a single B5 page.
+           Flex column pinned to the full page height: leftover space
+           (previous-bills table can have 0–3 rows) collects above the
+           cut line, so the office copy always ends at the page bottom. */
         .bill-copy {
             border: 1px solid #000;
             max-width: 100%;
@@ -316,7 +319,13 @@
             page-break-inside: avoid;
             break-inside: avoid;
             padding: 0;
+            height: 252mm; /* 257mm page − 2×2mm body padding, minus a hair for rounding */
+            display: flex;
+            flex-direction: column;
         }
+        .bill-copy > * { flex-shrink: 0; }
+        /* Push the cut separator and everything after it to the page bottom */
+        .bill-copy > .bill-cut { margin-top: auto; }
 
         .bill-copy > .bill-org {
             padding-left: 17mm;

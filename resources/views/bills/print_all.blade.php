@@ -73,9 +73,23 @@
 <style>
     .bill-page + .bill-page { margin-top: 24px; }
     @media print {
-        /* One bill per sheet of paper. */
-        .bill-page { page-break-after: always; break-after: page; margin-top: 0; }
+        /* The page gutter lives on each .bill-page (not on <body>, whose top
+           padding would only apply to the first sheet and misalign the rest). */
+        html body { padding: 0 !important; }
+        /* One bill per sheet: each wrapper is a hair under one B5 page tall,
+           so a break always lands cleanly between bills. margin-top must beat
+           the two-class screen rule above, hence !important. */
+        .bill-page {
+            page-break-after: always;
+            break-after: page;
+            margin-top: 0 !important;
+            height: 256mm;
+            box-sizing: border-box;
+            padding: 2mm 4mm;
+        }
         .bill-page:last-child { page-break-after: auto; break-after: auto; }
+        /* Fill the sheet; overrides the standalone 252mm in _document. */
+        .bill-page .bill-copy { height: 100%; }
     }
 </style>
 @endpush
