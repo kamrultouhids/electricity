@@ -9,6 +9,19 @@
     // Suggested deadline; the operator confirms or changes it below before
     // the bill is saved.
     $lastDate = \App\Models\Bill::defaultLastDate($billMonth);
+
+    if ($meterReading->reading_date) {
+        $currentReadingDate = $meterReading->reading_date->copy()->subMonth();
+    } else {
+        $currentReadingDate = $billMonth?->copy()->subMonth();
+    }
+
+    if ($previousReading?->reading_date) {
+        $previousReadingDate = $previousReading?->reading_date->copy()->subMonth();
+    } else {
+        $previousReadingDate = $billMonth?->copy()->subMonth();
+    }
+
 @endphp
 
 @section('content')
@@ -33,8 +46,8 @@
         'preparerName'       => auth()->user()->name ?? '',
         'currentReading'     => $meterReading->current_reading,
         'previousReading'    => $meterReading->previous_reading,
-        'currentReadingDate' => $meterReading->reading_date,
-        'previousReadingDate' => $previousReading?->reading_date,
+        'currentReadingDate' => $currentReadingDate,
+        'previousReadingDate' => $previousReadingDate,
         'units'              => $data['units'],
         'energyCharge'       => $data['energy_charge'],
         'lineCharge'         => $data['line_charge'],

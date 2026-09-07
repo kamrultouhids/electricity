@@ -9,6 +9,17 @@
     // The deadline entered when the bill was generated.
     $lastDate = $bill->paymentLastDate();
     $mr = $bill->meterReading;
+    if ($mr->reading_date) {
+        $currentReadingDate = $mr->reading_date->copy()->subMonth();
+    } else {
+        $currentReadingDate = $billMonth?->copy()->subMonth();
+    }
+
+    if ($previousReading?->reading_date) {
+            $previousReadingDate = $previousReading?->reading_date->copy()->subMonth();
+    } else {
+        $previousReadingDate = $billMonth?->copy()->subMonth();
+    }
 @endphp
 
 @section('content')
@@ -80,8 +91,8 @@
         'preparerName'       => $bill->createdBy->name ?? '',
         'currentReading'     => $mr->current_reading ?? 0,
         'previousReading'    => $mr->previous_reading ?? 0,
-        'currentReadingDate' => $mr->reading_date ?? $billMonth,
-        'previousReadingDate' => $previousReading?->reading_date,
+        'currentReadingDate' => $currentReadingDate,
+        'previousReadingDate' => $previousReadingDate,
         'units'              => $bill->units,
         'energyCharge'       => $bill->energy_charge,
         'lineCharge'         => $bill->line_charge,

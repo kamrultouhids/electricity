@@ -69,7 +69,7 @@ class Bill extends Model
      * Status constants.
      */
     /** How many previous months the bill document shows. */
-    public const HISTORY_MONTHS = 3;
+    public const HISTORY_MONTHS = 2;
 
     public const STATUS_UNPAID = 1;
     public const STATUS_PARTIAL = 2;

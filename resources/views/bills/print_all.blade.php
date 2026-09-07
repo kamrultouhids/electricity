@@ -36,6 +36,18 @@
                 ? ($readingsByCustomer[$bill->customer_id] ?? collect())
                     ->last(fn ($r) => $r->reading_date < $mr->reading_date)
                 : null;
+
+                if ($mr->reading_date) {
+                        $currentReadingDate = $mr->reading_date->copy()->subMonth();
+                } else {
+                    $currentReadingDate = $billMonth?->copy()->subMonth();
+                }
+
+                if ($previousReading?->reading_date) {
+                        $previousReadingDate = $previousReading?->reading_date->copy()->subMonth();
+                } else {
+                    $previousReadingDate = $billMonth?->copy()->subMonth();
+                }
         @endphp
 
         <div class="bill-page">
@@ -47,8 +59,8 @@
                 'preparerName'        => $bill->createdBy->name ?? '',
                 'currentReading'      => $mr->current_reading ?? 0,
                 'previousReading'     => $mr->previous_reading ?? 0,
-                'currentReadingDate'  => $mr->reading_date ?? $billMonth,
-                'previousReadingDate' => $previousReading?->reading_date,
+                'currentReadingDate'  => $currentReadingDate,
+                'previousReadingDate' => $previousReadingDate,
                 'units'               => $bill->units,
                 'energyCharge'        => $bill->energy_charge,
                 'lineCharge'          => $bill->line_charge,

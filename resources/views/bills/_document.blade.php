@@ -1,25 +1,10 @@
-{{--
-    Shared electricity-bill document.
-    Expects: $customer, $billMonth, $prepDate, $lastDate (Carbon),
-             $preparerName,
-             $currentReading, $previousReading, $currentReadingDate, $previousReadingDate,
-             $units, $energyCharge, $lineCharge, $serviceCharge, $demandCharge,
-             $electricityDutyRate, $electricityDuty,
-             $previousOutstanding, $lateFee, $fixedCharge, $totalAmount,
-             $previousBills (Collection of Bill)
---}}
 @php
     $lineCharge = $lineCharge ?? 0;
     $serviceCharge = $serviceCharge ?? 0;
     $demandCharge = $demandCharge ?? 0;
     $electricityDutyRate = $electricityDutyRate ?? 0;
     $electricityDuty = $electricityDuty ?? 0;
-
-    if ($previousReadingDate) {
-        $previousReadingDate = $previousReadingDate->copy()->subMonth();
-    } else {
-        $previousReadingDate = $billMonth?->copy()->subMonth();
-    }
+    $previousReadingDate = $previousReadingDate;
 
     // Bengali numerals and dates — shared with the dashboard, see App\Support\Bn.
     $bn = fn ($v) => \App\Support\Bn::digits($v);
@@ -58,7 +43,7 @@
         </div>
         <div class="col-6 p-2 ">
             <div class="kv"><span>এরিয়া কোড/শাখা</span><b>{{ $customer->sheet->name ?? '—' }}</b></div>
-            <div class="kv boxed"><span>হিসাব/গ্রাহক নং</span><b>{{ $customer->serial_no ?? '—' }}</b></div>
+            <div class="kv boxed"><span>হিসাব নং</span><b>{{ $customer->serial_no ?? '—' }}</b></div>
             <div class="kv boxed"><span>গ্রাহকের নাম</span><b>{{ $customer->name }}</b></div>
             @if (filled($customer->father_or_husband_name))
                 <div class="kv boxed"><span>পিতা/স্বামীর নাম</span><b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
@@ -208,7 +193,7 @@
             </div>
 
             <div class="col-5 p-2 font-office-copy">
-                <div class="d-flex mb-1"><span class="me-1 min-space-right">হিসাব/গ্রাহক নং</span>: <b>{{ $customer->serial_no ?? '—' }}</b></div>
+                <div class="d-flex mb-1"><span class="me-1 min-space-right">হিসাব নং</span>: <b>{{ $customer->serial_no ?? '—' }}</b></div>
                 <div class="d-flex"><span class="me-1 min-space-right">মোট বিল</span>: <b>{{ $bn(number_format($totalAmount, 0)) }}৳</b></div>
             </div>
         </div>

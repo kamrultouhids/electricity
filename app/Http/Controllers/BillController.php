@@ -218,6 +218,50 @@ class BillController extends Controller
     }
 
     /**
+     * Step 3 — generate (persist) the bill.
+     */
+    public function store(Request $request, MeterReading $meterReading, BillGenerator $generator)
+    {
+        if ($older = $this->olderPendingReading($meterReading)) {
+            return redirect()->route('bills.pending')
+                ->with('error', "Generate the oldest pending reading first — {$older->reading_date->format('M Y')}.");
+        }
+
+        // The payment deadline printed on the bill, entered on the preview page.
+        $data = $request->validate([
+            'bill_last_date' => 'required|date',
+        ]);
+
+        $bill = $generator->generateForReading($meterReading, auth()->id(), $data['bill_last_date']);
+
+        if (! $bill) {
+            return redirect()->route('bills.pending')
+                ->with('error', 'Could not generate a bill (inactive customer or already billed).');
+        }
+
+        return redirect()->route('bills.show', $bill)
+            ->with('success', 'Bill generated successfully!');
+    }
+
+    /**
+     * Show a single bill.
+     */
+    public function show(Bill $bill)
+    {
+        $bill->load(['customer.sheet', 'meterReading', 'createdBy', 'updatedBy', 'revisions.changedBy']);
+        $previousBills = $bill->historyRows();
+        $previousReading = $bill->meterReading
+            ? MeterReading::query()
+                ->where('customer_id', $bill->customer_id)
+                ->whereDate('reading_date', '<', $bill->meterReading->reading_date)
+                ->latest('reading_date')
+                ->first()
+            : null;
+
+        return view('bills.show', compact('bill', 'previousBills', 'previousReading'));
+    }
+
+    /**
      * Step 2 — preview the computed bill for a reading before generating.
      */
     public function preview(MeterReading $meterReading, BillGenerator $generator)
@@ -258,52 +302,6 @@ class BillController extends Controller
             'previousBills'   => $previousBills,
             'previousReading' => $previousReading,
         ]);
-    }
-
-    /**
-     * Step 3 — generate (persist) the bill.
-     */
-    public function store(Request $request, MeterReading $meterReading, BillGenerator $generator)
-    {
-        if ($older = $this->olderPendingReading($meterReading)) {
-            return redirect()->route('bills.pending')
-                ->with('error', "Generate the oldest pending reading first — {$older->reading_date->format('M Y')}.");
-        }
-
-        // The payment deadline printed on the bill, entered on the preview page.
-        $data = $request->validate([
-            'bill_last_date' => 'required|date',
-        ]);
-
-        $bill = $generator->generateForReading($meterReading, auth()->id(), $data['bill_last_date']);
-
-        if (! $bill) {
-            return redirect()->route('bills.pending')
-                ->with('error', 'Could not generate a bill (inactive customer or already billed).');
-        }
-
-        return redirect()->route('bills.show', $bill)
-            ->with('success', 'Bill generated successfully!');
-    }
-
-    /**
-     * Show a single bill.
-     */
-    public function show(Bill $bill)
-    {
-        $bill->load(['customer.sheet', 'meterReading', 'createdBy', 'updatedBy', 'revisions.changedBy']);
-
-        $previousBills = $bill->historyRows();
-
-        $previousReading = $bill->meterReading
-            ? MeterReading::query()
-                ->where('customer_id', $bill->customer_id)
-                ->whereDate('reading_date', '<', $bill->meterReading->reading_date)
-                ->latest('reading_date')
-                ->first()
-            : null;
-
-        return view('bills.show', compact('bill', 'previousBills', 'previousReading'));
     }
 
     /**
