@@ -42,15 +42,15 @@
             <div class="kv"><span>পরিশোধের শেষ তারিখ</span><b>{{ $bnDate($lastDate) }}</b></div>
         </div>
         <div class="col-6 p-2 ">
-            <div class="kv"><span>এরিয়া কোড/শাখা</span><b>{{ $customer->sheet->name ?? '—' }}</b></div>
-            <div class="kv boxed"><span>হিসাব নং</span><b>{{ $customer->serial_no ?? '—' }}</b></div>
-            <div class="kv boxed"><span>গ্রাহকের নাম</span><b>{{ $customer->name }}</b></div>
+            <div class="kv boxed-right"><span>এরিয়া কোড</span><b>{{ $customer->sheet->name ?? '—' }}</b></div>
+            <div class="kv boxed boxed-right"><span>হিসাব নং</span><b>{{ $customer->serial_no ?? '—' }}</b></div>
+            <div class="kv boxed boxed-right"><span>গ্রাহকের নাম</span><b>{{ $customer->name }}</b></div>
             @if (filled($customer->father_or_husband_name))
-                <div class="kv boxed"><span>পিতা/স্বামীর নাম</span><b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
+                <div class="kv boxed boxed-right"><span>পিতা/স্বামীর নাম</span><b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
             @endif
-            <div class="kv boxed"><span>ঠিকানা</span><b>{{ $customer->address ?? '—' }}</b></div>
+            <div class="kv boxed boxed-right"><span>ঠিকানা</span><b>{{ $customer->address ?? '—' }}</b></div>
             @if (filled($customer->mobile_number))
-                <div class="kv boxed"><span>মোবাইল নং</span><b>{{ $customer->mobile_number }}</b></div>
+                <div class="kv boxed boxed-right"><span>মোবাইল নং</span><b>{{ $customer->mobile_number }}</b></div>
             @endif
         </div>
 
@@ -269,6 +269,9 @@
     .bill-contact { margin: 2px 0 4px; }
     /* Clickable on screen, plain black text on paper. */
     .bill-contact a { color: inherit; text-decoration: underline; }
+    .boxed-right > span {
+        min-width: 90px !important;
+    }
     @media print {
         .bill-contact a { color: #000; text-decoration: none; }
     }
@@ -393,6 +396,9 @@
         .font-office-copy{
             font-size: 15px;
            font-weight: 700;
+        }
+    .boxed-right > span {
+            min-width: 90px !important;
         }
 
     }
