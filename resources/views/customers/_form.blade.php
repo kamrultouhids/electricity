@@ -27,7 +27,7 @@
             </ul>
         </div>
     @endif
-    
+
 @php $customer = $customer ?? null; @endphp
 
 <div class="row g-3">
@@ -53,6 +53,12 @@
                 </option>
             @endforeach
         </select>
+        <div class="d-flex flex-wrap gap-1 mt-2" id="sheetTags">
+            @foreach ($sheets as $sheet)
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2"
+                        data-sheet-id="{{ $sheet->id }}">{{ $sheet->name }}</button>
+            @endforeach
+        </div>
     </div>
 
     <div class="col-md-4">
@@ -155,11 +161,21 @@
                 </option>
             @endforeach
         </select>
+        <div class="d-flex flex-wrap gap-1 mt-2" id="connectionTypeTags">
+            @foreach ($connectionTypes as $type)
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2"
+                        data-connection-type="{{ $type }}">{{ ucfirst($type) }}</button>
+            @endforeach
+        </div>
     </div>
     <div class="col-md-4">
         <label class="form-label">Connection Date <span class="text-danger">*</span></label>
         <input type="date" name="connection_date" class="form-control" required
                value="{{ old('connection_date', isset($customer) && $customer->connection_date ? $customer->connection_date->format('Y-m-d') : '') }}">
+        <div class="d-flex flex-wrap gap-1 mt-2" id="connectionDateTags">
+            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2"
+                    data-date="2026-07-01">১ জুলাই ২০২৬</button>
+        </div>
     </div>
     <div class="col-md-4">
         <label class="form-label">Connection Status <span class="text-danger">*</span></label>
@@ -280,6 +296,94 @@
         });
 
         address.addEventListener('input', markActive);
+        markActive();
+    })();
+
+    // Sheet suggestion buttons
+    (function () {
+        const sheetSelect = document.querySelector('select[name="sheet_id"]');
+        const tags = document.getElementById('sheetTags');
+        if (!sheetSelect || !tags) return;
+
+        function markActive() {
+            const current = sheetSelect.value;
+            tags.querySelectorAll('button[data-sheet-id]').forEach(btn => {
+                const on = current === btn.dataset.sheetId;
+                btn.classList.toggle('btn-primary', on);
+                btn.classList.toggle('text-white', on);
+                btn.classList.toggle('btn-outline-secondary', !on);
+            });
+        }
+
+        tags.addEventListener('click', function (event) {
+            const btn = event.target.closest('button[data-sheet-id]');
+            if (!btn) return;
+
+            sheetSelect.value = btn.dataset.sheetId;
+            markActive();
+            sheetSelect.focus();
+        });
+
+        sheetSelect.addEventListener('change', markActive);
+        markActive();
+    })();
+
+    // Connection Type suggestion buttons
+    (function () {
+        const typeSelect = document.querySelector('select[name="connection_type"]');
+        const tags = document.getElementById('connectionTypeTags');
+        if (!typeSelect || !tags) return;
+
+        function markActive() {
+            const current = typeSelect.value;
+            tags.querySelectorAll('button[data-connection-type]').forEach(btn => {
+                const on = current === btn.dataset.connectionType;
+                btn.classList.toggle('btn-primary', on);
+                btn.classList.toggle('text-white', on);
+                btn.classList.toggle('btn-outline-secondary', !on);
+            });
+        }
+
+        tags.addEventListener('click', function (event) {
+            const btn = event.target.closest('button[data-connection-type]');
+            if (!btn) return;
+
+            typeSelect.value = btn.dataset.connectionType;
+            markActive();
+            typeSelect.focus();
+        });
+
+        typeSelect.addEventListener('change', markActive);
+        markActive();
+    })();
+
+    // Connection Date suggestion buttons (uses data-date attribute)
+    (function () {
+        const dateInput = document.querySelector('input[name="connection_date"]');
+        const tags = document.getElementById('connectionDateTags');
+        if (!dateInput || !tags) return;
+
+        function markActive() {
+            const current = dateInput.value;
+            tags.querySelectorAll('button[data-date]').forEach(btn => {
+                const on = current === btn.dataset.date;
+                btn.classList.toggle('btn-primary', on);
+                btn.classList.toggle('text-white', on);
+                btn.classList.toggle('btn-outline-secondary', !on);
+            });
+        }
+
+        tags.addEventListener('click', function (event) {
+            const btn = event.target.closest('button[data-date]');
+            if (!btn) return;
+
+            dateInput.value = btn.dataset.date;
+            markActive();
+            dateInput.focus();
+        });
+
+        dateInput.addEventListener('input', markActive);
+        dateInput.addEventListener('change', markActive);
         markActive();
     })();
 
