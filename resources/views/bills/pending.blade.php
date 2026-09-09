@@ -88,7 +88,7 @@
                         <th class="text-end">Previous</th>
                         <th class="text-end">Current</th>
                         <th class="text-end">Consumed</th>
-                        <th class="text-end" width="140">Action</th>
+                        <th class="text-end" width="250">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -104,6 +104,7 @@
                             <td class="text-end">{{ number_format($reading->current_reading, 2) }}</td>
                             <td class="text-end">{{ number_format($reading->consumed_units, 2) }}</td>
                             <td class="text-end">
+                               <a href="{{ route('meter-readings.edit', $reading) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil-square me-1"></i>Edit</a>
                                 <a href="{{ route('bills.preview', $reading) }}" class="btn btn-sm btn-primary text-white">
                                     <i class="bi bi-receipt me-1"></i>Generate Bill
                                 </a>
