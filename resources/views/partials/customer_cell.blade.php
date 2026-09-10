@@ -13,8 +13,12 @@
     <div class="min-w-0">
         <div class="fw-semibold">{{ $c->name ?? '—' }}</div>
         <small class="text-muted d-block">Serial No: {{ $c->serial_no ?? '—' }}</small>
-        <small class="text-muted d-block">Meter No: {{ $c->meter_number ?? '' }}</small>
-        <small class="text-muted d-block">Mobile: {{ $c->mobile_number ?? '' }}</small>
+        @if($c->meter_number)
+            <small class="text-muted d-block">Meter No: {{ $c->meter_number ?? '' }}</small>
+        @endif
+        @if($c->mobile_number)
+            <small class="text-muted d-block">Mobile: {{ $c->mobile_number ?? '' }}</small>
+        @endif
         @if ($showAddress)
             <small class="text-muted d-block">Address: {{ $c->address ?? '—' }}</small>
         @endif
