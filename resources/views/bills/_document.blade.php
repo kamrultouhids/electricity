@@ -40,6 +40,7 @@
             <div class="kv"><span>বিলের মাস</span> <b> {{ $bnMonthYear($billMonth) }}</b></div>
             <div class="kv"><span>বিল প্রস্তুতের তারিখ</span><b>{{ $bnDate($prepDate) }}</b></div>
             <div class="kv"><span>পরিশোধের শেষ তারিখ</span><b>{{ $bnDate($lastDate) }}</b></div>
+            <div class="kv"><span>সংযোগের ধরন</span><b>{{ $customer->connection_type_bangla }}</b></div>
         </div>
         <div class="col-6 p-2 ">
             <div class="kv boxed-right"><span>এরিয়া কোড</span><b>{{ $customer->sheet->name ?? '—' }}</b></div>
@@ -190,6 +191,7 @@
                     <div class="d-flex mb-1"><span class="me-1 min-space">মোবাইল নং</span>:<b>{{ $customer->mobile_number }}</b></div>
                 @endif
                 <div class="d-flex"><span class="me-1 min-space">বিলের মাস</span>:<b>{{ $bnMonthYear($billMonth) }}</b></div>
+                <div class="d-flex"><span class="me-1 min-space">সংযোগের ধরন</span>:<b>{{ $customer->connection_type_bangla }}</b></div>
             </div>
 
             <div class="col-5 p-2 font-office-copy">
@@ -227,7 +229,7 @@
     .bill-org .org-slogan { font-size: 12px; font-weight: 700; }
     .bill-org .org-name { font-size: 12px; }
     .bill-org .org-addr { font-size: 12px; font-weight: 700; }
-    .bill-title { font-size: 20px; font-weight: 700; padding: 8px 8px; }
+    .bill-title { font-size: 20px; font-weight: 700; padding: 3px 3px; }
     .bill-cut {
         position: relative;
         height: 24px;
@@ -277,7 +279,7 @@
     }
     .bill-contact-sep { padding: 0 4px; color: #555; }
     .bill-copy .kv { display: flex; font-size: 13px; padding: 1px 0; }
-    .bill-copy .kv > span { min-width: 120px;    margin-right: 2px; }
+    .bill-copy .kv > span { min-width: 130px;    margin-right: 2px; }
     .bill-copy .kv > span::after { content: ' :'; float: right; }
     /* Labels never wrap; date values (left column) stay on one line too.
        Long values on the right (name/address) may still wrap normally. */
@@ -359,12 +361,12 @@
         .bill-org .org-slogan { font-size: 10px; }
         .bill-org .org-name { font-size: 11px; line-height: 1.2; }
         .bill-org .org-addr { font-size: 10px; line-height: 1.3; }
-        .bill-title { font-size: 20px; font-weight: 700; padding: 8px 8px; }
+        .bill-title { font-size: 20px; font-weight: 700; padding: 3px 3px; }
         .bill-copy-tag { font-size: 10px; }
         /* Slightly smaller than screen: real printers render a hair narrower
            than the preview, which used to wrap the labels and dates. */
         .bill-copy .kv { font-size: 12px; padding: 0.3px 0; line-height: 1.45; }
-        .bill-copy .kv > span { min-width: 110px; margin-right: 2px;}
+        .bill-copy .kv > span { min-width: 120px; margin-right: 2px;}
         .bill-table th, .bill-table td { padding: 1.5px 3.5px; font-size: 10px; line-height: 1.3; }
         .bill-block.p-2 { padding: 1.2mm !important; }
         .row.g-0.bill-block .col-5.p-2, .row.g-0.bill-block .col-6.p-2, .row.g-0.bill-block .col-7.p-2 { padding: 1.2mm !important; }

@@ -94,6 +94,39 @@ class Customer extends Authenticatable
     public const CONNECTION_TYPES = ['residential', 'commercial', 'religious', 'Deep bill', 'Water plan', 'others'];
 
     /**
+     * Connection type Bangla names mapping.
+     */
+    public const CONNECTION_TYPES_BANGLA = [
+        'residential' => 'আবাসিক',
+        'commercial' => 'ব্যবসায়িক',
+        'religious' => 'ধর্মীয়',
+        'Deep bill' => 'ডিপ বিল',
+        'Water plan' => 'পানির প্ল্যান',
+        'others' => 'অন্যান্য',
+    ];
+
+    /**
+     * Get Bangla name for a connection type.
+     *
+     * @param string $type
+     * @return string
+     */
+    public static function getConnectionTypeBangla(string $type): string
+    {
+        return self::CONNECTION_TYPES_BANGLA[$type] ?? $type;
+    }
+
+    /**
+     * Get Bangla name for this customer's connection type.
+     *
+     * @return string
+     */
+    public function getConnectionTypeBanglaAttribute(): string
+    {
+        return self::getConnectionTypeBangla($this->connection_type);
+    }
+
+    /**
      * Status constants.
      */
     public const STATUS_ACTIVE = 1;
