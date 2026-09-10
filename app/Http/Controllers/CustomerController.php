@@ -23,10 +23,10 @@ class CustomerController extends Controller
         // Search by serial_no, name, mobile_number, or meter_number
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
-                $q->where('serial_no', 'like', "%{$search}%")
+                $q->where('serial_no', '=', "{$search}")
                     ->orWhere('name', 'like', "%{$search}%")
-                    ->orWhere('mobile_number', 'like', "%{$search}%")
-                    ->orWhere('meter_number', 'like', "%{$search}%");
+                    ->orWhere('mobile_number', '=', "{$search}")
+                    ->orWhere('meter_number', '=', "{$search}");
             });
         }
 
@@ -66,8 +66,10 @@ class CustomerController extends Controller
             ->with('latestMeterReading')
             ->when($term !== '', function ($q) use ($term) {
                 $q->where(function ($sub) use ($term) {
-                    $sub->where('name', 'like', "%{$term}%")
-                        ->orWhere('serial_no', 'like', "%{$term}%");
+                    $sub->where('serial_no', '=', "{$term}")
+                        ->orWhere('name', 'like', "%{$term}%")
+                        ->orWhere('mobile_number', '=', "{$term}")
+                        ->orWhere('meter_number', '=', "{$term}");
                 });
             })
             ->where('status', Customer::STATUS_ACTIVE)
@@ -417,7 +419,7 @@ class CustomerController extends Controller
      */
     protected function validateCustomer(Request $request, ?int $customerId = null): array
     {
-        $serialNoRule = 'required|string|size:4|unique:customers,serial_no';
+        $serialNoRule = 'required|string|min:4|max:6|unique:customers,serial_no';
         if ($customerId) {
             $serialNoRule .= ',' . $customerId;
         }
@@ -450,7 +452,8 @@ class CustomerController extends Controller
             'opening_due'               => 'nullable|numeric|min:0|required_with:opening_as_of',
             'status'                    => 'required|in:0,1',
         ], [
-            'serial_no.size' => 'The Serial No must be exactly 4 characters.',
+            'serial_no.min' => 'The Serial No must be at least 4 characters.',
+            'serial_no.max' => 'The Serial No must not be greater than 6 characters.',
             'serial_no.unique' => 'This Serial No is already taken.',
             'photo.max' => 'The photo field must not be greater than 2 mb.',
             'opening_as_of.after_or_equal' => 'The opening balance date cannot be before the connection date.',

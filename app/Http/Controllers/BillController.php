@@ -58,10 +58,10 @@ class BillController extends Controller
 
         if ($search = $request->input('search')) {
             $query->whereHas('customer', function ($q) use ($search) {
-                $q->where('serial_no', 'like', "%{$search}%")
+                $q->where('serial_no', '=', "{$search}")
                     ->orWhere('name', 'like', "%{$search}%")
-                    ->orWhere('mobile_number', 'like', "%{$search}%")
-                    ->orWhere('meter_number', 'like', "%{$search}%");
+                    ->orWhere('mobile_number', '=', "{$search}")
+                    ->orWhere('meter_number', '=', "{$search}");
             });
         }
 
@@ -132,10 +132,10 @@ class BillController extends Controller
 
         if ($search = $request->input('search')) {
             $query->whereHas('customer', function ($q) use ($search) {
-                $q->where('serial_no', 'like', "%{$search}%")
+                $q->where('serial_no', '=', "{$search}")
                     ->orWhere('name', 'like', "%{$search}%")
-                    ->orWhere('mobile_number', 'like', "%{$search}%")
-                    ->orWhere('meter_number', 'like', "%{$search}%");
+                    ->orWhere('mobile_number', '=', "{$search}")
+                    ->orWhere('meter_number', '=', "{$search}");
             });
         }
 
@@ -181,10 +181,10 @@ class BillController extends Controller
 
         if ($search = $request->input('search')) {
             $query->whereHas('customer', function ($q) use ($search) {
-                $q->where('serial_no', 'like', "%{$search}%")
+                $q->where('serial_no', '=', "{$search}")
                     ->orWhere('name', 'like', "%{$search}%")
-                    ->orWhere('mobile_number', 'like', "%{$search}%")
-                    ->orWhere('meter_number', 'like', "%{$search}%");
+                    ->orWhere('mobile_number', '=', "{$search}")
+                    ->orWhere('meter_number', '=', "{$search}");
             });
         }
 
