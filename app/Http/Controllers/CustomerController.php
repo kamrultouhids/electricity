@@ -417,9 +417,14 @@ class CustomerController extends Controller
      */
     protected function validateCustomer(Request $request, ?int $customerId = null): array
     {
+        $serialNoRule = 'required|string|size:4|unique:customers,serial_no';
+        if ($customerId) {
+            $serialNoRule .= ',' . $customerId;
+        }
+
         $data = $request->validate([
             'sheet_id'                  => 'required|exists:sheets,id',
-            'serial_no'                 => 'required|string',
+            'serial_no'                 => $serialNoRule,
             'photo'                     => 'nullable|image|max:2048',
             'name'                      => 'required|string',
             'father_or_husband_name'    => 'nullable|string',
@@ -445,6 +450,8 @@ class CustomerController extends Controller
             'opening_due'               => 'nullable|numeric|min:0|required_with:opening_as_of',
             'status'                    => 'required|in:0,1',
         ], [
+            'serial_no.size' => 'The Serial No must be exactly 4 characters.',
+            'serial_no.unique' => 'This Serial No is already taken.',
             'photo.max' => 'The photo field must not be greater than 2 mb.',
             'opening_as_of.after_or_equal' => 'The opening balance date cannot be before the connection date.',
             'opening_as_of.before_or_equal' => 'The opening balance date cannot be in the future.',
