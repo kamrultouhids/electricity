@@ -70,7 +70,17 @@
                     <label class="form-label mb-1">Month</label>
                     <input type="month" name="month" value="{{ request('month') }}" class="form-control">
                 </div>
-                <div class="col-md-3 d-flex gap-2">
+                <div class="col-md-1">
+                    <label class="form-label mb-1">Per Page</label>
+                    {{-- Applies straight away; page resets so the range stays valid. --}}
+                    <select name="per_page" class="form-select" onchange="this.form.page.value = 1; this.form.submit();">
+                        @foreach ($perPageOptions as $option)
+                            <option value="{{ $option }}" @selected($perPage === $option)>{{ $option }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <input type="hidden" name="page" value="1">
+                <div class="col-md-2 d-flex gap-2">
                     <button type="submit" class="btn btn-primary text-white "><i class="bi bi-funnel me-1"></i>Filter</button>
                     <a href="{{ route('meter-readings.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-counterclockwise"></i></a>
                 </div>

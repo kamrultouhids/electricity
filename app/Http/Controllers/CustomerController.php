@@ -13,6 +13,9 @@ use Illuminate\Support\Carbon;
 
 class CustomerController extends Controller
 {
+    /** Rows-per-page choices offered on the customer list. */
+    public const PER_PAGE_OPTIONS = [20, 50, 100, 200, 500, 1000];
+
     /**
      * List customers with search and filters.
      */
@@ -45,12 +48,18 @@ class CustomerController extends Controller
             $query->where('sheet_id', (int) $request->input('sheet_id'));
         }
 
-        $customers = $query->latest()->paginate(15)->withQueryString();
+        // Handle per_page parameter with validation
+        $perPage = (int) $request->input('per_page', self::PER_PAGE_OPTIONS[0]);
+        $perPage = in_array($perPage, self::PER_PAGE_OPTIONS, true) ? $perPage : self::PER_PAGE_OPTIONS[0];
+
+        $customers = $query->latest()->paginate($perPage)->withQueryString();
 
         return view('customers.index', [
             'customers'      => $customers,
             'connectionTypes' => Customer::CONNECTION_TYPES,
             'sheets'         => Sheet::orderBy('id')->get(),
+            'perPage'        => $perPage,
+            'perPageOptions' => self::PER_PAGE_OPTIONS,
         ]);
     }
 

@@ -46,7 +46,7 @@
                     <input type="text" name="search" value="{{ request('search') }}" class="form-control"
                            placeholder="Serial No, Name, Mobile or Meter Number">
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-1">
                     <label class="form-label mb-1">Sheet</label>
                     <select name="sheet_id" class="form-select">
                         <option value="">All</option>
@@ -76,6 +76,16 @@
                         <option value="0" @selected(request('status') === '0')>Inactive</option>
                     </select>
                 </div>
+                <div class="col-md-1">
+                    <label class="form-label mb-1">Per Page</label>
+                    {{-- Applies straight away; page resets so the range stays valid. --}}
+                    <select name="per_page" class="form-select" onchange="this.form.page.value = 1; this.form.submit();">
+                        @foreach ($perPageOptions as $option)
+                            <option value="{{ $option }}" @selected($perPage === $option)>{{ $option }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <input type="hidden" name="page" value="1">
                 <div class="col-md-2 d-flex gap-2">
                     <button type="submit" class="btn btn-primary text-white "><i class="bi bi-funnel me-1"></i>Filter</button>
                     <a href="{{ route('customers.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-counterclockwise"></i></a>
@@ -177,7 +187,7 @@
                 <div class="modal-body">
                     <p class="small text-muted">
                         Upload a CSV with a header row. Use the template so the columns match.
-                        
+
                         {{ implode(', ', \App\Models\Customer::CONNECTION_TYPES) }}.
                     </p>
                     <a href="{{ route('customers.import.template') }}" class="btn btn-sm btn-outline-secondary mb-3">

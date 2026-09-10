@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Validator;
 
 class MeterReadingController extends Controller
 {
+    /** Rows-per-page choices offered on the meter readings list. */
+    public const PER_PAGE_OPTIONS = [20, 50, 100, 200, 500, 1000];
+
     /**
      * List readings with filters (sheet, customer, month).
      */
@@ -53,8 +56,12 @@ class MeterReadingController extends Controller
             }
         }
 
+        // Handle per_page parameter with validation
+        $perPage = (int) $request->input('per_page', self::PER_PAGE_OPTIONS[0]);
+        $perPage = in_array($perPage, self::PER_PAGE_OPTIONS, true) ? $perPage : self::PER_PAGE_OPTIONS[0];
+
         $readings = $query->latest()
-            ->paginate(15)->withQueryString();
+            ->paginate($perPage)->withQueryString();
 
         $this->flagDiscrepancies($readings->getCollection());
 
@@ -62,6 +69,8 @@ class MeterReadingController extends Controller
             'readings'      => $readings,
             'sheets'        => Sheet::orderBy('id')->get(),
             'statusOptions' => MeterReading::STATUS_LABELS,
+            'perPage'        => $perPage,
+            'perPageOptions' => self::PER_PAGE_OPTIONS,
         ]);
     }
 
