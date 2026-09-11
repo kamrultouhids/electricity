@@ -201,6 +201,10 @@
                     calcConsumed();
                 },
             });
+
+            // Land the cursor in the customer search so a reading can be typed
+            // straight away, unless the customer is already picked.
+            if (! ts.getValue()) ts.focus();
         }
 
         function previewPhoto(event) {

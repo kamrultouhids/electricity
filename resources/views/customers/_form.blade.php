@@ -68,7 +68,7 @@
     </div>
     <div class="col-md-4">
         <label class="form-label">Name <span class="text-danger">*</span></label>
-        <input type="text" name="name" class="form-control" required placeholder="Enter Name"
+        <input type="text" name="name" class="form-control" required autofocus placeholder="Enter Name"
                value="{{ old('name', $customer->name ?? '') }}">
     </div>
 
