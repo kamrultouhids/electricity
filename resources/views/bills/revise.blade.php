@@ -116,10 +116,8 @@
                                     </tr>
                                     <tr>
                                         <td>Line + Service + Demand</td>
-                                        <td class="text-end text-muted" colspan="2">
-                                            {{ number_format((float) $bill->line_charge + (float) $bill->service_charge + (float) $bill->demand_charge, 2) }}
-                                            <span class="badge bg-light text-muted border ms-1">unchanged</span>
-                                        </td>
+                                        <td class="text-end text-muted">{{ number_format((float) $bill->line_charge + (float) $bill->service_charge + (float) $bill->demand_charge, 2) }}</td>
+                                        <td class="text-end fw-semibold" id="new_line_service_demand">—</td>
                                     </tr>
                                     <tr>
                                         <td>Electricity Duty <small class="text-muted">{{ rtrim(rtrim(number_format($bill->electricity_duty_rate, 2), '0'), '.') }}%</small></td>
@@ -205,14 +203,18 @@
 <script>
     // Mirrors BillCalculator: energy charge floors at the connection minimum,
     // duty is a percentage of it, the late fee is charged on the outstanding,
-    // and the rest of the bill is untouched.
-    const rate       = {{ (float) $bill->per_unit_rate }};
-    const minCharge  = {{ (float) $minimumCharge }};
-    const dutyRate   = {{ (float) $bill->electricity_duty_rate }};
-    const fixedParts = {{ (float) $bill->line_charge + (float) $bill->service_charge + (float) $bill->demand_charge + (float) $bill->fixed_charge + (float) $bill->meter_rent }};
-    const flatLimit  = {{ \App\Services\BillCalculator::OUTSTANDING_FLAT_LIMIT }};
-    const flatFee    = {{ \App\Services\BillCalculator::OUTSTANDING_FLAT_FEE }};
-    const percentFee = {{ \App\Services\BillCalculator::OUTSTANDING_PERCENT }};
+    // line/service/demand charges from current tariff, only apply if units > 25.
+    const rate         = {{ (float) $bill->per_unit_rate }};
+    const minCharge    = {{ (float) $minimumCharge }};
+    const dutyRate     = {{ (float) $bill->electricity_duty_rate }};
+    const lineCharge   = {{ (float) ($currentTariff?->line_charge ?? 0) }};
+    const serviceCharge = {{ (float) ($currentTariff?->service_charge ?? 0) }};
+    const demandCharge = {{ (float) ($currentTariff?->demand_charge ?? 0) }};
+    const fixedCharge  = {{ (float) $bill->fixed_charge }};
+    const meterRent    = {{ (float) $bill->meter_rent }};
+    const flatLimit    = {{ \App\Services\BillCalculator::OUTSTANDING_FLAT_LIMIT }};
+    const flatFee      = {{ \App\Services\BillCalculator::OUTSTANDING_FLAT_FEE }};
+    const percentFee   = {{ \App\Services\BillCalculator::OUTSTANDING_PERCENT }};
 
     const previousInput    = document.getElementById('previous_reading');
     const currentInput     = document.getElementById('current_reading');
@@ -230,21 +232,31 @@
         const previous    = parseFloat(previousInput.value);
         const current     = parseFloat(currentInput.value);
         const outstanding = parseFloat(outstandingInput.value);
-        const targets = ['new_units', 'new_energy', 'new_duty', 'new_outstanding', 'new_late_fee', 'new_total'];
+        const targets = ['new_units', 'new_energy', 'new_duty', 'new_outstanding', 'new_late_fee', 'new_total', 'new_line_service_demand'];
 
         if (isNaN(previous) || isNaN(current) || isNaN(outstanding) || current < previous || outstanding < 0) {
             targets.forEach(id => document.getElementById(id).textContent = '—');
             return;
         }
 
-        const units   = Math.round((current - previous) * 100) / 100;
-        const energy  = Math.round(Math.max(minCharge, Math.max(0, units) * rate) * 100) / 100;
-        const duty    = dutyRate > 0 ? Math.round(energy * dutyRate) / 100 : 0;
+        const units = Math.round((current - previous) * 100) / 100;
+        const energy = Math.round(Math.max(minCharge, Math.max(0, units) * rate) * 100) / 100;
+
+        // Line, Service, Demand charges only apply if units > 25
+        const hasConsumption = units > 25;
+        const appliedLineCharge = hasConsumption ? lineCharge : 0;
+        const appliedServiceCharge = hasConsumption ? serviceCharge : 0;
+        const appliedDemandCharge = hasConsumption ? demandCharge : 0;
+        const lineServiceDemandTotal = appliedLineCharge + appliedServiceCharge + appliedDemandCharge;
+
+        // Electricity duty only applies if units > 25
+        const duty = (dutyRate > 0 && hasConsumption) ? Math.round(energy * dutyRate) / 100 : 0;
         const lateFee = lateFeeOn(outstanding);
-        const total   = Math.round((energy + duty + fixedParts + outstanding + lateFee) * 100) / 100;
+        const total = Math.round((energy + lineServiceDemandTotal + duty + fixedCharge + meterRent + outstanding + lateFee) * 100) / 100;
 
         document.getElementById('new_units').textContent       = money(units);
         document.getElementById('new_energy').textContent      = money(energy);
+        document.getElementById('new_line_service_demand').textContent = money(lineServiceDemandTotal);
         document.getElementById('new_duty').textContent        = money(duty);
         document.getElementById('new_outstanding').textContent = money(outstanding);
         document.getElementById('new_late_fee').textContent    = money(lateFee);

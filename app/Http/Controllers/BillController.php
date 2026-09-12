@@ -316,10 +316,14 @@ class BillController extends Controller
             return redirect()->route('bills.show', $bill)->with('error', $reason);
         }
 
+        // Get current tariff for line, service, demand charges
+        $tariff = \App\Models\Tariff::resolveFor($bill->customer->connection_type);
+
         return view('bills.revise', [
             'bill' => $bill,
             // Feeds the live preview so it floors exactly like the server does.
             'minimumCharge' => $calculator->minimumCharge($bill->customer->connection_type),
+            'currentTariff' => $tariff,
         ]);
     }
 
