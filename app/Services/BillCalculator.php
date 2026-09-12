@@ -44,9 +44,14 @@ class BillCalculator
 
         $energyCharge = $this->energyCharge($type, $units, $rate);
         $lateFee = $this->lateFee($type, $lateFeeBasis);
-        $duty = $this->electricityDuty($energyCharge, $lateFee, $dutyRate);
 
-        $total = round($energyCharge + $line + $service + $demand + $duty + $fixed + $meterRent + $previous + $lateFee, 2);
+        // Line Charge, Service Charge, Demand Charge, and Electricity Duty are only added if consumed_units > 25
+        $lineCharge = ($units > 25) ? $line : 0;
+        $serviceCharge = ($units > 25) ? $service : 0;
+        $demandCharge = ($units > 25) ? $demand : 0;
+        $duty = ($units > 25) ? $this->electricityDuty($energyCharge, $lateFee, $dutyRate) : 0;
+
+        $total = round($energyCharge + $lineCharge + $serviceCharge + $demandCharge + $duty + $fixed + $meterRent + $previous + $lateFee, 2);
         $due = round($total - $paid, 2);
 
         return [

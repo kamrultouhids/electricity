@@ -54,6 +54,10 @@ class BillGenerator
             'late_fee_basis'       => $this->lateFeeBasis($previousOutstanding, $previousBill),
         ]);
 
+        // Only apply line, service, demand charges and electricity duty if units > 25
+        $units = (float) $reading->consumed_units;
+        $hasConsumption = $units > 25;
+
         return [
             'customer_id'          => $customer->id,
             'meter_reading_id'     => $reading->id,
@@ -61,12 +65,12 @@ class BillGenerator
             'bill_last_date'       => $billLastDate
                 ? Carbon::parse($billLastDate)->toDateString()
                 : Bill::defaultLastDate($billingMonth)->toDateString(),
-            'units'                => (float) $reading->consumed_units,
+            'units'                => $units,
             'per_unit_rate'        => $rate,
             'energy_charge'        => $computed['energy_charge'],
-            'line_charge'          => $lineCharge,
-            'service_charge'       => $serviceCharge,
-            'demand_charge'        => $demandCharge,
+            'line_charge'          => $hasConsumption ? $lineCharge : 0,
+            'service_charge'       => $hasConsumption ? $serviceCharge : 0,
+            'demand_charge'        => $hasConsumption ? $demandCharge : 0,
             'electricity_duty_rate' => $dutyRate,
             'electricity_duty'     => $computed['electricity_duty'],
             'fixed_charge'         => 0,
@@ -89,20 +93,29 @@ class BillGenerator
      * never smuggle in a later tariff change. The late fee is re-derived from
      * the corrected balance, since the penalty is charged on it.
      *
-     * @return array{units: float, energy_charge: float, electricity_duty: float, late_fee: float, total_amount: float, due_amount: float, status: int}
+     * @return array{units: float, energy_charge: float, line_charge: float, service_charge: float, demand_charge: float, electricity_duty: float, late_fee: float, total_amount: float, due_amount: float, status: int}
      */
     public function reviseData(Bill $bill, float $currentReading, float $previousReading, ?float $previousOutstanding = null): array
     {
         $units = round($currentReading - $previousReading, 2);
         $previousOutstanding = round($previousOutstanding ?? (float) $bill->previous_outstanding, 2);
 
+        // Get tariff values from Per Unit Rate Settings (current active tariff)
+        $tariff = Tariff::resolveFor($bill->customer->connection_type);
+        $lineCharge = (float) ($tariff?->line_charge ?? 0);
+        $serviceCharge = (float) ($tariff?->service_charge ?? 0);
+        $demandCharge = (float) ($tariff?->demand_charge ?? 0);
+
+        // Only apply line, service, demand charges if units > 25
+        $hasConsumption = $units > 25;
+
         $computed = $this->calculator->compute([
             'connection_type'       => $bill->customer->connection_type,
             'units'                 => $units,
             'per_unit_rate'         => (float) $bill->per_unit_rate,
-            'line_charge'           => (float) $bill->line_charge,
-            'service_charge'        => (float) $bill->service_charge,
-            'demand_charge'         => (float) $bill->demand_charge,
+            'line_charge'           => $lineCharge,
+            'service_charge'        => $serviceCharge,
+            'demand_charge'         => $demandCharge,
             'electricity_duty_rate' => (float) $bill->electricity_duty_rate,
             'fixed_charge'          => (float) $bill->fixed_charge,
             'meter_rent'            => (float) $bill->meter_rent,
@@ -120,6 +133,9 @@ class BillGenerator
             'units'                => $units,
             'previous_outstanding' => $previousOutstanding,
             'energy_charge'        => $computed['energy_charge'],
+            'line_charge'          => $hasConsumption ? $lineCharge : 0,
+            'service_charge'       => $hasConsumption ? $serviceCharge : 0,
+            'demand_charge'        => $hasConsumption ? $demandCharge : 0,
             'electricity_duty'     => $computed['electricity_duty'],
             'late_fee'             => $computed['late_fee'],
             'total_amount'         => $computed['total_amount'],
@@ -180,6 +196,9 @@ class BillGenerator
             $bill->update([
                 'units'                => $revised['units'],
                 'energy_charge'        => $revised['energy_charge'],
+                'line_charge'          => $revised['line_charge'],
+                'service_charge'       => $revised['service_charge'],
+                'demand_charge'        => $revised['demand_charge'],
                 'electricity_duty'     => $revised['electricity_duty'],
                 'previous_outstanding' => $revised['previous_outstanding'],
                 'late_fee'             => $revised['late_fee'],
