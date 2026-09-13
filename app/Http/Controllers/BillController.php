@@ -342,7 +342,7 @@ class BillController extends Controller
             'previous_reading'     => 'required|numeric|min:0',
             'current_reading'      => 'required|numeric|min:0',
             'previous_outstanding' => 'required|numeric|min:0',
-            'reason'               => 'required|string|max:255',
+            'reason'               => 'nullable|string|max:255',
         ]);
 
         $previous = round((float) $data['previous_reading'], 2);

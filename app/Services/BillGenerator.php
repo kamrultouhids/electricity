@@ -152,7 +152,7 @@ class BillGenerator
     public function revise(
         Bill $bill,
         float $currentReading,
-        string $reason,
+        ?string $reason = null,
         ?int $userId = null,
         ?float $previousReading = null,
         ?float $previousOutstanding = null,

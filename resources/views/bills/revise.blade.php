@@ -78,8 +78,8 @@
                                 <small class="text-muted">The late fee is recalculated from this.</small>
                             </div>
                             <div class="col-12">
-                                <label class="form-label mb-1">Reason <span class="text-danger">*</span></label>
-                                <input type="text" name="reason" class="form-control" maxlength="255" required
+                                <label class="form-label mb-1">Reason</label>
+                                <input type="text" name="reason" class="form-control" maxlength="255"
                                        placeholder="e.g. misread digit — photo shows 1450, not 1050"
                                        value="{{ old('reason') }}">
                                 <small class="text-muted">Recorded against the bill's revision history.</small>
@@ -186,7 +186,7 @@
                                 <td class="text-nowrap">{{ number_format($revision->old_previous_outstanding, 2) }} <i class="bi bi-arrow-right mx-1"></i> {{ number_format($revision->new_previous_outstanding, 2) }}</td>
                                 <td class="text-nowrap">{{ number_format($revision->old_late_fee, 2) }} <i class="bi bi-arrow-right mx-1"></i> {{ number_format($revision->new_late_fee, 2) }}</td>
                                 <td class="text-nowrap">{{ number_format($revision->old_total_amount, 2) }} <i class="bi bi-arrow-right mx-1"></i> {{ number_format($revision->new_total_amount, 2) }}</td>
-                                <td>{{ $revision->reason }}</td>
+                                <td>{{ $revision->reason ?? '—' }}</td>
                                 <td>{{ $revision->changedBy->name ?? '—' }}</td>
                                 <td>{{ $revision->created_at->format('d M Y, h:i A') }}</td>
                             </tr>

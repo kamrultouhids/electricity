@@ -171,7 +171,7 @@
     <div class="col-md-4">
         <label class="form-label">Connection Date <span class="text-danger">*</span></label>
         <input type="date" name="connection_date" class="form-control" required
-               value="{{ old('connection_date', isset($customer) && $customer->connection_date ? $customer->connection_date->format('Y-m-d') : '') }}">
+               value="{{ old('connection_date', isset($customer) && $customer->connection_date ? $customer->connection_date->format('Y-m-d') : '2026-07-01') }}">
         <div class="d-flex flex-wrap gap-1 mt-2" id="connectionDateTags">
             <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2"
                     data-date="2026-07-01">১ জুলাই ২০২৬</button>
@@ -238,6 +238,10 @@
                @disabled($openingBlocked)
                @if($hasOpening && !$openingBlocked) required @endif
                value="{{ old('opening_as_of', ($customer && $customer->opening_as_of) ? $customer->opening_as_of->format('Y-m-d') : '') }}">
+        <div class="d-flex flex-wrap gap-1 mt-2" id="asOfDateTags">
+            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2"
+                    data-date="2026-07-01">১ জুলাই ২০২৬</button>
+        </div>
         <div class="form-text">The last month the old system billed. Billing here starts after it.</div>
     </div>
 </div>
@@ -266,6 +270,11 @@
                 // Add required attribute when checkbox is checked
                 openingInputs.forEach(input => {
                     input.setAttribute('required', 'required');
+
+                    // Set default value for As Of field if it's empty
+                    if (input.name === 'opening_as_of' && !input.value) {
+                        input.value = '2026-07-01';
+                    }
                 });
             } else {
                 // Remove required attribute and clear values when unchecked
@@ -378,6 +387,36 @@
     (function () {
         const dateInput = document.querySelector('input[name="connection_date"]');
         const tags = document.getElementById('connectionDateTags');
+        if (!dateInput || !tags) return;
+
+        function markActive() {
+            const current = dateInput.value;
+            tags.querySelectorAll('button[data-date]').forEach(btn => {
+                const on = current === btn.dataset.date;
+                btn.classList.toggle('btn-primary', on);
+                btn.classList.toggle('text-white', on);
+                btn.classList.toggle('btn-outline-secondary', !on);
+            });
+        }
+
+        tags.addEventListener('click', function (event) {
+            const btn = event.target.closest('button[data-date]');
+            if (!btn) return;
+
+            dateInput.value = btn.dataset.date;
+            markActive();
+            dateInput.focus();
+        });
+
+        dateInput.addEventListener('input', markActive);
+        dateInput.addEventListener('change', markActive);
+        markActive();
+    })();
+
+    // As Of Date suggestion buttons (uses data-date attribute)
+    (function () {
+        const dateInput = document.querySelector('input[name="opening_as_of"]');
+        const tags = document.getElementById('asOfDateTags');
         if (!dateInput || !tags) return;
 
         function markActive() {

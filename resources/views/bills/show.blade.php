@@ -134,7 +134,7 @@
                                 <td class="text-nowrap">{{ number_format($revision->old_current_reading, 2) }} <i class="bi bi-arrow-right mx-1"></i> {{ number_format($revision->new_current_reading, 2) }}</td>
                                 <td class="text-nowrap">{{ number_format($revision->old_units, 2) }} <i class="bi bi-arrow-right mx-1"></i> {{ number_format($revision->new_units, 2) }}</td>
                                 <td class="text-nowrap">{{ number_format($revision->old_total_amount, 2) }} <i class="bi bi-arrow-right mx-1"></i> {{ number_format($revision->new_total_amount, 2) }}</td>
-                                <td>{{ $revision->reason }}</td>
+                                <td>{{ $revision->reason ?? '—' }}</td>
                                 <td>{{ $revision->changedBy->name ?? '—' }}</td>
                                 <td>{{ $revision->created_at->format('d M Y, h:i A') }}</td>
                             </tr>
