@@ -9,7 +9,7 @@
     // The deadline entered when the bill was generated.
     $lastDate = $bill->paymentLastDate();
     $mr = $bill->meterReading;
-    if ($mr->reading_date) {
+    if ($mr?->reading_date) {
         $currentReadingDate = $mr->reading_date->copy()->subMonth();
     } else {
         $currentReadingDate = $billMonth?->copy()->subMonth();

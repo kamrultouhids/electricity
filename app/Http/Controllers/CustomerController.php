@@ -456,9 +456,9 @@ class CustomerController extends Controller
             // Opening balances — all or nothing, and only for a customer who
             // predates the system. A zero due with a reading is valid: the
             // customer is paid up but the meter still has to start somewhere.
-            'opening_as_of'             => 'nullable|date|after_or_equal:connection_date|before_or_equal:today',
-            'opening_reading'           => 'nullable|numeric|min:0|required_with:opening_as_of',
-            'opening_due'               => 'nullable|numeric|min:0|required_with:opening_as_of',
+            'opening_as_of'             => 'nullable|date|after_or_equal:connection_date|before_or_equal:today|required_with:opening_reading,opening_due',
+            'opening_reading'           => 'nullable|numeric|min:0|required_with:opening_as_of,opening_due',
+            'opening_due'               => 'nullable|numeric|min:0|required_with:opening_as_of,opening_reading',
             'status'                    => 'required|in:0,1',
         ], [
             'serial_no.min' => 'The Serial No must be at least 4 characters.',
@@ -467,8 +467,9 @@ class CustomerController extends Controller
             'photo.max' => 'The photo field must not be greater than 2 mb.',
             'opening_as_of.after_or_equal' => 'The opening balance date cannot be before the connection date.',
             'opening_as_of.before_or_equal' => 'The opening balance date cannot be in the future.',
-            'opening_reading.required_with' => 'Enter the meter reading the customer was brought over at.',
-            'opening_due.required_with' => 'Enter the outstanding amount carried over (0 if they are paid up).',
+            'opening_as_of.required_with' => 'The As Of date is required when entering opening balance.',
+            'opening_reading.required_with' => 'The Last Meter Reading is required when entering opening balance.',
+            'opening_due.required_with' => 'The Outstanding Due is required when entering opening balance (enter 0 if paid up).',
         ]);
 
         // An unticked "existing customer" box submits nothing; make that an
