@@ -55,6 +55,17 @@ class Bn
     }
 
     /**
+     * A taka amount in Bengali numerals: whole amounts print without a
+     * fraction, anything with paisa keeps two decimals (e.g. ৩৬৯.২০).
+     */
+    public static function money(string|int|float|null $value): string
+    {
+        $value = round((float) $value, 2);
+
+        return self::digits(number_format($value, fmod($value, 1) == 0.0 ? 0 : 2));
+    }
+
+    /**
      * "মাস - বছর", e.g. সেপ্টেম্বর - ২০২৬.
      */
     public static function monthYear(?Carbon $date): string

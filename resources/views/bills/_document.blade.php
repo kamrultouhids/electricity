@@ -8,6 +8,7 @@
 
     // Bengali numerals and dates — shared with the dashboard, see App\Support\Bn.
     $bn = fn ($v) => \App\Support\Bn::digits($v);
+    $money = fn ($v) => \App\Support\Bn::money($v);
     $bnMonths = \App\Support\Bn::MONTHS;
     $bnMonthYear = fn ($d) => \App\Support\Bn::monthYear($d);
     $bnDate = fn ($d) => \App\Support\Bn::date($d);
@@ -74,10 +75,10 @@
                 <tr class="text-end">
                     <td class="text-center">{{ $bnMonthYear($pb->billing_month) }}</td>
                     <td>{{ $bn(number_format($pb->units, 0)) }}</td>
-                    <td>{{ $bn(number_format($pb->total_amount, 0)) }}</td>
-                    <td>{{ $bn(number_format($pb->paid_amount, 0)) }}</td>
-                    <td>{{ $bn(number_format($pb->discount, 0)) }}</td>
-                    <td>{{ $bn(number_format($pb->due_amount, 0)) }}</td>
+                    <td>{{ $money($pb->total_amount) }}</td>
+                    <td>{{ $money($pb->paid_amount) }}</td>
+                    <td>{{ $money($pb->discount) }}</td>
+                    <td>{{ $money($pb->due_amount) }}</td>
                 </tr>
             @empty
                 <tr><td colspan="6" class="text-center text-muted">কোন আগের বিল নেই</td></tr>
@@ -118,23 +119,23 @@
                     <tr><th>বিবরণ</th><th class="text-end" width="120">টাকা</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td>ব্যবহৃত ইউনিট মূল্য</td><td class="text-end">{{ $bn(number_format($energyCharge, 0)) }}</td></tr>
-                    <tr><td>লাইন চার্জ</td><td class="text-end">{{ $bn(number_format($lineCharge, 0)) }}</td></tr>
-                    <tr><td>সার্ভিস চার্জ</td><td class="text-end">{{ $bn(number_format($serviceCharge, 0)) }}</td></tr>
-                    <tr><td>ডিমান্ড চার্জ</td><td class="text-end">{{ $bn(number_format($demandCharge, 0)) }}</td></tr>
-                    <tr><td>বকেয়া বিল</td><td class="text-end">{{ $bn(number_format($previousOutstanding, 0)) }}</td></tr>
-                    <tr><td>বকেয়া বিলের জরিমানা</td><td class="text-end">{{ $bn(number_format($lateFee, 0)) }}</td></tr>
-                    <tr><td>অতিরিক্ত চার্জ</td><td class="text-end">{{ $bn(number_format($fixedCharge, 0)) }}</td></tr>
+                    <tr><td>ব্যবহৃত ইউনিট মূল্য</td><td class="text-end">{{ $money($energyCharge) }}</td></tr>
+                    <tr><td>লাইন চার্জ</td><td class="text-end">{{ $money($lineCharge) }}</td></tr>
+                    <tr><td>সার্ভিস চার্জ</td><td class="text-end">{{ $money($serviceCharge) }}</td></tr>
+                    <tr><td>ডিমান্ড চার্জ</td><td class="text-end">{{ $money($demandCharge) }}</td></tr>
+                    <tr><td>বকেয়া বিল</td><td class="text-end">{{ $money($previousOutstanding) }}</td></tr>
+                    <tr><td>বকেয়া বিলের জরিমানা</td><td class="text-end">{{ $money($lateFee) }}</td></tr>
+                    <tr><td>অতিরিক্ত চার্জ</td><td class="text-end">{{ $money($fixedCharge) }}</td></tr>
                     <tr>
                         <td>বিদ্যুৎ শুল্ক{{ $electricityDutyRate > 0 ? ' ('.$bn(rtrim(rtrim(number_format($electricityDutyRate, 2), '0'), '.')).'%)' : '(%)' }}</td>
-                        <td class="text-end">{{ $bn(number_format($electricityDuty, 0)) }}</td>
+                        <td class="text-end">{{ $money($electricityDuty) }}</td>
                     </tr>
                     <!-- @php $discount = $discount ?? 0; @endphp -->
                     @php $discount =  0; @endphp
 
-                    <tr class="fw-bold"><td>মোট বিল</td><td class="text-end">{{ $bn(number_format($totalAmount, 0)) }}</td></tr>
-                    <tr><td>ছাড়(-)</td><td class="text-end">{{ $bn(number_format($discount, 0)) }}</td></tr>
-                    <tr class="fw-bold "><td>বিল</td><td class="text-end">{{ $bn(number_format($totalAmount - $discount, 0)) }}৳</td></tr>
+                    <tr class="fw-bold"><td>মোট বিল</td><td class="text-end">{{ $money($totalAmount) }}</td></tr>
+                    <tr><td>ছাড়(-)</td><td class="text-end">{{ $money($discount) }}</td></tr>
+                    <tr class="fw-bold "><td>বিল</td><td class="text-end">{{ $money($totalAmount - $discount) }}৳</td></tr>
                 </tbody>
             </table>
         </div>
@@ -196,7 +197,7 @@
 
             <div class="col-5 p-2 font-office-copy">
                 <div class="d-flex mb-1"><span class="me-1 min-space-right">হিসাব নং</span>: <b>{{ $customer->serial_no ?? '—' }}</b></div>
-                <div class="d-flex"><span class="me-1 min-space-right">মোট বিল</span>: <b>{{ $bn(number_format($totalAmount, 0)) }}৳</b></div>
+                <div class="d-flex"><span class="me-1 min-space-right">মোট বিল</span>: <b>{{ $money($totalAmount) }}৳</b></div>
             </div>
         </div>
 
