@@ -133,9 +133,9 @@
                     <!-- @php $discount = $discount ?? 0; @endphp -->
                     @php $discount =  0; @endphp
 
-                    <tr class="fw-bold"><td>মোট বিল</td><td class="text-end">{{ $money($totalAmount) }}</td></tr>
+                    <tr class="fw-bold"><td>মোট বিল</td><td class="text-end custom-size">{{ $money($totalAmount) }}</td></tr>
                     <tr><td>ছাড়(-)</td><td class="text-end">{{ $money($discount) }}</td></tr>
-                    <tr class="fw-bold "><td>বিল</td><td class="text-end">{{ $money($totalAmount - $discount) }}৳</td></tr>
+                    <tr class="fw-bold "><td>বিল</td><td class="text-end custom-size">{{ $money($totalAmount - $discount) }}৳</td></tr>
                 </tbody>
             </table>
         </div>
@@ -310,6 +310,10 @@
         font-size: 15px !important;
         font-weight: 700;
     }
+    .custom-size {
+      font-size: 15px !important;
+      font-weight: 700;
+    }
     @media print {
         /* Zero page margin so the browser drops its own header/footer. */
         @page { size: 182mm 257mm; margin: 0; }
@@ -400,8 +404,12 @@
             font-size: 15px;
            font-weight: 700;
         }
-    .boxed-right > span {
+        .boxed-right > span {
             min-width: 90px !important;
+        }
+        .custom-size {
+          font-size: 15px !important;
+          font-weight: 700;
         }
 
     }
