@@ -43,7 +43,7 @@
                 ["Today's Collection",  '৳ '.number_format($todayCollection, 2),   'Today',     'bi-cash-coin',             'stat-green'],
                 ['Monthly Collection',  '৳ '.number_format($monthCollection, 2),   'This month','bi-calendar-check',        'stat-indigo'],
                 ['Discount This Month', '৳ '.number_format($monthDiscount, 2),     'This month','bi-tags-fill',             'stat-amber'],
-                ['Due Balance',         '৳ '.number_format($totalOutstanding, 2),  'Outstanding','bi-exclamation-circle',   'stat-red'],
+                ['Due Balance',         '৳ '.number_format(round($totalOutstanding), 2),  'Outstanding','bi-exclamation-circle',   'stat-red'],
                 ['Total Consumption',   number_format($unitsThisMonth, 2).' units', 'This month','bi-lightning-charge-fill','stat-amber'],
                 ['Pending Bill Generation', number_format($pendingBills),         'Readings',  'bi-hourglass-split',       'stat-red'],
                 ['Meter Not Read',      number_format($meterNotRead),             'This month','bi-clipboard-x',           'stat-amber'],
