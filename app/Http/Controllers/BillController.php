@@ -20,11 +20,30 @@ class BillController extends Controller
     public function index(Request $request)
     {
         $perPage = $this->perPage($request);
+        $sortBy = $request->input('sort_by', 'billing_month');
 
-        $bills = $this->filteredBills($request)
-            ->with(['customer.sheet'])
-            ->latest('billing_month')->latest('id')
-            ->paginate($perPage)->withQueryString();
+        $query = $this->filteredBills($request)
+            ->with(['customer.sheet']);
+
+        // Apply sorting
+        if ($sortBy === 'serial_no_asc') {
+            $query->join('customers', 'bills.customer_id', '=', 'customers.id')
+                ->select('bills.*')
+                ->orderBy('customers.serial_no', 'asc')
+                ->orderBy('bills.billing_month', 'desc')
+                ->orderBy('bills.id', 'desc');
+        } elseif ($sortBy === 'serial_no_desc') {
+            $query->join('customers', 'bills.customer_id', '=', 'customers.id')
+                ->select('bills.*')
+                ->orderBy('customers.serial_no', 'desc')
+                ->orderBy('bills.billing_month', 'desc')
+                ->orderBy('bills.id', 'desc');
+        } else {
+            // Default: sort by billing_month
+            $query->latest('billing_month')->latest('id');
+        }
+
+        $bills = $query->paginate($perPage)->withQueryString();
 
         return view('bills.index', [
             'bills'          => $bills,
@@ -92,14 +111,33 @@ class BillController extends Controller
      */
     public function printAll(Request $request)
     {
-        $bills = $this->filteredBills($request)
+        $sortBy = $request->input('sort_by', 'billing_month');
+
+        $query = $this->filteredBills($request)
             // An opening balance has no units, no rate and no reading — printed
             // as a bill document it would be a blank sheet. It is shown on its
             // own page instead, and carried into the next real bill regardless.
             ->where('is_opening', false)
-            ->with(['customer.sheet', 'meterReading', 'createdBy'])
-            ->latest('billing_month')->latest('id')
-            ->paginate($this->perPage($request))
+            ->with(['customer.sheet', 'meterReading', 'createdBy']);
+
+        // Apply sorting (same as index)
+        if ($sortBy === 'serial_no_asc') {
+            $query->join('customers', 'bills.customer_id', '=', 'customers.id')
+                ->select('bills.*')
+                ->orderBy('customers.serial_no', 'asc')
+                ->orderBy('bills.billing_month', 'desc')
+                ->orderBy('bills.id', 'desc');
+        } elseif ($sortBy === 'serial_no_desc') {
+            $query->join('customers', 'bills.customer_id', '=', 'customers.id')
+                ->select('bills.*')
+                ->orderBy('customers.serial_no', 'desc')
+                ->orderBy('bills.billing_month', 'desc')
+                ->orderBy('bills.id', 'desc');
+        } else {
+            $query->latest('billing_month')->latest('id');
+        }
+
+        $bills = $query->paginate($this->perPage($request))
             ->withQueryString();
 
         if ($bills->isEmpty()) {

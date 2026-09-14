@@ -18,7 +18,7 @@
                 {{-- Prints exactly the bills shown below — same filters, same
                      per-page — into a hidden frame, so we stay on this page. --}}
                 <button type="button" id="printAllBtn" class="btn btn-outline-secondary"
-                        data-url="{{ route('bills.print-all', request()->only('search', 'sheet_id', 'status', 'month', 'per_page', 'page')) }}"
+                        data-url="{{ route('bills.print-all', request()->only('search', 'sheet_id', 'status', 'month', 'per_page', 'page', 'sort_by')) }}"
                         title="Print the bills shown on this page">
                     <i class="bi bi-printer me-1"></i>Print
                     <span class="badge bg-light text-dark ms-1">{{ $printableCount }}</span>
@@ -39,7 +39,7 @@
     <div class="card mb-3">
         <div class="card-body">
             <form method="GET" action="{{ route('bills.index') }}" class="row g-2 align-items-end">
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label mb-1">Search</label>
                     <input type="text" name="search" value="{{ request('search') }}" class="form-control"
                            placeholder="Serial No, Name, Mobile or Meter No">
@@ -55,7 +55,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-1">
                     <label class="form-label mb-1">Status</label>
                     <select name="status" class="form-select">
                         <option value="">All</option>
@@ -69,6 +69,14 @@
                 <div class="col-md-2">
                     <label class="form-label mb-1">Month</label>
                     <input type="month" name="month" value="{{ request('month') }}" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label mb-1">Sort</label>
+                    <select name="sort_by" class="form-select">
+                        <option value="billing_month" @selected(request('sort_by', 'billing_month') === 'billing_month')>Month</option>
+                        <option value="serial_no_asc" @selected(request('sort_by') === 'serial_no_asc')>Serial ASC</option>
+                        <option value="serial_no_desc" @selected(request('sort_by') === 'serial_no_desc')>Serial DESC</option>
+                    </select>
                 </div>
                 <div class="col-md-1">
                     <label class="form-label mb-1">Per Page</label>
