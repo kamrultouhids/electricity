@@ -82,7 +82,7 @@
                             </td>
                             <td>{{ $bill->customer->sheet->name ?? '—' }}</td>
                             <td>{{ $bill->billing_month->format('M Y') }}</td>
-                            <td class="text-end fw-bold">{{ number_format($bill->due_amount, 2) }}</td>
+                            <td class="text-end fw-bold">{{ number_format(round($bill->due_amount), 0) }}</td>
                             <td class="text-end no-print">
                                 @can('collect-payments')
                                     <a href="{{ route('payments.create', $bill->customer) }}" class="btn btn-sm btn-success text-white">
@@ -101,7 +101,7 @@
                     <tfoot>
                         <tr class="fw-bold table-light">
                             <td colspan="4" class="text-end">Total Due (all filtered)</td>
-                            <td class="text-end">{{ number_format($totalDue, 2) }}</td>
+                            <td class="text-end">{{ number_format(round($totalDue), 0) }}</td>
                             <td class="no-print"></td>
                         </tr>
                     </tfoot>

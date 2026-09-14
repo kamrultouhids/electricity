@@ -97,11 +97,11 @@
                                     <span class="badge rounded-pill bg-danger-subtle text-danger">Inactive</span>
                                 @endif
                             </td>
-                            <td class="text-end">{{ number_format((float) $customer->consumption_total, 2) }}</td>
-                            <td class="text-end">{{ number_format((float) $customer->paid_total, 2) }}</td>
-                            <td class="text-end">{{ number_format((float) $customer->discount_total, 2) }}</td>
+                            <td class="text-end">{{ number_format(round((float) $customer->consumption_total), 0) }}</td>
+                            <td class="text-end">{{ number_format(round((float) $customer->paid_total), 0) }}</td>
+                            <td class="text-end">{{ number_format(round((float) $customer->discount_total), 0) }}</td>
                             <td class="text-end {{ (float) $customer->outstanding > 0 ? 'text-danger fw-bold' : '' }}">
-                                {{ number_format((float) $customer->outstanding, 2) }}
+                                {{ number_format(round((float) $customer->outstanding), 0) }}
                             </td>
                         </tr>
                     @empty

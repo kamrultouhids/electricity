@@ -49,7 +49,7 @@
     </div>
 
     <div class="alert alert-warning py-2">
-        Total Outstanding (filtered): <strong>{{ number_format($total, 2) }}</strong>
+        Total Outstanding (filtered): <strong>{{ number_format(round($total), 0) }}</strong>
     </div>
 
     <div class="card list-card rounded-4">
@@ -75,7 +75,7 @@
                             <td>{{ $bill->customer->mobile_number ?? '—' }}</td>
                             <td>{{ $bill->customer->meter_number ?? '—' }}</td>
                             <td>{{ optional($bill->billing_month)->format('M Y') ?? '—' }}</td>
-                            <td class="text-end text-danger fw-bold">{{ number_format($bill->due_amount, 2) }}</td>
+                            <td class="text-end text-danger fw-bold">{{ number_format(round($bill->due_amount), 0) }}</td>
                         </tr>
                     @empty
                         <tr><td colspan="7" class="text-center text-muted py-4">No outstanding balances found.</td></tr>

@@ -39,15 +39,15 @@
                         </div>
                         <div class="col-4">
                             <div class="text-muted small">Total</div>
-                            <div>{{ number_format($bill->total_amount, 2) }}</div>
+                            <div>{{ number_format(round($bill->total_amount), 0) }}</div>
                         </div>
                         <div class="col-4">
                             <div class="text-muted small">Paid</div>
-                            <div>{{ number_format($bill->paid_amount, 2) }}</div>
+                            <div>{{ number_format(round($bill->paid_amount), 0) }}</div>
                         </div>
                         <div class="col-4">
                             <div class="text-muted small">Due</div>
-                            <div class="fw-bold">{{ number_format($bill->due_amount, 2) }}</div>
+                            <div class="fw-bold">{{ number_format(round($bill->due_amount), 0) }}</div>
                         </div>
                     </div>
                     <div class="text-muted small mt-2">
@@ -69,7 +69,7 @@
                                 <label class="form-label">Amount <span class="text-danger">*</span></label>
                                 <input type="number" step="0.01" min="0" name="amount" id="amount"
                                        class="form-control" required
-                                       value="{{ old('amount', $bill->due_amount) }}">
+                                       value="{{ old('amount', round($bill->due_amount)) }}">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Discount</label>
@@ -114,16 +114,16 @@
 
 @push('scripts')
 <script>
-    const due = {{ (float) $bill->due_amount }};
+    const due = {{ round((float) $bill->due_amount) }};
     const amount = document.getElementById('amount');
     const discount = document.getElementById('discount');
     const settling = document.getElementById('settling');
     const remaining = document.getElementById('remaining');
 
     function recalc() {
-        const s = (parseFloat(amount.value) || 0) + (parseFloat(discount.value) || 0);
-        settling.value = s.toFixed(2);
-        remaining.textContent = (due - s).toFixed(2);
+        const s = Math.round((parseFloat(amount.value) || 0) + (parseFloat(discount.value) || 0));
+        settling.value = s.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+        remaining.textContent = (due - s).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
     }
 
     amount.addEventListener('input', recalc);
