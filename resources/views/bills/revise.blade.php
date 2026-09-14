@@ -5,6 +5,10 @@
 @php
     $reading = $bill->meterReading;
     $previous = (float) $reading->previous_reading;
+    // The revision re-prices from the customer's CURRENT connection type, so a
+    // type change (e.g. religious → residential) is picked up here.
+    $newRate = (float) ($currentTariff?->per_unit_rate ?? $bill->per_unit_rate);
+    $newDutyRate = (float) ($currentTariff?->electricity_duty ?? $bill->electricity_duty_rate);
 @endphp
 
 @section('content')
@@ -28,7 +32,9 @@
 
     <div class="alert alert-warning">
         Correcting the readings or the carried balance rewrites this bill's units, late fee and charges.
-        The tariff rates and previous-months history stay exactly as issued.
+        The charges are re-priced from the customer's current connection type
+        ({{ ucfirst($bill->customer->connection_type) }} @ ৳{{ number_format($newRate, 2) }}/unit);
+        the previous-months history stays exactly as issued.
     </div>
 
     <form method="POST" action="{{ route('bills.revise.store', $bill) }}">
@@ -110,7 +116,15 @@
                                         <td class="text-end fw-semibold" id="new_units">—</td>
                                     </tr>
                                     <tr>
-                                        <td>Energy Charge <small class="text-muted">@ ৳{{ number_format($bill->per_unit_rate, 2) }}/unit</small></td>
+                                        <td>Energy Charge
+                                            <small class="text-muted">
+                                                @if ($newRate !== (float) $bill->per_unit_rate)
+                                                    @ ৳{{ number_format($bill->per_unit_rate, 2) }} <i class="bi bi-arrow-right"></i> ৳{{ number_format($newRate, 2) }}/unit
+                                                @else
+                                                    @ ৳{{ number_format($bill->per_unit_rate, 2) }}/unit
+                                                @endif
+                                            </small>
+                                        </td>
                                         <td class="text-end text-muted">{{ number_format($bill->energy_charge, 2) }}</td>
                                         <td class="text-end fw-semibold" id="new_energy">—</td>
                                     </tr>
@@ -120,7 +134,15 @@
                                         <td class="text-end fw-semibold" id="new_line_service_demand">—</td>
                                     </tr>
                                     <tr>
-                                        <td>Electricity Duty <small class="text-muted">{{ rtrim(rtrim(number_format($bill->electricity_duty_rate, 2), '0'), '.') }}%</small></td>
+                                        <td>Electricity Duty
+                                            <small class="text-muted">
+                                                @if ($newDutyRate !== (float) $bill->electricity_duty_rate)
+                                                    {{ rtrim(rtrim(number_format($bill->electricity_duty_rate, 2), '0'), '.') }}% <i class="bi bi-arrow-right"></i> {{ rtrim(rtrim(number_format($newDutyRate, 2), '0'), '.') }}%
+                                                @else
+                                                    {{ rtrim(rtrim(number_format($bill->electricity_duty_rate, 2), '0'), '.') }}%
+                                                @endif
+                                            </small>
+                                        </td>
                                         <td class="text-end text-muted">{{ number_format($bill->electricity_duty, 2) }}</td>
                                         <td class="text-end fw-semibold" id="new_duty">—</td>
                                     </tr>
@@ -204,9 +226,11 @@
     // Mirrors BillCalculator: energy charge floors at the connection minimum,
     // duty is a percentage of it, the late fee is charged on the outstanding,
     // line/service/demand charges from current tariff, only apply if units > 25.
-    const rate         = {{ (float) $bill->per_unit_rate }};
+    // All rates come from the customer's CURRENT connection type's tariff, so a
+    // type change re-prices the bill on revision.
+    const rate         = {{ $newRate }};
     const minCharge    = {{ (float) $minimumCharge }};
-    const dutyRate     = {{ (float) $bill->electricity_duty_rate }};
+    const dutyRate     = {{ $newDutyRate }};
     const lineCharge   = {{ (float) ($currentTariff?->line_charge ?? 0) }};
     const serviceCharge = {{ (float) ($currentTariff?->service_charge ?? 0) }};
     const demandCharge = {{ (float) ($currentTariff?->demand_charge ?? 0) }};

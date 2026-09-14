@@ -397,7 +397,14 @@ class BillController extends Controller
             && $current === (float) $bill->meterReading->current_reading
             && $outstanding === (float) $bill->previous_outstanding;
 
-        if ($unchanged) {
+        // Even with the same figures, a revision still re-prices the bill when
+        // the customer's connection type (or its tariff) changed since issue.
+        $tariff = \App\Models\Tariff::resolveFor($bill->customer->connection_type);
+        $tariffChanged = $tariff
+            && ((float) $tariff->per_unit_rate !== (float) $bill->per_unit_rate
+                || (float) $tariff->electricity_duty !== (float) $bill->electricity_duty_rate);
+
+        if ($unchanged && ! $tariffChanged) {
             return back()->withInput()->withErrors([
                 'current_reading' => 'These are the figures already on the bill — nothing to revise.',
             ]);
