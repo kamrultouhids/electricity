@@ -48,6 +48,21 @@ class CustomerController extends Controller
             $query->where('sheet_id', (int) $request->input('sheet_id'));
         }
 
+        // Filter by sub-meter (serial_no contains "/")
+        if ($request->filled('is_submeter')) {
+            $isSubmeter = $request->input('is_submeter');
+            if ($isSubmeter === '1') {
+                // Show only sub-meters (serial_no contains "/")
+                $query->where('serial_no', 'like', '%/%');
+            } elseif ($isSubmeter === '0') {
+                // Show only main meters (serial_no does NOT contain "/")
+                $query->where(function ($q) {
+                    $q->where('serial_no', 'not like', '%/%')
+                      ->orWhereNull('serial_no');
+                });
+            }
+        }
+
         // Handle per_page parameter with validation
         $perPage = (int) $request->input('per_page', self::PER_PAGE_OPTIONS[0]);
         $perPage = in_array($perPage, self::PER_PAGE_OPTIONS, true) ? $perPage : self::PER_PAGE_OPTIONS[0];

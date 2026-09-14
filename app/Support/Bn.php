@@ -55,14 +55,14 @@ class Bn
     }
 
     /**
-     * A taka amount in Bengali numerals: whole amounts print without a
-     * fraction, anything with paisa keeps two decimals (e.g. ৩৬৯.২০).
+     * A taka amount in Bengali numerals: always rounds to whole numbers.
+     * Values >= 0.50 round up, values < 0.50 round down (e.g. 73.02 → ৭৩, 73.50 → ৭৪).
      */
     public static function money(string|int|float|null $value): string
     {
-        $value = round((float) $value, 2);
+        $value = round((float) $value, 0);
 
-        return self::digits(number_format($value, fmod($value, 1) == 0.0 ? 0 : 2));
+        return self::digits(number_format($value, 0));
     }
 
     /**

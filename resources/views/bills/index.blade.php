@@ -122,10 +122,10 @@
                                 @endif
                             </td>
                             <td class="text-end">{{ $bill->is_opening ? '—' : number_format($bill->units, 2) }}</td>
-                            <td class="text-end">{{ number_format($bill->total_amount, 2) }}</td>
-                            <td class="text-end">{{ number_format($bill->paid_amount, 2) }}</td>
-                            <td class="text-end">{{ number_format($bill->discount, 2) }}</td>
-                            <td class="text-end">{{ number_format($bill->due_amount, 2) }}</td>
+                            <td class="text-end">{{ number_format(round($bill->total_amount), 0) }}</td>
+                            <td class="text-end">{{ number_format(round($bill->paid_amount), 0) }}</td>
+                            <td class="text-end">{{ number_format(round($bill->discount), 0) }}</td>
+                            <td class="text-end">{{ number_format(round($bill->due_amount), 0) }}</td>
                             <td>
                                 @if ($bill->isPaid())
                                     <span class="badge bg-success">Paid</span>

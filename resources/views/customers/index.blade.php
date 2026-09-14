@@ -68,8 +68,16 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label mb-1"> Status</label>
+                <div class="col-md-1">
+                    <label class="form-label mb-1">Meter Type</label>
+                    <select name="is_submeter" class="form-select">
+                        <option value="">All</option>
+                        <option value="1" @selected(request('is_submeter') === '1')>Sub-meter</option>
+                        <option value="0" @selected(request('is_submeter') === '0')>Main</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label class="form-label mb-1">Status</label>
                     <select name="status" class="form-select">
                         <option value="">All</option>
                         <option value="1" @selected(request('status') === '1')>Active</option>
