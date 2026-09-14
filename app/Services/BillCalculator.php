@@ -98,12 +98,13 @@ class BillCalculator
     }
 
     /**
-     * Penalty on previous outstanding (same for all connection types).
+     * Penalty on previous outstanding.
      * 1..999 -> flat 100, above 999 -> 10%.
+     * Religious connections are exempt: no late fee.
      */
     public function lateFee(?string $type, float $previousOutstanding): float
     {
-        if ($previousOutstanding <= 0) {
+        if ($type === 'religious' || $previousOutstanding <= 0) {
             return 0.0;
         }
 
