@@ -215,15 +215,18 @@
     const flatLimit    = {{ \App\Services\BillCalculator::OUTSTANDING_FLAT_LIMIT }};
     const flatFee      = {{ \App\Services\BillCalculator::OUTSTANDING_FLAT_FEE }};
     const percentFee   = {{ \App\Services\BillCalculator::OUTSTANDING_PERCENT }};
+    // Religious connections pay no late fee — mirrors BillCalculator::lateFee.
+    const lateFeeExempt = {{ $bill->customer->connection_type === 'religious' ? 'true' : 'false' }};
 
     const previousInput    = document.getElementById('previous_reading');
     const currentInput     = document.getElementById('current_reading');
     const outstandingInput = document.getElementById('previous_outstanding');
     const money = (v) => v.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-    // BillCalculator::lateFee — flat up to the limit, a percentage above it.
+    // BillCalculator::lateFee — exempt for religious, else flat up to the
+    // limit and a percentage above it.
     function lateFeeOn(outstanding) {
-        if (outstanding <= 0) return 0;
+        if (lateFeeExempt || outstanding <= 0) return 0;
         if (outstanding <= flatLimit) return flatFee;
         return Math.round(outstanding * percentFee * 100) / 100;
     }
