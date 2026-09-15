@@ -76,6 +76,8 @@
                         <option value="billing_month" @selected(request('sort_by', 'billing_month') === 'billing_month')>Month</option>
                         <option value="serial_no_asc" @selected(request('sort_by') === 'serial_no_asc')>Serial ASC</option>
                         <option value="serial_no_desc" @selected(request('sort_by') === 'serial_no_desc')>Serial DESC</option>
+                        <option value="id_no_asc" @selected(request('sort_by') === 'id_no_asc')>ID ASC</option>
+                        <option value="id_no_desc" @selected(request('sort_by') === 'id_no_desc')>ID DESC</option>
                     </select>
                 </div>
                 <div class="col-md-1">

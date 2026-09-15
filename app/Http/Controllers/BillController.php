@@ -38,6 +38,10 @@ class BillController extends Controller
                 ->orderBy('customers.serial_no', 'desc')
                 ->orderBy('bills.billing_month', 'desc')
                 ->orderBy('bills.id', 'desc');
+        } else if ($sortBy === 'id_no_asc') {
+            $query->orderBy('id', 'asc');
+        } elseif ($sortBy === 'id_no_desc') {
+            $query->orderBy('id', 'desc');
         } else {
             // Default: sort by billing_month
             $query->latest('billing_month')->latest('id');
