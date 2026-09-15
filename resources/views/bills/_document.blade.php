@@ -47,13 +47,9 @@
             <div class="kv boxed-right"><span>এরিয়া কোড</span><b>{{ $customer->sheet->name ?? '—' }}</b></div>
             <div class="kv boxed boxed-right"><span>হিসাব নং</span><b>{{ $customer->serial_no ?? '—' }}</b></div>
             <div class="kv boxed boxed-right"><span>গ্রাহকের নাম</span><b>{{ $customer->name }}</b></div>
-            @if (filled($customer->father_or_husband_name))
-                <div class="kv boxed boxed-right"><span>পিতা/স্বামীর নাম</span><b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
-            @endif
+            <div class="kv boxed boxed-right"><span>পিতা/স্বামীর নাম</span><b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
             <div class="kv boxed boxed-right"><span>ঠিকানা</span><b>{{ $customer->address ?? '—' }}</b></div>
-            @if (filled($customer->mobile_number))
-                <div class="kv boxed boxed-right"><span>মোবাইল নং</span><b>{{ $customer->mobile_number }}</b></div>
-            @endif
+            <div class="kv boxed boxed-right"><span>মোবাইল নং</span><b>{{ $customer->mobile_number ?? '—' }}</b></div>
         </div>
 
     </div>
@@ -184,13 +180,9 @@
         <div class="row g-0">
             <div class="col-7 p-2 border-end border-dark">
                 <div class="d-flex mb-1"><span class="me-1 min-space">গ্রাহকের নাম</span>:<b>{{ $customer->name }}</b></div>
-                @if (filled($customer->father_or_husband_name))
-                    <div class="d-flex mb-1"><span class="me-1 min-space">পিতা/স্বামীর নাম</span>:<b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
-                @endif
+                <div class="d-flex mb-1"><span class="me-1 min-space">পিতা/স্বামীর নাম</span>:<b>{{ $customer->father_or_husband_name ?? '—' }}</b></div>
                 <div class="d-flex"><span class="me-1 min-space">ঠিকানা</span>:<b>{{ $customer->address ?? '—' }}</b></div>
-                @if (filled($customer->mobile_number))
-                    <div class="d-flex mb-1"><span class="me-1 min-space">মোবাইল নং</span>:<b>{{ $customer->mobile_number }}</b></div>
-                @endif
+                <div class="d-flex mb-1"><span class="me-1 min-space">মোবাইল নং</span>:<b>{{ $customer->mobile_number ?? '—' }}</b></div>
                 <div class="d-flex"><span class="me-1 min-space">বিলের মাস</span>:<b>{{ $bnMonthYear($billMonth) }}</b></div>
                 <div class="d-flex"><span class="me-1 min-space">সংযোগের ধরন</span>:<b>{{ $customer->connection_type_bangla }}</b></div>
             </div>
