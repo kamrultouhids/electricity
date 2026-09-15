@@ -408,11 +408,6 @@ class BillController extends Controller
             && ((float) $tariff->per_unit_rate !== (float) $bill->per_unit_rate
                 || (float) $tariff->electricity_duty !== (float) $bill->electricity_duty_rate);
 
-        if ($unchanged && ! $tariffChanged) {
-            return back()->withInput()->withErrors([
-                'current_reading' => 'These are the figures already on the bill — nothing to revise.',
-            ]);
-        }
 
         $generator->revise($bill, $current, $data['reason'], auth()->id(), $previous, $outstanding);
 
