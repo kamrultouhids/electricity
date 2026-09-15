@@ -26,14 +26,21 @@ class BillController extends Controller
             ->with(['customer.sheet']);
 
         // Apply sorting
-        if ($sortBy === 'id_no_asc') {
-            $query->orderBy('id', 'asc');
-
-        } elseif ($sortBy === 'id_no_desc') {
-            $query->orderBy('id', 'desc');
+        if ($sortBy === 'serial_no_asc') {
+            $query->join('customers', 'bills.customer_id', '=', 'customers.id')
+                ->select('bills.*')
+                ->orderBy('customers.serial_no', 'asc')
+                ->orderBy('bills.billing_month', 'desc')
+                ->orderBy('bills.id', 'desc');
+        } elseif ($sortBy === 'serial_no_desc') {
+            $query->join('customers', 'bills.customer_id', '=', 'customers.id')
+                ->select('bills.*')
+                ->orderBy('customers.serial_no', 'desc')
+                ->orderBy('bills.billing_month', 'desc')
+                ->orderBy('bills.id', 'desc');
         } else {
-            // Default: sort by billing_month, then id
-            $query->latest('id');
+            // Default: sort by billing_month
+            $query->latest('billing_month')->latest('id');
         }
 
         $bills = $query->paginate($perPage)->withQueryString();
