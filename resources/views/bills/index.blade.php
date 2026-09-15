@@ -74,8 +74,8 @@
                     <label class="form-label mb-1">Sort</label>
                     <select name="sort_by" class="form-select">
                         <option value="billing_month" @selected(request('sort_by', 'billing_month') === 'billing_month')>Month</option>
-                        <option value="serial_no_asc" @selected(request('sort_by') === 'serial_no_asc')>Serial ASC</option>
-                        <option value="serial_no_desc" @selected(request('sort_by') === 'serial_no_desc')>Serial DESC</option>
+                        <option value="id_no_asc" @selected(request('sort_by') === 'id_no_asc')>Id ASC</option>
+                        <option value="id_no_desc" @selected(request('sort_by') === 'id_no_desc')>Id DESC</option>
                     </select>
                 </div>
                 <div class="col-md-1">
